@@ -98,8 +98,11 @@ function createParentDecoratorProxy(nestedProxy, parentProxy) {
 
     const handler = {
         get(t, prop, receiver) {
-            if (prop === 'parent') return parentProxy;
-            if (prop === 'children') t.children.map(childProxy => createParentDecoratorProxy(childProxy, proxyRef));
+            if (prop === 'parent') {
+                console.warn("making parent");
+                return parentProxy;
+            }
+            if (prop === 'children') return t.children.map(childProxy => createParentDecoratorProxy(childProxy, proxyRef));
             return Reflect.get(t, prop, receiver);
         }
     }
