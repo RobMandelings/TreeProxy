@@ -16,44 +16,50 @@ sourceNodeMap.addNode(child1);
 sourceNodeMap.addNode(child2);
 
 const srcTree = Proxies.createSourceTree(sourceNodeMap, 1);
-const {compTree, computedNodeMap} = Proxies.createComputedTree(sourceNodeMap, 1);
-const name = compTree.name;
+const compTree1 = Proxies.createComputedTree(sourceNodeMap, 1);
+const compTree2 = Proxies.createComputedTree(compTree1.computedNodeMap, 1);
+const name = compTree1.tree.name;
 
 
 // watch(() => computedNodeMap, () => console.log("Node map changed"), {deep: true});
 
-// compTree.name = "HHell";
-// compTree.children[0].name = "Chicago2"
+// compTree1.tree.name = "HHell";
+// compTree1.tree.children[0].name = "Chicago2"
 
 const values = ref([
   computed(() => `src root: ${srcTree.name}`),
-  computed(() => `comp root: ${compTree.name}`),
-  computed(() => compTree.children[0])
+  computed(() => `comp root: ${compTree1.tree.name}`),
+  computed(() => `comp root: ${compTree2.tree.name}`),
+  computed(() => compTree1.tree.children[0]),
+  computed(() => compTree2.tree.children[0])
   // computed(() => `src root child: ${srcTree.children[0].name}`),
-  // computed(() => `comp root child: ${compTree.children[0].name}`),
-  // computed(() => compTree.__target__.node)
-  // computed(() => compTree.children)
-  // compTree.children[0].children[0].children[0].parent.parent.name,
+  // computed(() => `comp root child: ${compTree1.tree.children[0].name}`),
+  // computed(() => compTree1.tree.__target__.node)
+  // computed(() => compTree1.tree.children)
+  // compTree1.tree.children[0].children[0].children[0].parent.parent.name,
 ]);
 
 const {obj} = useProxyWatchTest();
 
-watch(compTree.children[0].children, (vN, vO) => {
+watch(compTree1.tree.children[0].children, (vN, vO) => {
   console.log(`Children changed`)
 });
 
-const compName = computed(() => compTree.name + " (computed)");
+const compName = computed(() => compTree1.tree.name + " (computed)");
 
 let count = 0;
 const change = () => {
-  compTree.name = `Supercool ${count++}`;
-  // compTree.childrenIds = [];
-  compTree.children[0].name = `Hi ${count}`;
+  count += 1;
+  compTree1.tree.name = `Supercool ${count}`;
+
+  if (count > 5) compTree2.tree.name = `Mega cool`;
+  // compTree1.tree.childrenIds = [];
+  // compTree1.tree.children[0].name = `Hi ${count}`;
   // obj.value.count++;
 }
 
-// {{ compTree.children[0].children[0].parent.name }}<br>
-//   {{ compTree.children[1].parent.name }}
+// {{ compTree1.tree.children[0].children[0].parent.name }}<br>
+//   {{ compTree1.tree.children[1].parent.name }}
 
 </script>
 

@@ -114,15 +114,15 @@ function createParentDecoratorProxy(nestedProxy, parentProxy) {
 // Function to create a computed tree
 export function createComputedTree(srcNodeMap, rootId) {
     const computedNodeMap = reactive(new ComputedNodeMap(srcNodeMap));
-    let proxy = createCopyOnWriteProxy(computedNodeMap, rootId);
-    proxy = createParentDecoratorProxy(proxy, null);
-    return {compTree: proxy, computedNodeMap};
+    let tree = createCopyOnWriteProxy(computedNodeMap, rootId);
+    tree = createParentDecoratorProxy(tree, null);
+    return {tree: tree, computedNodeMap};
 }
 
 export function createSourceTree(sourceNodeMap, rootId) {
-    let proxy = createMutableReferenceProxy(sourceNodeMap, rootId);
-    proxy = createParentDecoratorProxy(proxy, null)
-    return proxy;
+    let tree = createMutableReferenceProxy(sourceNodeMap, rootId);
+    tree = createParentDecoratorProxy(tree, null)
+    return tree;
 }
 
 // Create a computed tree
