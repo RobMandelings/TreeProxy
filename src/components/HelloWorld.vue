@@ -20,21 +20,13 @@ const name = compTree.name;
 
 compTree.name = "HHell";
 compTree.children[0].name = "Chicago2"
-compTree.children[0].name = "Chicaco3"
-compTree.children[0].childrenIds = [1];
-
-const obj = reactive({name: "Hello", value: 10});
-const proxyObj = new Proxy(obj, {});
-
-watch(proxyObj, () => {
-  console.log("Proxy obj changed");
-}, {deep: true})
+compTree.children[0].name = "Chicago9"
 
 const values = ref([
   srcTree.name,
   compTree.name,
   srcTree.children[0].name,
-  computed(() => compTree.children[0].name)
+  computed(() => compTree.children[0]?.name)
   // compTree.children[0].children[0].children[0].parent.parent.name,
 ]);
 
@@ -46,9 +38,9 @@ const compName = computed(() => compTree.name + " (computed)");
 
 let count = 0;
 const changeName = () => {
-  // compTree.name = `Supercool ${count++}`;
-  // compTree.children[0].name = "Hi";
-  proxyObj.name = "Bami";
+  compTree.name = `Supercool ${count++}`;
+  // compTree.childrenIds = [];
+  compTree.children[0].name = "Hi";
 }
 
 // {{ compTree.children[0].children[0].parent.name }}<br>
@@ -59,9 +51,6 @@ const changeName = () => {
 <template>
   <div v-for="v of values">
     {{ v }}
-  </div>
-  <div>
-    {{ proxyObj.name }}
   </div>
 
   <div class="card">
