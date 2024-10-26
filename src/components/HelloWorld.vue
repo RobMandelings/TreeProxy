@@ -18,21 +18,23 @@ const srcTree = Proxies.createSourceTree(sourceNodeMap, 1);
 const {compTree, computedNodeMap} = Proxies.createComputedTree(sourceNodeMap, 1);
 const name = compTree.name;
 
-compTree.name = "HHell";
+
+// watch(() => computedNodeMap, () => console.log("Node map changed"), {deep: true});
+
+// compTree.name = "HHell";
 compTree.children[0].name = "Chicago2"
-compTree.children[0].name = "Chicago9"
 
 const values = ref([
-  srcTree.name,
-  compTree.name,
-  srcTree.children[0].name,
-  computed(() => compTree.children[0]?.name)
+  computed(() => `src root: ${srcTree.name}`),
+  computed(() => `comp root: ${compTree.name}`),
+  computed(() => `src root child: ${srcTree.children[0].name}`),
+  computed(() => `comp root child: ${compTree.children[0].name}`)
   // compTree.children[0].children[0].children[0].parent.parent.name,
 ]);
 
 watch(() => compTree.children, (vN, vO) => {
   console.log(`Children changed: from ${vO} to ${vN}`)
-}, {deep: true})
+})
 
 const compName = computed(() => compTree.name + " (computed)");
 

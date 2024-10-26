@@ -75,8 +75,8 @@ function createMutableReferenceProxy(nodeMap, nodeId) {
 function createCopyOnWriteProxy(computedNodeMap, nodeId) {
 
     const setHandler = (t, prop, value) => {
-        if (!computedNodeMap.getComputedNode(nodeId)) {
-            const srcNode = computedNodeMap.srcNodeMap.getNode(nodeId);
+        if (!computedNodeMap.getComputedNode(t.node.value.id)) {
+            const srcNode = computedNodeMap.srcNodeMap.getNode(t.node.value.id);
             const newNode = srcNode.copy();
             computedNodeMap.addNode(newNode);
         }
