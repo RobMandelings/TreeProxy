@@ -28,13 +28,14 @@ const values = ref([
   computed(() => `src root: ${srcTree.name}`),
   computed(() => `comp root: ${compTree.name}`),
   computed(() => `src root child: ${srcTree.children[0].name}`),
-  computed(() => `comp root child: ${compTree.children[0].name}`)
+  computed(() => `comp root child: ${compTree.children[0].name}`),
+  computed(() => compTree.children)
   // compTree.children[0].children[0].children[0].parent.parent.name,
 ]);
 
-watch(() => compTree.children, (vN, vO) => {
+watch(() => compTree, (vN, vO) => {
   console.log(`Children changed: from ${vO} to ${vN}`)
-})
+}, {deep: true});
 
 const compName = computed(() => compTree.name + " (computed)");
 
@@ -42,7 +43,7 @@ let count = 0;
 const changeName = () => {
   compTree.name = `Supercool ${count++}`;
   // compTree.childrenIds = [];
-  compTree.children[0].name = "Hi";
+  compTree.children[0].name = `Hi ${count}`;
 }
 
 // {{ compTree.children[0].children[0].parent.name }}<br>
