@@ -2,8 +2,9 @@
 
 import * as Proxies from "../assets/js/Proxies.js"
 import {computed, reactive, ref, watch} from "vue";
+import {useProxyWatchTest} from "../assets/js/ProxyWatchTest.js";
 // Example usage
-const sourceNodeMap = new Proxies.NodeMap();
+const sourceNodeMap = reactive(new Proxies.NodeMap());
 
 // Create some nodes
 const root = new Proxies.Node(1, 'Root', [2, 3]);
@@ -22,28 +23,32 @@ const name = compTree.name;
 // watch(() => computedNodeMap, () => console.log("Node map changed"), {deep: true});
 
 // compTree.name = "HHell";
-compTree.children[0].name = "Chicago2"
+// compTree.children[0].name = "Chicago2"
 
 const values = ref([
   computed(() => `src root: ${srcTree.name}`),
   computed(() => `comp root: ${compTree.name}`),
-  computed(() => `src root child: ${srcTree.children[0].name}`),
-  computed(() => `comp root child: ${compTree.children[0].name}`),
-  computed(() => compTree.children)
+  // computed(() => `src root child: ${srcTree.children[0].name}`),
+  // computed(() => `comp root child: ${compTree.children[0].name}`),
+  // computed(() => compTree.__target__.node)
+  // computed(() => compTree.children.map(c => c.__target__))
   // compTree.children[0].children[0].children[0].parent.parent.name,
 ]);
 
-watch(() => compTree, (vN, vO) => {
-  console.log(`Children changed: from ${vO} to ${vN}`)
-}, {deep: true});
+const {obj} = useProxyWatchTest();
+
+watch(compTree, (vN, vO) => {
+  console.log(`Children changed: from ${vO.name} to ${vN.name}`)
+});
 
 const compName = computed(() => compTree.name + " (computed)");
 
 let count = 0;
-const changeName = () => {
+const change = () => {
   compTree.name = `Supercool ${count++}`;
   // compTree.childrenIds = [];
-  compTree.children[0].name = `Hi ${count}`;
+  // compTree.children[0].name = `Hi ${count}`;
+  // obj.value.count++;
 }
 
 // {{ compTree.children[0].children[0].parent.name }}<br>
@@ -57,7 +62,7 @@ const changeName = () => {
   </div>
 
   <div class="card">
-    <button type="button" @click="changeName()">Click me: {{ compName }}</button>
+    <button type="button" @click="change()">Click me: {{ compName }}</button>
     <p>
       Edit
       <code>components/HelloWorld.vue</code> to test HMR
