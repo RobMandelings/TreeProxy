@@ -9,7 +9,7 @@ const sourceNodeMap = reactive(new Proxies.NodeMap());
 // Create some nodes
 const root = new Proxies.Node(1, 'Root', [2, 3]);
 const child1 = new Proxies.Node(2, 'Child 1', [3]);
-const child2 = new Proxies.Node(3, 'Child 2');
+const child2 = new Proxies.Node(3, 'Child 2', []);
 
 sourceNodeMap.addNode(root);
 sourceNodeMap.addNode(child1);
@@ -28,17 +28,18 @@ const name = compTree.name;
 const values = ref([
   computed(() => `src root: ${srcTree.name}`),
   computed(() => `comp root: ${compTree.name}`),
+  computed(() => compTree.children[1].children)
   // computed(() => `src root child: ${srcTree.children[0].name}`),
   // computed(() => `comp root child: ${compTree.children[0].name}`),
   // computed(() => compTree.__target__.node)
-  // computed(() => compTree.children.map(c => c.__target__))
+  // computed(() => compTree.children)
   // compTree.children[0].children[0].children[0].parent.parent.name,
 ]);
 
 const {obj} = useProxyWatchTest();
 
-watch(compTree, (vN, vO) => {
-  console.log(`Children changed: from ${vO.name} to ${vN.name}`)
+watch(compTree.children[0].children, (vN, vO) => {
+  console.log(`Children changed`)
 });
 
 const compName = computed(() => compTree.name + " (computed)");
@@ -47,7 +48,7 @@ let count = 0;
 const change = () => {
   compTree.name = `Supercool ${count++}`;
   // compTree.childrenIds = [];
-  // compTree.children[0].name = `Hi ${count}`;
+  compTree.children[0].name = `Hi ${count}`;
   // obj.value.count++;
 }
 

@@ -1,11 +1,11 @@
 // Base Node class
-import {computed, reactive} from "vue";
+import {computed, reactive, watch} from "vue";
 
 export class Node {
     constructor(id, name, childrenIds) {
         this.id = id;
         this.name = name;
-        this.childrenIds = childrenIds ?? [];
+        this.childrenIds = childrenIds;
     }
 
     copy() {
@@ -50,7 +50,7 @@ export class ComputedNodeMap extends NodeMap {
 function createReferenceProxy(nodeMap, nodeId, setHandler) {
     const node = computed(() => {
         // console.log(`Recomputing node ${nodeId}`);
-        return nodeMap.getNode(nodeId)
+        return nodeMap.getNode(nodeId);
     });
     const children = computed(() => {
         // console.log("Recomputing children");
@@ -59,7 +59,6 @@ function createReferenceProxy(nodeMap, nodeId, setHandler) {
     const targetObj = reactive({node: node, children: children});
     return new Proxy(targetObj, {
         get(t, prop, receiver) {
-            if (prop === 'children') return Reflect.get(t, prop, receiver);
             if (prop in t.node) return Reflect.get(t.node, prop, receiver);
 
             return Reflect.get(t, prop, receiver);
@@ -93,35 +92,34 @@ function createCopyOnWriteProxy(computedNodeMap, nodeId) {
     return createReferenceProxy(computedNodeMap, nodeId, setHandler);
 }
 
-function createParentDecoratorProxy(nodeProxy, parentProxy) {
+function createParentDecoratorProxy(nestedProxy, parentProxy) {
 
     let proxyRef;
+
     const handler = {
-        get(t, prop) {
+        get(t, prop, receiver) {
             if (prop === 'parent') return parentProxy;
-            if (prop === 'children') {
-                return t.children.map(childProxy => createParentDecoratorProxy(childProxy, proxyRef));
-            }
-            return t[prop];
+            if (prop === 'children') t.children.map(childProxy => createParentDecoratorProxy(childProxy, proxyRef));
+            return Reflect.get(t, prop, receiver);
         }
     }
 
-    proxyRef = new Proxy(nodeProxy, handler);
+    proxyRef = new Proxy(nestedProxy, handler);
     return proxyRef;
 }
 
 // Function to create a computed tree
 export function createComputedTree(srcNodeMap, rootId) {
     const computedNodeMap = reactive(new ComputedNodeMap(srcNodeMap));
-    const refProxy = createCopyOnWriteProxy(computedNodeMap, rootId);
-    // const parentProxy = createParentDecoratorProxy(refProxy, null);
-    return {compTree: refProxy, computedNodeMap};
+    let proxy = createCopyOnWriteProxy(computedNodeMap, rootId);
+    proxy = createParentDecoratorProxy(proxy, null);
+    return {compTree: proxy, computedNodeMap};
 }
 
 export function createSourceTree(sourceNodeMap, rootId) {
-    const refProxy = createMutableReferenceProxy(sourceNodeMap, rootId);
-    // const parentProxy = createParentDecoratorProxy(refProxy, null)
-    return refProxy;
+    let proxy = createMutableReferenceProxy(sourceNodeMap, rootId);
+    proxy = createParentDecoratorProxy(proxy, null)
+    return proxy;
 }
 
 // Create a computed tree
