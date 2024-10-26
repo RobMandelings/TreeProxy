@@ -1,9 +1,15 @@
 // Base Node class
+import {reactive} from "vue";
+
 export class Node {
     constructor(id, name, childrenIds) {
         this.id = id;
         this.name = name;
         this.childrenIds = childrenIds;
+    }
+
+    copy() {
+        return new Node(this.id, this.name, this.childrenIds);
     }
 }
 
@@ -19,6 +25,24 @@ export class NodeMap {
 
     getNode(id) {
         return this.nodes.get(id);
+    }
+}
+
+export class ComputedNodeMap extends NodeMap {
+
+    constructor(srcNodeMap) {
+        super();
+        this.srcNodeMap = srcNodeMap;
+    }
+
+    getNode(id) {
+        const node = this.getComputedNode(id);
+        if (!node) return this.srcNodeMap.getNode(id);
+        return node;
+    }
+
+    getComputedNode(id) {
+        return super.getNode(id);
     }
 }
 
@@ -58,35 +82,39 @@ function createParentDecoratorProxy(nodeProxy, parentProxy) {
 }
 
 // Proxy layer 2: Copy-on-write
-// function createCopyOnWriteProxy(sourceNodeMap, computedNodeMap, nodeId) {
-//     return new Proxy({}, {
-//         get(_, prop) {
-//             let refProxy;
-//             if (computedNodeMap.getNode(nodeId)) {
-//                 refProxy = createReferenceProxy(computedNodeMap, nodeId);
-//             }
-//             refProxy = createReferenceProxy(sourceNodeMap, nodeId);
-//             refProxy = createParentDecoratorProxy(refProxy, null);
-//             return refProxy[prop];
-//         },
-//         set(_, prop, value) {
-//             if (!computedNodeMap.getNode(nodeId)) {
-//                 const sourceNode = sourceNodeMap.getNode(nodeId);
-//                 const newNode = new Node(nodeId, {...sourceNode.properties});
-//                 newNode.childrenIds = [...sourceNode.childrenIds];
-//                 computedNodeMap.addNode(newNode);
-//             }
-//             createReferenceProxy(computedNodeMap, nodeId)[prop] = value;
-//             return true;
-//         }
-//     });
-// }
+function createCopyOnWriteProxy(computedNodeMap, nodeId) {
+    return new Proxy({}, {
+        get(_, prop) {
+            if (prop === "children") {
+                const node = computedNodeMap.getNode(nodeId);
+                return node.childrenIds.map(id => createCopyOnWriteProxy(computedNodeMap, id));
+            }
+
+            return createReferenceProxy(computedNodeMap, nodeId)[prop];
+        },
+        set(_, prop, value) {
+            if (!computedNodeMap.getComputedNode(nodeId)) {
+                const srcNode = computedNodeMap.srcNodeMap.getNode(nodeId);
+                const newNode = srcNode.copy();
+                computedNodeMap.addNode(newNode);
+            }
+            createReferenceProxy(computedNodeMap, nodeId)[prop] = value;
+            return true;
+        }
+    });
+}
 
 // Function to create a computed tree
-export function createComputedTree(sourceNodeMap, rootId) {
-    const computedNodeMap = new NodeMap();
+export function createComputedTree(srcNodeMap, rootId) {
+    const computedNodeMap = reactive(new ComputedNodeMap(srcNodeMap));
+    const refProxy = createCopyOnWriteProxy(computedNodeMap, rootId);
+    const parentProxy = createParentDecoratorProxy(refProxy, null);
+    return {compTree: reactive(parentProxy), computedNodeMap};
+}
+
+export function createSourceTree(sourceNodeMap, rootId) {
     const refProxy = createReferenceProxy(sourceNodeMap, rootId);
-    const parentProxy = createParentDecoratorProxy(refProxy, "Chicago");
+    const parentProxy = createParentDecoratorProxy(refProxy, null)
     return parentProxy;
 }
 

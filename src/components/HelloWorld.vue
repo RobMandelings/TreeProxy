@@ -1,8 +1,9 @@
 <script setup>
 
 import * as Proxies from "../assets/js/Proxies.js"
+import {computed, reactive, ref} from "vue";
 // Example usage
-const sourceNodeMap = new Proxies.NodeMap();
+const sourceNodeMap = reactive(new Proxies.NodeMap());
 
 // Create some nodes
 const root = new Proxies.Node(1, 'Root', [2, 3]);
@@ -13,19 +14,41 @@ sourceNodeMap.addNode(root);
 sourceNodeMap.addNode(child1);
 sourceNodeMap.addNode(child2);
 
-const treeRoot = Proxies.createComputedTree(sourceNodeMap, 1);
-const name = treeRoot.name;
+const srcTree = Proxies.createSourceTree(sourceNodeMap, 1);
+const {compTree, computedNodeMap} = Proxies.createComputedTree(sourceNodeMap, 1);
+const name = compTree.name;
+
+compTree.name = "HHell";
+compTree.children[0].name = "Chicago2"
+compTree.children[0].name = "Chicaco3"
+compTree.children[0].childrenIds = [1];
+
+const values = ref([
+  srcTree.name,
+  compTree.name,
+  srcTree.children[0].name,
+  compTree.children[0].children[0].children[0].parent.parent.name,
+]);
+
+const compName = computed(() => compTree.name + " (computed)");
+
+let count = 0;
+const changeName = () => {
+  compTree.name = `Supercool ${count++}`;
+}
+
+// {{ compTree.children[0].children[0].parent.name }}<br>
+//   {{ compTree.children[1].parent.name }}
 
 </script>
 
 <template>
-  <div>
-    {{ treeRoot.children[0].children[0].parent.name }}<br>
-    {{ treeRoot.children[1].parent.name}}
+  <div v-for="v of values">
+    {{ v }}
   </div>
 
   <div class="card">
-    <button type="button" @click="">count is {{ }}</button>
+    <button type="button" @click="changeName()">Click me: {{ compName }}</button>
     <p>
       Edit
       <code>components/HelloWorld.vue</code> to test HMR
