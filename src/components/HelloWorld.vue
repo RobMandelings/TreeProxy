@@ -1,9 +1,9 @@
 <script setup>
 
 import * as Proxies from "../assets/js/Proxies.js"
-import {computed, reactive, ref} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 // Example usage
-const sourceNodeMap = reactive(new Proxies.NodeMap());
+const sourceNodeMap = new Proxies.NodeMap();
 
 // Create some nodes
 const root = new Proxies.Node(1, 'Root', [2, 3]);
@@ -23,18 +23,32 @@ compTree.children[0].name = "Chicago2"
 compTree.children[0].name = "Chicaco3"
 compTree.children[0].childrenIds = [1];
 
+const obj = reactive({name: "Hello", value: 10});
+const proxyObj = new Proxy(obj, {});
+
+watch(proxyObj, () => {
+  console.log("Proxy obj changed");
+}, {deep: true})
+
 const values = ref([
   srcTree.name,
   compTree.name,
   srcTree.children[0].name,
-  compTree.children[0].children[0].children[0].parent.parent.name,
+  computed(() => compTree.children[0].name)
+  // compTree.children[0].children[0].children[0].parent.parent.name,
 ]);
+
+watch(() => compTree.children, (vN, vO) => {
+  console.log(`Children changed: from ${vO} to ${vN}`)
+}, {deep: true})
 
 const compName = computed(() => compTree.name + " (computed)");
 
 let count = 0;
 const changeName = () => {
-  compTree.name = `Supercool ${count++}`;
+  // compTree.name = `Supercool ${count++}`;
+  // compTree.children[0].name = "Hi";
+  proxyObj.name = "Bami";
 }
 
 // {{ compTree.children[0].children[0].parent.name }}<br>
@@ -45,6 +59,9 @@ const changeName = () => {
 <template>
   <div v-for="v of values">
     {{ v }}
+  </div>
+  <div>
+    {{ proxyObj.name }}
   </div>
 
   <div class="card">

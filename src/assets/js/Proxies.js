@@ -48,6 +48,7 @@ export class ComputedNodeMap extends NodeMap {
 
 // Proxy layer 1: Map IDs to references
 function createReferenceProxy(tree, nodeId) {
+
     return new Proxy({}, {
         get(_, prop) {
             const node = tree.getNode(nodeId);
