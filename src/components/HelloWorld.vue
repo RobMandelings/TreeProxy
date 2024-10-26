@@ -6,7 +6,7 @@ const sourceNodeMap = new Proxies.NodeMap();
 
 // Create some nodes
 const root = new Proxies.Node(1, 'Root', [2, 3]);
-const child1 = new Proxies.Node(2, 'Child 1');
+const child1 = new Proxies.Node(2, 'Child 1', [3]);
 const child2 = new Proxies.Node(3, 'Child 2');
 
 sourceNodeMap.addNode(root);
@@ -20,7 +20,8 @@ const name = treeRoot.name;
 
 <template>
   <div>
-    {{treeRoot.children[1]}}
+    {{ treeRoot.children[0].children[0].parent.name }}<br>
+    {{ treeRoot.children[1].parent.name}}
   </div>
 
   <div class="card">

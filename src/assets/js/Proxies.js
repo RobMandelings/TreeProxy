@@ -41,14 +41,20 @@ function createReferenceProxy(tree, nodeId) {
 }
 
 function createParentDecoratorProxy(nodeProxy, parentProxy) {
-    return new Proxy(nodeProxy, {
-        get(t, prop) {
+
+    let proxyRef;
+    const handler = {
+        get(_, prop) {
             if (prop === 'parent') return parentProxy;
             if (prop === 'children') {
-                nodeProxy.children.map(childProxy => createParentDecoratorProxy(childProxy, nodeProxy));
+                return nodeProxy.children.map(childProxy => createParentDecoratorProxy(childProxy, proxyRef));
             }
+            return nodeProxy[prop];
         }
-    })
+    }
+
+    proxyRef = new Proxy(nodeProxy, handler);
+    return proxyRef;
 }
 
 // Proxy layer 2: Copy-on-write
@@ -79,7 +85,9 @@ function createParentDecoratorProxy(nodeProxy, parentProxy) {
 // Function to create a computed tree
 export function createComputedTree(sourceNodeMap, rootId) {
     const computedNodeMap = new NodeMap();
-    return createReferenceProxy(sourceNodeMap, rootId);
+    const refProxy = createReferenceProxy(sourceNodeMap, rootId);
+    const parentProxy = createParentDecoratorProxy(refProxy, "Chicago");
+    return parentProxy;
 }
 
 // Create a computed tree
