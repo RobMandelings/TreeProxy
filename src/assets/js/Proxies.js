@@ -27,7 +27,7 @@ function createReferenceProxy(nodeMap, initialId, setHandler) {
 }
 
 // Proxy layer 1: Map IDs to references
-function createMutableReferenceProxy(nodeMap, initialId) {
+export function createMutableReferenceProxy(nodeMap, initialId) {
 
     const setHandler = (t, prop, value) => {
         t.node[prop] = value;
@@ -37,7 +37,7 @@ function createMutableReferenceProxy(nodeMap, initialId) {
 }
 
 // Proxy layer 2: Copy-on-write
-function createCopyOnWriteProxy(computedNodeMap, initialId) {
+export function createCopyOnWriteProxy(computedNodeMap, initialId) {
 
     const setHandler = (t, prop, value) => {
         if (!computedNodeMap.getOverwrittenNode(t.id)) {
@@ -51,7 +51,7 @@ function createCopyOnWriteProxy(computedNodeMap, initialId) {
     return createReferenceProxy(computedNodeMap, initialId, setHandler);
 }
 
-function createParentDecoratorProxy(nestedProxy, parentProxy) {
+export function createParentDecoratorProxy(nestedProxy, parentProxy) {
 
     let proxyRef;
     let children = computed(() =>
