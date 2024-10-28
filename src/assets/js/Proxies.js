@@ -56,6 +56,14 @@ function createCopyOnWriteProxy(computedNodeMap, initialId) {
 function createParentDecoratorProxy(nestedProxy, parentProxy) {
 
     let proxyRef;
+    let children = computed(() =>
+        nestedProxy.children.map(childProxy =>
+            createParentDecoratorProxy(childProxy, proxyRef)));
+
+    const targetObj = reactive({
+        nestedProxy,
+        children
+    });
 
     const handler = {
         get(t, prop, receiver) {
@@ -63,12 +71,17 @@ function createParentDecoratorProxy(nestedProxy, parentProxy) {
                 console.warn("making parent");
                 return parentProxy;
             }
-            if (prop === 'children') return t.children.map(childProxy => createParentDecoratorProxy(childProxy, proxyRef));
+            if (prop === "children") return children.value;
+            if (prop in t.nestedProxy) return Reflect.get(t.nestedProxy, prop, receiver)
             return Reflect.get(t, prop, receiver);
+
+        },
+        set(t, prop, value, receiver) {
+            return Reflect.set(t.nestedProxy, prop, value, receiver);
         }
     }
 
-    proxyRef = new Proxy(nestedProxy, handler);
+    proxyRef = new Proxy(targetObj, handler);
     return proxyRef;
 }
 

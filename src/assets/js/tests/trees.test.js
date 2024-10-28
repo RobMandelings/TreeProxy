@@ -1,5 +1,4 @@
-import {nextTick, reactive, watch} from "vue";
-import {SourceNodeMap} from "../NodeMap.js";
+import {nextTick, watch} from "vue";
 import {CustomNode} from "../CustomNode.js";
 import * as Proxies from "../Proxies.js";
 
@@ -8,42 +7,49 @@ describe('Parent and Child relation', () => {
     const childId = sourceNodeMap.addNode(new CustomNode('Child 2'));
     srcTree.childrenIds = [childId];
     const child = srcTree.children[0];
+    console.log(srcTree.children);
 
     test('Child id test', () => expect(child.id).toBe(childId));
     test('Parent relation test', () => expect(child.parent).toBe(srcTree));
-    // test('Child instance via parent equal to child instance', () => expect(child.parent.children[0]).toBe(child));
+    test('Child instance via parent equal to child instance', () => expect(child.parent.children[0]).toBe(child));
 })
 
 describe("Deep watch on source tree", () => {
 
-    test('Test initial child name change', async () => {
-        const initialChildName = 'Child';
-        const {srcTree, sourceNodeMap} = Proxies.createSourceTree(new CustomNode('Root'));
+    let srcTree, sourceNodeMap, child, mockCallback, initialChildName;
+
+    beforeEach(() => {
+        initialChildName = 'Child';
+        const result = Proxies.createSourceTree(new CustomNode('Root'));
+        srcTree = result.srcTree;
+        sourceNodeMap = result.sourceNodeMap;
         const childId = sourceNodeMap.addNode(new CustomNode(initialChildName));
         srcTree.childrenIds = [childId];
-        const child = srcTree.children[0];
+        child = srcTree.children[0];
 
-        const mockCallback = jest.fn();
+        mockCallback = jest.fn();
         watch(srcTree, () => mockCallback());
+    })
 
+    test('Test initial child name change', async () => {
         child.name = "Changed";
         await nextTick();
         expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
     test('Assign with no change', async () => {
-        const initialChildName = 'Child';
-        const {srcTree, sourceNodeMap} = Proxies.createSourceTree(new CustomNode('Root'));
-        const childId = sourceNodeMap.addNode(new CustomNode(initialChildName));
-        srcTree.childrenIds = [childId];
-        const child = srcTree.children[0];
-
-        const mockCallback = jest.fn();
-        watch(srcTree, () => mockCallback());
-
-        expect(child.name).toBe(initialChildName);
         child.name = initialChildName;
         await nextTick();
         expect(mockCallback).toHaveBeenCalledTimes(0);
+    })
+
+    test('Many changes', async () => {
+        let count = 0;
+        const nrChanges = 5;
+        for (let i = 0; i < nrChanges; i++) {
+            child.name = `${count++}`;
+            await nextTick();
+        }
+        expect(mockCallback).toHaveBeenCalledTimes(nrChanges);
     })
 })
