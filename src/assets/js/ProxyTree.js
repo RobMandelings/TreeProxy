@@ -4,12 +4,23 @@ import {createCopyOnWriteProxy, createMutableReferenceProxy, createProxyNode} fr
 
 export class ProxyTree {
 
-    constructor(nodeMap, rootId) {
+    constructor(nodeMap) {
         this.nodeMap = nodeMap;
         this.proxyNodes = new Map();
     }
 
+    createRefProxy(id) {
+
+    }
+
     createProxyChild(id, parentId) {
+        console.assert(!parentId || this.proxyNodes.get(parentId),
+            `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
+
+        const parentProxy = this.proxyNodes.get(parentId);
+        let proxyNode = this.createRefProxy(id);
+        proxyNode = createProxyNode(this.getChildren, proxyNode, parentProxy);
+        return proxyNode;
     }
 
     getChildren(id) {
@@ -31,15 +42,8 @@ export class SourceTree extends ProxyTree {
         this.root = this.createProxyChild(rootId, null);
     }
 
-    createProxyChild(id, parentId) {
-        console.assert(!parentId || this.proxyNodes.get(parentId),
-            `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
-
-        const parentProxy = this.proxyNodes.get(parentId);
-
-        let proxyNode = createMutableReferenceProxy(this.nodeMap, id);
-        proxyNode = createProxyNode(this.getChildren, proxyNode,)
-        return proxyNode;
+    createRefProxy(id) {
+        return createMutableReferenceProxy(this.nodeMap, id);
     }
 }
 
@@ -47,18 +51,11 @@ export class ComputedTree extends ProxyTree {
 
     constructor(srcNodeMap, rootId) {
         let computedNodeMap = new ComputedNodeMap(srcNodeMap);
-        super(computedNodeMap, rootId);
-        this.computedNodeMap = computedNodeMap;
+        super(computedNodeMap);
         this.root = this.createProxyChild(rootId, null);
     }
 
-    createProxyChild(id, parentId) {
-
-        console.assert(!parentId || this.proxyNodes.get(parentId),
-            `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
-
-        const parentProxy = this.proxyNodes.get(parentId);
-        let refProxy = createCopyOnWriteProxy(this.computedNodeMap, id);
-        return createProxyNode(this.getChildren, refProxy, parentProxy);
+    createRefProxy(id) {
+        return createCopyOnWriteProxy(this.nodeMap, id);
     }
 }
