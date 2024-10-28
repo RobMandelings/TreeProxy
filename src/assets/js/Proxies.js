@@ -3,7 +3,6 @@ import {computed, reactive, ref, watch} from "vue";
 import {ComputedNodeMap} from "./NodeMap.js";
 
 
-
 // Tree class to manage nodes
 
 function createReferenceProxy(nodeMap, initialId, setHandler) {
@@ -20,6 +19,7 @@ function createReferenceProxy(nodeMap, initialId, setHandler) {
     const targetObj = reactive({node: node, children: children, id: id});
     return new Proxy(targetObj, {
         get(t, prop, receiver) {
+            if (prop === "__target__") return t;
             if (prop in t.node) return Reflect.get(t.node, prop, receiver);
 
             return Reflect.get(t, prop, receiver);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Test2 from "./components/Test2.vue";
+import Test1 from "./components/Test1.vue";
 </script>
 
 <template>
@@ -11,7 +11,7 @@ import Test2 from "./components/Test2.vue";
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo"/>
     </a>
   </div>
-  <Test2 msg="Vite + Vue"/>
+  <Test1 msg="Vite + Vue"/>
 </template>
 
 <style scoped>

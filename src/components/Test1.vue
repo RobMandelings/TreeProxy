@@ -9,9 +9,9 @@ import {CustomNode} from "../assets/js/CustomNode.js";
 const sourceNodeMap = reactive(new SourceNodeMap());
 
 // Create some nodes
-// const child1Id = sourceNodeMap.addNode(new CustomNode('Child 1'));
+const child1Id = sourceNodeMap.addNode(new CustomNode('Child 1'));
 // const child2Id = sourceNodeMap.addNode(new CustomNode('Child 2'));
-const rootId = sourceNodeMap.addNode(new CustomNode('Root'));
+const rootId = sourceNodeMap.addNode(new CustomNode('Root', [child1Id]));
 
 const srcTree = Proxies.createSourceTree(sourceNodeMap, rootId);
 const compTree1 = Proxies.createComputedTree(sourceNodeMap, rootId);
@@ -39,7 +39,7 @@ const values = ref([
 
 const {obj} = useProxyWatchTest();
 
-watch(compTree1.tree.children[0].children, (vN, vO) => {
+watch(compTree1, (vN, vO) => {
   console.log(`Children changed`)
 });
 
@@ -48,11 +48,11 @@ const compName = computed(() => compTree1.tree.name + " (computed)");
 let count = 0;
 const change = () => {
   count += 1;
-  compTree1.tree.name = `Supercool ${count}`;
+  // compTree1.tree.name = `Supercool ${count}`;
+  compTree1.tree.children[0].name = `Hi ${count}`;
 
-  if (count > 5) compTree2.tree.name = `Mega cool`;
+  // if (count > 5) compTree2.tree.name = `Mega cool`;
   // compTree1.tree.childrenIds = [];
-  // compTree1.tree.children[0].name = `Hi ${count}`;
   // obj.value.count++;
 }
 
