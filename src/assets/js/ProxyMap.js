@@ -1,22 +1,22 @@
 import {reactive} from "vue";
 import {ComputedNodeMap} from "./NodeMap.js";
-import {createCopyOnWriteProxy, createParentDecoratorProxy} from "./Proxies.js";
+import {createCopyOnWriteProxy, createProxyNode} from "./Proxies.js";
 
 export class ProxyTree {
 
-    constructor(nodeMap) {
+    constructor(nodeMap, rootId) {
         this.nodeMap = nodeMap;
         this.proxyNodes = new Map();
+        this.root = this.createProxyChild(rootId, null);
     }
 
     createProxyChild(id, parentId) {
-        // Proxy creation logic here
     }
 
     getChildren(id) {
         return this.nodeMap.getNode(id).childrenIds.map(cId => {
             return this.proxyNodes.get(cId)
-                ?? this.#createProxyChild(cId, id);
+                ?? this.createProxyChild(cId, id);
         });
     }
 
@@ -26,15 +26,19 @@ export class ProxyTree {
 
 export class ComputedTree extends ProxyTree {
 
-    constructor(srcNodeMap) {
-        let computedNodeMap = reactive(new ComputedNodeMap(srcNodeMap));
-        super(computedNodeMap);
+    constructor(srcNodeMap, rootId) {
+        let computedNodeMap = new ComputedNodeMap(srcNodeMap);
+        super(computedNodeMap, rootId);
         this.computedNodeMap = computedNodeMap;
     }
 
     createProxyChild(id, parentId) {
-        let proxyNode = createCopyOnWriteProxy(this.computedNodeMap, id);
-        proxyNode = createParentDecoratorProxy(proxyNode, parentId);
-        return proxyNode;
+
+        console.assert(!parentId || this.proxyNodes.get(parentId),
+            `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
+
+        const parentProxy = this.proxyNodes.get(parentId);
+        let refProxy = createCopyOnWriteProxy(this.computedNodeMap, id);
+        return createProxyNode(this.getChildren, refProxy, parentProxy);
     }
 }
