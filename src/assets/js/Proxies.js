@@ -61,9 +61,8 @@ export function createProxyNode(getChildrenFn, refProxy, parentProxy) {
         get(t, prop, receiver) {
             if (prop === 'parent') return parentProxy;
             if (prop === 'children') return children.value;
-            if (prop in t.refProxy) return Reflect.get(t.refProxy, prop, receiver)
-            return Reflect.get(t, prop, receiver);
-
+            return Reflect.get(t.refProxy, prop, receiver)
+                ?? Reflect.get(t, prop, receiver);
         },
         set(t, prop, value, receiver) {
             return Reflect.set(t.refProxy, prop, value, receiver);
