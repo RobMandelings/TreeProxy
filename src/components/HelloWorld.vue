@@ -3,21 +3,19 @@
 import * as Proxies from "../assets/js/Proxies.js"
 import {computed, reactive, ref, watch} from "vue";
 import {useProxyWatchTest} from "../assets/js/ProxyWatchTest.js";
+import {SourceNodeMap} from "../assets/js/NodeMap.js";
+import {CustomNode} from "../assets/js/CustomNode.js";
 // Example usage
-const sourceNodeMap = reactive(new Proxies.NodeMap());
+const sourceNodeMap = reactive(new SourceNodeMap());
 
 // Create some nodes
-const root = new Proxies.Node('Root', [2, 3]);
-const child1 = new Proxies.Node('Child 1', [3]);
-const child2 = new Proxies.Node('Child 2', []);
+// const child1Id = sourceNodeMap.addNode(new CustomNode('Child 1'));
+// const child2Id = sourceNodeMap.addNode(new CustomNode('Child 2'));
+const rootId = sourceNodeMap.addNode(new CustomNode('Root'));
 
-sourceNodeMap.addNode(root);
-sourceNodeMap.addNode(child1);
-sourceNodeMap.addNode(child2);
-
-const srcTree = Proxies.createSourceTree(sourceNodeMap, 1);
-const compTree1 = Proxies.createComputedTree(sourceNodeMap, 1);
-const compTree2 = Proxies.createComputedTree(compTree1.computedNodeMap, 1);
+const srcTree = Proxies.createSourceTree(sourceNodeMap, rootId);
+const compTree1 = Proxies.createComputedTree(sourceNodeMap, rootId);
+const compTree2 = Proxies.createComputedTree(compTree1.computedNodeMap, rootId);
 const name = compTree1.tree.name;
 
 

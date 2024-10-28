@@ -74,7 +74,7 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
-### Node ###
+### CustomNode ###
 # Logs
 logs
 *.log
@@ -205,7 +205,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-### Node Patch ###
+### CustomNode Patch ###
 # Serverless Webpack directories
 .webpack/
 
@@ -349,7 +349,7 @@ fabric.properties
 ### Vue ###
 # gitignore template for Vue.js projects
 #
-# Recommended template: Node.gitignore
+# Recommended template: CustomNode.gitignore
 
 # TODO: where does this rule come from?
 docs/_book
@@ -358,7 +358,7 @@ docs/_book
 test/
 
 ### Vuejs ###
-# Recommended template: Node.gitignore
+# Recommended template: CustomNode.gitignore
 
 dist/
 npm-debug.log

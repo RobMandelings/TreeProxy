@@ -1,32 +1,23 @@
 // Base Node class
-import {computed, reactive, watch} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import {ComputedNodeMap} from "./NodeMap.js";
 
-export class Node {
-    constructor(name, childrenIds) {
-        this.name = name;
-        this.childrenIds = childrenIds;
-    }
 
-    copy() {
-        return new Node(this.name, this.childrenIds);
-    }
-}
 
 // Tree class to manage nodes
 
-function createReferenceProxy(nodeMap, nodeId, setHandler) {
+function createReferenceProxy(nodeMap, initialId, setHandler) {
 
-
+    const id = ref(initialId);
     const node = computed(() => {
         // console.log(`Recomputing node ${nodeId}`);
-        return nodeMap.getNode(nodeId);
+        return nodeMap.getNode(id.value);
     });
     const children = computed(() => {
         // console.log("Recomputing children");
         return node.value.childrenIds.map(id => createReferenceProxy(nodeMap, id, setHandler))
     });
-    const targetObj = reactive({node: node, children: children});
+    const targetObj = reactive({node: node, children: children, id: id});
     return new Proxy(targetObj, {
         get(t, prop, receiver) {
             if (prop in t.node) return Reflect.get(t.node, prop, receiver);
@@ -38,28 +29,28 @@ function createReferenceProxy(nodeMap, nodeId, setHandler) {
 }
 
 // Proxy layer 1: Map IDs to references
-function createMutableReferenceProxy(nodeMap, nodeId) {
+function createMutableReferenceProxy(nodeMap, initialId) {
 
     const setHandler = (t, prop, value) => {
         t.node[prop] = value;
         return true;
     }
-    return createReferenceProxy(nodeMap, nodeId, setHandler);
+    return createReferenceProxy(nodeMap, initialId, setHandler);
 }
 
 // Proxy layer 2: Copy-on-write
-function createCopyOnWriteProxy(computedNodeMap, nodeId) {
+function createCopyOnWriteProxy(computedNodeMap, initialId) {
 
     const setHandler = (t, prop, value) => {
-        if (!computedNodeMap.getComputedNode(t.node.id)) {
-            const srcNode = computedNodeMap.srcNodeMap.getNode(t.node.id);
+        if (!computedNodeMap.getOverwrittenNode(t.id)) {
+            const srcNode = computedNodeMap.srcNodeMap.getNode(t.id);
             const newNode = srcNode.copy();
-            computedNodeMap.addNode(newNode);
+            computedNodeMap.overwriteNode(t.id, newNode);
         }
         t.node[prop] = value;
         return true;
     }
-    return createReferenceProxy(computedNodeMap, nodeId, setHandler);
+    return createReferenceProxy(computedNodeMap, initialId, setHandler);
 }
 
 function createParentDecoratorProxy(nestedProxy, parentProxy) {
