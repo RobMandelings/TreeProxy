@@ -7,61 +7,37 @@ import {SourceNodeMap} from "../assets/js/NodeMap.js";
 import {CustomNode} from "../assets/js/CustomNode.js";
 import {createSourceTree} from "../assets/js/Proxies.js";
 
-const {srcTree, sourceNodeMap} = createSourceTree(new CustomNode('Root'));
+// const compTree1 = Proxies.createComputedTree(sourceNodeMap, srcTree.id);
+// const compTree2 = Proxies.createComputedTree(compTree1.computedNodeMap, srcTree.id);
+// const name = compTree1.tree.name;
 
-// Create some nodes
+// const values = ref([
+//   computed(() => `src root: ${srcTree.name}`),
+//   computed(() => `comp root: ${compTree1.tree.name}`),
+//   computed(() => `comp root: ${compTree2.tree.name}`),
+//   computed(() => compTree1.tree.children[0]),
+//   computed(() => compTree2.tree.children[0])
+// ]);
+
+const {srcTree, sourceNodeMap} = createSourceTree(new CustomNode('Root'));
 const child1Id = sourceNodeMap.addNode(new CustomNode('Child 1'));
 srcTree.childrenIds = [child1Id];
-
-const compTree1 = Proxies.createComputedTree(sourceNodeMap, srcTree.id);
-const compTree2 = Proxies.createComputedTree(compTree1.computedNodeMap, srcTree.id);
-const name = compTree1.tree.name;
-
-// compTree1.tree.name = "HHell";
-// compTree1.tree.children[0].name = "Chicago2"
-
-const values = ref([
-  computed(() => `src root: ${srcTree.name}`),
-  computed(() => `comp root: ${compTree1.tree.name}`),
-  computed(() => `comp root: ${compTree2.tree.name}`),
-  computed(() => compTree1.tree.children[0]),
-  computed(() => compTree2.tree.children[0])
-  // computed(() => `src root child: ${srcTree.children[0].name}`),
-  // computed(() => `comp root child: ${compTree1.tree.children[0].name}`),
-  // computed(() => compTree1.tree.__target__.node)
-  // computed(() => compTree1.tree.children)
-  // compTree1.tree.children[0].children[0].children[0].parent.parent.name,
-]);
-
-watch(compTree1.tree, (vN, vO) => {
+watch(srcTree, (vN, vO) => {
   console.log(`Children changed`)
 });
-
-const compName = computed(() => compTree1.tree.name + " (computed)");
 
 let count = 0;
 const change = () => {
   count += 1;
-  // compTree1.tree.name = `Supercool ${count}`;
-  compTree1.tree.children[0].name = `Hi ${count}`;
-
-  // if (count > 5) compTree2.tree.name = `Mega cool`;
-  // compTree1.tree.childrenIds = [];
-  // obj.value.count++;
+  srcTree.children[0].name = `Hi ${count}`;
 }
-
-// {{ compTree1.tree.children[0].children[0].parent.name }}<br>
-//   {{ compTree1.tree.children[1].parent.name }}
 
 </script>
 
 <template>
-  <div v-for="v of values">
-    {{ v }}
-  </div>
 
   <div class="card">
-    <button type="button" @click="change()">Click me: {{ compName }}</button>
+    <button type="button" @click="change()">Click me</button>
     <p>
       Edit
       <code>components/HelloWorld.vue</code> to test HMR
