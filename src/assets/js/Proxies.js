@@ -1,6 +1,6 @@
 // Base Node class
 import {computed, reactive, ref, watch} from "vue";
-import {ComputedNodeMap} from "./NodeMap.js";
+import {ComputedNodeMap, SourceNodeMap} from "./NodeMap.js";
 
 
 // Tree class to manage nodes
@@ -80,26 +80,10 @@ export function createComputedTree(srcNodeMap, rootId) {
     return {tree: tree, computedNodeMap};
 }
 
-export function createSourceTree(sourceNodeMap, rootId) {
+export function createSourceTree(rootNode) {
+    const sourceNodeMap = reactive(new SourceNodeMap());
+    const rootId = sourceNodeMap.addNode(rootNode);
     let tree = createMutableReferenceProxy(sourceNodeMap, rootId);
     tree = createParentDecoratorProxy(tree, null)
-    return tree;
+    return {srcTree: tree, sourceNodeMap};
 }
-
-// Create a computed tree
-// const computedTree = createComputedTree(sourceTree);
-
-// Access and modify nodes
-// console.log(computedTree.getNode(1).name); // Output: Root
-// console.log(computedTree.getNode(1).children[0].name); // Output: Child 1
-
-// Modify a node in the computed tree
-// computedTree.applyChanges([
-//     {nodeId: 2, prop: 'name', value: 'Modified Child 1'}
-// ]);
-
-// console.log(sourceTree.getNode(2).properties.name); // Output: Child 1
-// console.log(computedTree.getNode(2).name); // Output: Modified Child 1
-
-// Access parent
-// console.log(computedTree.getNode(2).parent.name); // Output: Root
