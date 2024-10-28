@@ -67,10 +67,7 @@ function createParentDecoratorProxy(nestedProxy, parentProxy) {
 
     const handler = {
         get(t, prop, receiver) {
-            if (prop === 'parent') {
-                console.warn("making parent");
-                return parentProxy;
-            }
+            if (prop === 'parent') return parentProxy;
             if (prop === "children") return children.value;
             if (prop in t.nestedProxy) return Reflect.get(t.nestedProxy, prop, receiver)
             return Reflect.get(t, prop, receiver);
