@@ -9,11 +9,9 @@ function createReferenceProxy(nodeMap, initialId, setHandler) {
 
     const id = ref(initialId);
     const node = computed(() => {
-        // console.log(`Recomputing node ${nodeId}`);
         return nodeMap.getNode(id.value);
     });
     const children = computed(() => {
-        // console.log("Recomputing children");
         return node.value.childrenIds.map(id => createReferenceProxy(nodeMap, id, setHandler))
     });
     const targetObj = reactive({node: node, children: children, id: id});
