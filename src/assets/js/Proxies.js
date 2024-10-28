@@ -1,53 +1,23 @@
 // Base Node class
 import {computed, reactive, watch} from "vue";
+import {ComputedNodeMap} from "./NodeMap.js";
 
 export class Node {
-    constructor(id, name, childrenIds) {
-        this.id = id;
+    constructor(name, childrenIds) {
         this.name = name;
         this.childrenIds = childrenIds;
     }
 
     copy() {
-        console.log(`Made copy of node with id ${this.id}`);
-        return new Node(this.id, this.name, this.childrenIds);
+        return new Node(this.name, this.childrenIds);
     }
 }
 
 // Tree class to manage nodes
-export class NodeMap {
-    constructor() {
-        this.nodes = new Map();
-    }
-
-    addNode(node) {
-        this.nodes.set(node.id, node);
-    }
-
-    getNode(id) {
-        return this.nodes.get(id);
-    }
-}
-
-export class ComputedNodeMap extends NodeMap {
-
-    constructor(srcNodeMap) {
-        super();
-        this.srcNodeMap = srcNodeMap;
-    }
-
-    getNode(id) {
-        const node = this.getComputedNode(id);
-        if (!node) return this.srcNodeMap.getNode(id);
-        return node;
-    }
-
-    getComputedNode(id) {
-        return super.getNode(id);
-    }
-}
 
 function createReferenceProxy(nodeMap, nodeId, setHandler) {
+
+
     const node = computed(() => {
         // console.log(`Recomputing node ${nodeId}`);
         return nodeMap.getNode(nodeId);

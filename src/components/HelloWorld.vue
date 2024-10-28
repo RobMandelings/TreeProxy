@@ -7,9 +7,9 @@ import {useProxyWatchTest} from "../assets/js/ProxyWatchTest.js";
 const sourceNodeMap = reactive(new Proxies.NodeMap());
 
 // Create some nodes
-const root = new Proxies.Node(1, 'Root', [2, 3]);
-const child1 = new Proxies.Node(2, 'Child 1', [3]);
-const child2 = new Proxies.Node(3, 'Child 2', []);
+const root = new Proxies.Node('Root', [2, 3]);
+const child1 = new Proxies.Node('Child 1', [3]);
+const child2 = new Proxies.Node('Child 2', []);
 
 sourceNodeMap.addNode(root);
 sourceNodeMap.addNode(child1);
