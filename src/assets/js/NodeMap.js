@@ -73,7 +73,7 @@ export class ComputedNodeMap extends NodeMap {
         this.srcNodeMap = srcNodeMap;
         this.overwrittenNodes = new Map();
         this.addedNodes = new Map();
-        this.deletedNodes = new Set();
+        this.deletedNodeIds = new Set();
     }
 
     overwriteNode(id, node) {
@@ -88,15 +88,23 @@ export class ComputedNodeMap extends NodeMap {
     }
 
     _deleteNode(id) {
-        this.deletedNodes.add(id);
+        this.deletedNodeIds.add(id);
     }
 
-    getDeletedNodes() {
-        return this.deletedNodes;
+    getDeletedNodeIds() {
+        return this.deletedNodeIds;
     }
 
     getAddedNode(id) {
         return this.addedNodes.get(id);
+    }
+
+    getOverwrittenNodeIds() {
+        return Array.from(this.overwrittenNodes.keys());
+    }
+
+    getAddedNodeIds() {
+        return Array.from(this.addedNodes.keys());
     }
 
     getOverwrittenNode(id) {
@@ -109,7 +117,7 @@ export class ComputedNodeMap extends NodeMap {
     }
 
     getNode(id) {
-        if (id in this.deletedNodes) throw new Error(`Node with id ${id} is deleted`);
+        if (id in this.deletedNodeIds) throw new Error(`Node with id ${id} is deleted`);
 
         return this.getComputedNode(id)
             ?? this.srcNodeMap.getNode(id);

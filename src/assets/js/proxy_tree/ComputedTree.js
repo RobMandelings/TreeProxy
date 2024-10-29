@@ -10,12 +10,16 @@ export class ComputedTree extends ProxyTree {
         this.computedNodeMap = computedNodeMap;
     }
 
+    getOverwrittenNodes() {
+        return this.computedNodeMap.getOverwrittenNodeIds().map(id => this.getNode(id));
+    }
+
     getAddedNodes() {
-        throw new Error("Not implemented yet");
+        return this.computedNodeMap.getAddedNodeIds().map(id => this.getNode(id));
     }
 
     getDeletedNodes() {
-        return this.computedNodeMap.getDeletedNodes();
+        return this.computedNodeMap.getDeletedNodeIds();
     }
 
     createRefProxyNode(id) {
