@@ -1,3 +1,5 @@
+import {CustomNode} from "./CustomNode.js";
+
 class NodeNotExistsError extends Error {
     constructor(id) {
         super(`Node ${id} doesn't exist`);
@@ -24,6 +26,11 @@ class NodeMap {
         const id = this._addNode(node);
         console.assert(this.getNode(id));
         return id;
+    }
+
+    addTree(tree) {
+        let childrenIds = (tree.children?.length) ? tree.children.map(c => this.addTree(c)) : [];
+        return this.addNode(new CustomNode(tree.name, childrenIds));
     }
 
     deleteNode(id) {
