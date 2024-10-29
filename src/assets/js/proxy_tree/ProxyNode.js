@@ -16,6 +16,24 @@ export function useFind(rProxyNode) {
     return {findFn}
 }
 
+export function useLineage(rProxyNode) {
+
+    const ancestors = computed(() => {
+        const proxyNode = rProxyNode.value;
+        if (!proxyNode.parent) return [];
+        return [proxyNode.parent, ...proxyNode.ancestors];
+    });
+
+    const descendants = computed(() => {
+        const proxyNode = rProxyNode.value;
+        if (!proxyNode.hasChildren()) return [];
+        return proxyNode.children.reduce((acc, c) => [...acc, ...c.descendants], []);
+    });
+
+    return {ancestors, descendants};
+}
+
+
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.createRefProxyNode(id);
 
@@ -28,6 +46,8 @@ export function createProxyNode(proxyTree, id, parentId) {
         refProxy,
         children
     });
+
+    const hasChildren = () => !!children.value?.length;
 
     const {findFn} = useFind(rProxyNode);
 

@@ -12,6 +12,7 @@ export class ProxyTree extends NodeMap {
     }
 
     init(rootId) {
+        this.proxyNodes.clear();
         this.root = this.createProxyNode(rootId, null);
     }
 
