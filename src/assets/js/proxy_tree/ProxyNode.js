@@ -55,6 +55,7 @@ export function createProxyNode(proxyTree, id, parentId) {
     const targetObj = reactive({
         refProxy,
         children,
+        parent: parentProxy,
         ancestors: rAncestors,
         descendants: rDescendants,
         hasChildren: hasChildrenFn,
@@ -68,11 +69,6 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const handler = {
         get(t, prop, receiver) {
-            if (prop === 'parent') return parentProxy.value;
-            // if (prop === 'find') return findFn;
-            // if (prop === 'ancestors') return rAncestors.value;
-            // if (prop === 'descendants') return rDescendants.value;
-
             return Reflect.get(t.refProxy, prop, receiver)
                 ?? Reflect.get(t, prop, receiver);
         },
