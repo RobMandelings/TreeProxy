@@ -17,6 +17,23 @@ test('First test of computed tree', () => {
     // expect(srcTree.root.children[0].parent).toBe("Hello");
 });
 
+describe('Stale proxies', () => {
+
+    let srcTree;
+    beforeEach(() => {
+        srcTree = new SourceTree();
+        const rootId = srcTree.addTree({name: "Root", children: [{name: "Child 1"}]});
+        srcTree.init(rootId);
+        expect(srcTree.root.stale).toBe(false);
+    });
+
+    test('Delete via proxy', () => {
+        srcTree.root.delete();
+        expect(srcTree.nodeMap.get(srcTree.root.id)).toBe(true);
+        expect(srcTree.root.stale).toBe(true);
+    });
+});
+
 
 // xdescribe('Parent and Child relation', () => {
 //     const {srcTree, sourceNodeMap} = Proxies.createSourceTree(new CustomNode('Root'));

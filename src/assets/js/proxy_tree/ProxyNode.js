@@ -45,6 +45,14 @@ export function useLineage(rProxyNode) {
     return {getDescendants, getAncestors};
 }
 
+export function useDelete(proxyTree, rProxyNode) {
+    const deleteFn = () => {
+        proxyTree.deleteNode(rProxyNode.value.id);
+    }
+
+    return {deleteFn: deleteFn};
+}
+
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.createRefProxyNode(id);
@@ -61,6 +69,7 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const {findFn} = useFind(rProxyNode);
     const {getAncestors, getDescendants} = useLineage(rProxyNode);
+    const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
     const targetObj = reactive({
         refProxy,
@@ -68,6 +77,7 @@ export function createProxyNode(proxyTree, id, parentId) {
         parent: parentProxy,
         getAncestors,
         getDescendants,
+        delete: deleteFn,
         hasChildren: hasChildrenFn,
         find: findFn
     });
@@ -79,7 +89,7 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const handler = {
         get(t, prop, receiver) {
-            return Reflect.get(t.refProxy, prop, receiver)
+            return Reflect.get(t.refProxy, prop, receiver) // TODO reverse if possible
                 ?? Reflect.get(t, prop, receiver);
         },
         set(t, prop, value, receiver) {
