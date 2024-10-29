@@ -1,35 +1,15 @@
 <script setup>
 
-import * as Proxies from "../assets/js/proxy_tree/RefProxy.js"
-import {computed, reactive, ref, watch} from "vue";
-import {useProxyWatchTest} from "../assets/js/ProxyWatchTest.js";
-import {SourceNodeMap} from "../assets/js/NodeMap.js";
-import {CustomNode} from "../assets/js/CustomNode.js";
-import {createSourceTree} from "../assets/js/proxy_tree/RefProxy.js";
+import {SourceTree} from "../assets/js/proxy_tree/SrcTree.js";
+import {ref} from "vue";
 
-// const compTree1 = Proxies.createComputedTree(sourceNodeMap, srcTree.id);
-// const compTree2 = Proxies.createComputedTree(compTree1.computedNodeMap, srcTree.id);
-// const name = compTree1.tree.name;
-
-// const values = ref([
-//   computed(() => `src root: ${srcTree.name}`),
-//   computed(() => `comp root: ${compTree1.tree.name}`),
-//   computed(() => `comp root: ${compTree2.tree.name}`),
-//   computed(() => compTree1.tree.children[0]),
-//   computed(() => compTree2.tree.children[0])
-// ]);
-
-const {srcTree, sourceNodeMap} = createSourceTree(new CustomNode('Root'));
-const child1Id = sourceNodeMap.addNode(new CustomNode('Child 1'));
-srcTree.childrenIds = [child1Id];
-watch(srcTree, (vN, vO) => {
-  console.log(`Children changed`)
-});
+const srcTree = new SourceTree();
+const rootId = srcTree.addTree({name: "Child1"});
+srcTree.init(rootId);
 
 let count = 0;
 const change = () => {
-  count += 1;
-  srcTree.children[0].name = `Hi ${count}`;
+  srcTree.root.name = `Child${count++}`;
 }
 
 </script>
@@ -37,7 +17,8 @@ const change = () => {
 <template>
 
   <div class="card">
-    <button type="button" @click="change()">Click me</button>
+    <div>{{ srcTree.root.name }}</div>
+    <button type="button" @click="change">Click me</button>
     <p>
       Edit
       <code>components/HelloWorld.vue</code> to test HMR

@@ -89,8 +89,8 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const handler = {
         get(t, prop, receiver) {
-            return Reflect.get(t.refProxy, prop, receiver) // TODO reverse if possible
-                ?? Reflect.get(t, prop, receiver);
+            return Reflect.get(t, prop, receiver)
+                ?? Reflect.get(t.refProxy, prop, receiver);
         },
         set(t, prop, value, receiver) {
             return Reflect.set(t.refProxy, prop, value, receiver);

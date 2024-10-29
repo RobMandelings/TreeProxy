@@ -1,11 +1,12 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {SourceNodeMap} from "../NodeMap.js";
 import {createMutableReferenceProxy} from "./RefProxy.js";
+import {reactive} from "vue";
 
 export class SourceTree extends ProxyTree {
 
     constructor() {
-        super(new SourceNodeMap());
+        super(reactive(new SourceNodeMap()));
     }
 
     createRefProxyNode(id) {
