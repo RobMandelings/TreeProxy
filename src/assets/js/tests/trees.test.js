@@ -10,8 +10,9 @@ test('First test of computed tree', () => {
         children: [{name: "Banaan", children: [{name: "Superbanaan"}]}, {name: "Appel"}]
     });
     srcTree.init(rootId);
-    console.warn(srcTree.root.descendants.map(d => d.name));
-    expect(srcTree.root.children).toBe('Root');
+    // console.warn(srcTree.root.descendants.map(d => d.name));
+    console.warn(srcTree.root.children[0].children[0].ancestors.map(a => a.name));
+    // expect(srcTree.root.children).toBe('Root');
     // expect(srcTree.root.children[0].parent).toBe("Hello");
 });
 

@@ -21,12 +21,15 @@ export function useLineage(rProxyNode) {
     const rAncestors = computed(() => {
         const proxyNode = rProxyNode.value;
         if (!proxyNode.parent) return [];
-        return [proxyNode.parent, ...proxyNode.ancestors];
+        return [proxyNode.parent, ...proxyNode.parent.ancestors];
     });
 
     const rDescendants = computed(() => {
         const proxyNode = rProxyNode.value;
-        return [proxyNode, ...proxyNode.children.reduce((acc, c) => [...acc, ...c.descendants], [])];
+        return [
+            ...proxyNode.children,
+            ...proxyNode.children.flatMap(c => c.descendants)
+        ];
     });
 
     return {rAncestors, rDescendants};
@@ -64,6 +67,7 @@ export function createProxyNode(proxyTree, id, parentId) {
             if (prop === 'parent') return parentProxy.value;
             if (prop === 'children') return children.value;
             if (prop === 'descendants') return rDescendants.value;
+            if (prop === 'ancestors') return rAncestors.value;
             if (prop === 'hasChildren') return hasChildren;
             // if (prop === 'find') return findFn;
             // if (prop === 'ancestors') return rAncestors.value;
