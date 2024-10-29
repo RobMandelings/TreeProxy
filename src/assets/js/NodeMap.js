@@ -6,7 +6,7 @@ class NodeNotExistsError extends Error {
     }
 }
 
-class NodeMap {
+export class NodeMap {
     constructor() {
     }
 
@@ -89,6 +89,10 @@ export class ComputedNodeMap extends NodeMap {
 
     _deleteNode(id) {
         this.deletedNodes.add(id);
+    }
+
+    getDeletedNodes() {
+        return this.deletedNodes;
     }
 
     getAddedNode(id) {

@@ -1,11 +1,29 @@
-import {ComputedNodeMap, SourceNodeMap} from "./NodeMap.js";
-import * as Proxies from "./Proxies.js";
+import {NodeMap} from "../NodeMap.js";
+import * as Proxies from "../Proxies.js";
 
-export class ProxyTree {
+export class ProxyTree extends NodeMap {
 
     constructor(nodeMap) {
+        super();
         this.nodeMap = nodeMap;
         this.proxyNodes = new Map();
+        this.root = null;
+    }
+
+    setRoot(id) {
+        this.root = this.getNode(id);
+    }
+
+    getNode(id) {
+        this.getProxyNode(id);
+    }
+
+    addNode(node) {
+        return this.nodeMap.addNode(node);
+    }
+
+    deleteNode(id) {
+        this.nodeMap.deleteNode(id);
     }
 
     createRefProxyNode(id) {
@@ -36,31 +54,5 @@ export class ProxyTree {
     }
 
     moveTo(nodeId, parentId) {
-    }
-}
-
-export class SourceTree extends ProxyTree {
-
-    constructor(rootNode) {
-        super(new SourceNodeMap());
-        const rootId = this.nodeMap.addNode(rootNode);
-        this.root = this.createProxyNode(rootId, null);
-    }
-
-    createRefProxyNode(id) {
-        return Proxies.createMutableReferenceProxy(this.nodeMap, id);
-    }
-}
-
-export class ComputedTree extends ProxyTree {
-
-    constructor(srcNodeMap, rootId) {
-        let computedNodeMap = new ComputedNodeMap(srcNodeMap);
-        super(computedNodeMap);
-        this.root = this.createProxyNode(rootId, null);
-    }
-
-    createRefProxyNode(id) {
-        return Proxies.createCopyOnWriteProxy(this.nodeMap, id);
     }
 }
