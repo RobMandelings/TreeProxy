@@ -5,8 +5,12 @@ import {SourceTree} from "../proxy_tree/SrcTree.js";
 
 test('First test of computed tree', () => {
     const srcTree = new SourceTree();
-    const rootId = srcTree.addTree({name: "Root", children: [{name: "Banaan"}]});
+    const rootId = srcTree.addTree({
+        name: "Root",
+        children: [{name: "Banaan", children: [{name: "Superbanaan"}]}, {name: "Appel"}]
+    });
     srcTree.init(rootId);
+    console.warn(srcTree.root.descendants.map(d => d.name));
     expect(srcTree.root.children).toBe('Root');
     // expect(srcTree.root.children[0].parent).toBe("Hello");
 });
