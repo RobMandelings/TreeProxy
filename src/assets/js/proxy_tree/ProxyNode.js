@@ -1,4 +1,4 @@
-import {computed, reactive, ref} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.createRefProxyNode(id);
@@ -11,6 +11,10 @@ export function createProxyNode(proxyTree, id, parentId) {
         refProxy,
         children
     });
+
+    // watch(refProxy.stale, (vN) => {
+    //     if (vN && proxyTree.getNode(refProxy.id)) proxyTree.deleteNode(vN);
+    // });
 
     const handler = {
         get(t, prop, receiver) {

@@ -11,8 +11,9 @@ function createReferenceProxy(nodeMap, initialId, setHandler) {
     const node = computed(() => {
         return nodeMap.getNode(id.value);
     });
+    const stale = computed(() => !!node.value);
 
-    const targetObj = reactive({node: node, id: id});
+    const targetObj = reactive({node: node, id: id, stale: stale});
     return new Proxy(targetObj, {
         get(t, prop, receiver) {
             if (prop === "__target__") return t;
