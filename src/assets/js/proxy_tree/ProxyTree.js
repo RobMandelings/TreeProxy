@@ -1,6 +1,7 @@
 import {NodeMap} from "../NodeMap.js";
 import * as ProxyNode from "../proxy_tree/ProxyNode.js"
 import {readonly} from "vue";
+import * as Utils from "../Utils.js";
 
 export class ProxyTree extends NodeMap {
 
@@ -12,8 +13,8 @@ export class ProxyTree extends NodeMap {
     }
 
     init(rootId) {
-        this.proxyNodes.clear();
         this.root = this.createProxyNode(rootId, null);
+        // Utils.difference(this.nodeMap.getNodeIds(), new Set(...this.root.descendants));
     }
 
     getNode(id) {
@@ -27,6 +28,10 @@ export class ProxyTree extends NodeMap {
     deleteNode(id) {
         this.proxyNodes.delete(id);
         this.nodeMap.deleteNode(id);
+    }
+
+    deleteNodes(ids) {
+        for (let id of ids) this.deleteNode(id);
     }
 
     createRefProxyNode(id) {

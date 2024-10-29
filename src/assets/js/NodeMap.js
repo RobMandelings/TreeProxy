@@ -42,6 +42,10 @@ export class NodeMap {
     getNode(id) {
         throw new Error("Abstract method")
     }
+
+    getNodeIds() {
+
+    }
 }
 
 export class SourceNodeMap extends NodeMap {
@@ -63,6 +67,10 @@ export class SourceNodeMap extends NodeMap {
 
     getNode(id) {
         return this.nodes.get(id);
+    }
+
+    getNodeIds() {
+        return new Set(this.nodes.keys());
     }
 }
 
@@ -91,24 +99,28 @@ export class ComputedNodeMap extends NodeMap {
         this.deletedNodeIds.add(id);
     }
 
-    getDeletedNodeIds() {
-        return this.deletedNodeIds;
-    }
-
     getAddedNode(id) {
         return this.addedNodes.get(id);
     }
 
+    getDeletedNodeIds() {
+        return this.deletedNodeIds;
+    }
+
     getOverwrittenNodeIds() {
-        return Array.from(this.overwrittenNodes.keys());
+        return new Set(this.overwrittenNodes.keys());
     }
 
     getAddedNodeIds() {
-        return Array.from(this.addedNodes.keys());
+        return new Set(this.addedNodes.keys());
     }
 
     getOverwrittenNode(id) {
         return this.overwrittenNodes.get(id);
+    }
+
+    getNodeIds() {
+        let set = this.srcNodeMap.getNodeIds();
     }
 
     getComputedNode(id) {
