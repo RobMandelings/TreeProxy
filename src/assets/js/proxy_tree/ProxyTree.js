@@ -1,5 +1,5 @@
 import {NodeMap} from "../NodeMap.js";
-import * as Proxies from "../Proxies.js";
+import * as ProxyNode from "../proxy_tree/ProxyNode.js"
 import {readonly} from "vue";
 
 export class ProxyTree extends NodeMap {
@@ -29,7 +29,6 @@ export class ProxyTree extends NodeMap {
     }
 
     createRefProxyNode(id) {
-
     }
 
     createProxyNode(id, parentId) {
@@ -37,8 +36,7 @@ export class ProxyTree extends NodeMap {
         console.assert(!parentId || this.proxyNodes.get(parentId),
             `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
 
-        let proxyNode = this.createRefProxyNode(id);
-        proxyNode = Proxies.createProxyNode(this, proxyNode, parentId);
+        const proxyNode = ProxyNode.createProxyNode(this, id, parentId);
         this.proxyNodes.set(id, proxyNode);
         return proxyNode;
     }
