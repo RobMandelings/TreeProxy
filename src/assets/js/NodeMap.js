@@ -1,4 +1,5 @@
 import {CustomNode} from "./CustomNode.js";
+import * as Utils from "./Utils.js";
 
 class NodeNotExistsError extends Error {
     constructor(id) {
@@ -121,6 +122,9 @@ export class ComputedNodeMap extends NodeMap {
 
     getNodeIds() {
         let set = this.srcNodeMap.getNodeIds();
+        set = set.union(this.getAddedNodeIds());
+        set = Utils.difference(set, this.getDeletedNodeIds());
+        return set;
     }
 
     getComputedNode(id) {

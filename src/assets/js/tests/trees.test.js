@@ -9,6 +9,7 @@ test('First test of computed tree', () => {
         name: "Root",
         children: [{name: "Banaan", children: [{name: "Superbanaan"}]}, {name: "Appel"}]
     });
+    const root2Id = srcTree.addTree({name: "Baviano"});
     srcTree.init(rootId);
     // console.warn(srcTree.root.descendants.map(d => d.name));
     // console.warn(srcTree.root.children[0].children[0].ancestors.map(a => a.name));

@@ -21,18 +21,28 @@ export function useLineage(rProxyNode) {
     const rAncestors = computed(() => {
         const proxyNode = rProxyNode.value;
         if (!proxyNode.parent) return [];
-        return [proxyNode.parent, ...proxyNode.parent.ancestors];
+        return [...proxyNode.parent.getAncestors(true)];
     });
 
     const rDescendants = computed(() => {
         const proxyNode = rProxyNode.value;
-        return [
-            ...proxyNode.children,
-            ...proxyNode.children.flatMap(c => c.descendants)
+        return [...proxyNode.children.flatMap(c => c.getDescendants(true))
         ];
     });
 
-    return {rAncestors, rDescendants};
+    const getDescendants = (includeSelf = false) => {
+        const descendants = rDescendants.value;
+        if (includeSelf) return [rProxyNode.value, ...descendants];
+        return descendants;
+    }
+
+    const getAncestors = (includeSelf = false) => {
+        const ancestors = rAncestors.value;
+        if (includeSelf) return [rProxyNode.value, ...ancestors];
+        return ancestors;
+    }
+
+    return {getDescendants, getAncestors};
 }
 
 
@@ -50,14 +60,14 @@ export function createProxyNode(proxyTree, id, parentId) {
     const hasChildrenFn = () => !!children.value?.length;
 
     const {findFn} = useFind(rProxyNode);
-    const {rAncestors, rDescendants} = useLineage(rProxyNode);
+    const {getAncestors, getDescendants} = useLineage(rProxyNode);
 
     const targetObj = reactive({
         refProxy,
         children,
         parent: parentProxy,
-        ancestors: rAncestors,
-        descendants: rDescendants,
+        getAncestors,
+        getDescendants,
         hasChildren: hasChildrenFn,
         find: findFn
     });
