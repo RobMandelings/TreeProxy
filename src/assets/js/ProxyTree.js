@@ -1,4 +1,3 @@
-import {reactive} from "vue";
 import {ComputedNodeMap, SourceNodeMap} from "./NodeMap.js";
 import {createCopyOnWriteProxy, createMutableReferenceProxy, createProxyNode} from "./Proxies.js";
 
@@ -14,12 +13,14 @@ export class ProxyTree {
     }
 
     createProxyChild(id, parentId) {
+        console.assert(!this.proxyNodes.has(id));
         console.assert(!parentId || this.proxyNodes.get(parentId),
             `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
 
-        const parentProxy = this.proxyNodes.get(parentId);
+        const parentProxy = parentId ? this.proxyNodes.get(parentId) : null;
         let proxyNode = this.createRefProxy(id);
-        proxyNode = createProxyNode(this.getChildren, proxyNode, parentProxy);
+        proxyNode = createProxyNode(this, proxyNode, parentProxy);
+        this.proxyNodes.set(id, proxyNode);
         return proxyNode;
     }
 
