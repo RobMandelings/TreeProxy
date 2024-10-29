@@ -1,3 +1,9 @@
+class NodeNotExistsError extends Error {
+    constructor(id) {
+        super(`Node ${id} doesn't exist`);
+    }
+}
+
 class NodeMap {
     constructor() {
     }
@@ -6,8 +12,24 @@ class NodeMap {
         return crypto.randomUUID();
     }
 
+    _deleteNode(id) {
+
+    }
+
+    _addNode(node) {
+    }
+
     addNode(node) {
-        throw new Error("Abstract method")
+        if (node == null) throw new Error("Node is null");
+        const id = this._addNode(node);
+        console.assert(this.getNode(id));
+        return id;
+    }
+
+    deleteNode(id) {
+        if (!this.getNode(id)) throw new NodeNotExistsError(id);
+        this._deleteNode(id);
+        console.assert(!this.getNode(id));
     }
 
     getNode(id) {
@@ -22,10 +44,14 @@ export class SourceNodeMap extends NodeMap {
         this.nodes = new Map();
     }
 
-    addNode(node) {
+    _addNode(node) {
         const id = this.generateId();
         this.nodes.set(id, node);
         return id;
+    }
+
+    _deleteNode(id) {
+        this.nodes.delete(id);
     }
 
     getNode(id) {
@@ -43,15 +69,19 @@ export class ComputedNodeMap extends NodeMap {
         this.deletedNodes = new Set();
     }
 
-    addNode(node) {
+    overwriteNode(id, node) {
+        console.assert(this.srcNodeMap.getNode(id), "Node not present in the src node map");
+        this.overwrittenNodes.set(id, node);
+    }
+
+    _addNode(node) {
         const id = this.generateId();
         this.addedNodes.set(id, node);
         return id;
     }
 
-    overwriteNode(id, node) {
-        console.assert(this.srcNodeMap.getNode(id), "Cannot set overwritten node: node not present in the src node map");
-        this.overwrittenNodes.set(id, node);
+    _deleteNode(id) {
+        this.deletedNodes.add(id);
     }
 
     getAddedNode(id) {
