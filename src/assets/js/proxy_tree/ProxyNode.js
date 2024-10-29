@@ -18,26 +18,29 @@ export function useFind(rProxyNode) {
 
 export function useLineage(rProxyNode) {
 
-    const ancestors = computed(() => {
+    const rAncestors = computed(() => {
         const proxyNode = rProxyNode.value;
         if (!proxyNode.parent) return [];
         return [proxyNode.parent, ...proxyNode.ancestors];
     });
 
-    const descendants = computed(() => {
+    const rDescendants = computed(() => {
         const proxyNode = rProxyNode.value;
         if (!proxyNode.hasChildren()) return [];
         return proxyNode.children.reduce((acc, c) => [...acc, ...c.descendants], []);
     });
 
-    return {ancestors, descendants};
+    return {rAncestors, rDescendants};
 }
 
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.createRefProxyNode(id);
 
-    const rProxyNode = ref(null);
+    const rProxyNode = {
+        value: null,
+    }
+
     let rParentId = ref(parentId);
     let parentProxy = computed(() => proxyTree.getNode(rParentId.value));
     let children = computed(() => proxyTree.getChildren(id));
@@ -50,16 +53,23 @@ export function createProxyNode(proxyTree, id, parentId) {
     const hasChildren = () => !!children.value?.length;
 
     const {findFn} = useFind(rProxyNode);
+    const {rAncestors, rDescendants} = useLineage(rProxyNode);
 
-    watch(refProxy.stale, (vN) => {
+
+    watch(() => refProxy.stale, (vN) => {
         if (vN && proxyTree.getNode(refProxy.id)) proxyTree.deleteNode(vN);
     });
 
     const handler = {
         get(t, prop, receiver) {
             if (prop === 'parent') return parentProxy.value;
-            if (prop === 'children') return children.value;
-            if (prop === 'find') return findFn;
+            if (prop === 'children') {
+                console.warn("Children!");
+                return children.value;
+            }
+            // if (prop === 'find') return findFn;
+            // if (prop === 'ancestors') return rAncestors.value;
+            // if (prop === 'descendants') return rDescendants.value;
 
             return Reflect.get(t.refProxy, prop, receiver)
                 ?? Reflect.get(t, prop, receiver);
@@ -68,6 +78,6 @@ export function createProxyNode(proxyTree, id, parentId) {
             return Reflect.set(t.refProxy, prop, value, receiver);
         }
     }
-    rProxyNode = new Proxy(targetObj, handler)
-    return rProxyNode;
+    rProxyNode.value = new Proxy(targetObj, handler);
+    return rProxyNode.value;
 }

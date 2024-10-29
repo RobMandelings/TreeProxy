@@ -7,8 +7,8 @@ test('First test of computed tree', () => {
     const srcTree = new SourceTree();
     const rootId = srcTree.addTree({name: "Root", children: [{name: "Banaan"}]});
     srcTree.init(rootId);
-    // expect(srcTree.root.name).toBe('Root');
-    expect(srcTree.root.children[0].parent).toBe("Hello");
+    expect(srcTree.root.children).toBe('Root');
+    // expect(srcTree.root.children[0].parent).toBe("Hello");
 });
 
 
