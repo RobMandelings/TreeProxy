@@ -12,11 +12,12 @@ export class ProxyTree extends NodeMap {
     }
 
     setRoot(id) {
+        if (!this.getNode(id)) this.createProxyNode(id, null);
         this.root = this.getNode(id);
     }
 
     getNode(id) {
-        this.getProxyNode(id);
+        return this.proxyNodes.get(id);
     }
 
     addNode(node) {
@@ -29,11 +30,6 @@ export class ProxyTree extends NodeMap {
 
     createRefProxyNode(id) {
 
-    }
-
-    getProxyNode(id) {
-        // TODO do a find when there are no proxy nodes inside the map
-        return this.proxyNodes.get(id);
     }
 
     createProxyNode(id, parentId) {

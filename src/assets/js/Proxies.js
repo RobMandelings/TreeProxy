@@ -52,7 +52,7 @@ export function createCopyOnWriteProxy(computedNodeMap, initialId) {
 export function createProxyNode(proxyTree, refProxy, parentId) {
 
     let rParentId = ref(parentId);
-    let parentProxy = computed(() => proxyTree.getProxyNode(rParentId.value));
+    let parentProxy = computed(() => proxyTree.getNode(rParentId.value));
     let children = computed(() => proxyTree.getChildren(refProxy.id));
 
     const targetObj = reactive({

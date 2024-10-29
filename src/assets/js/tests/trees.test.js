@@ -1,11 +1,14 @@
 import {nextTick, watch} from "vue";
 import {CustomNode} from "../CustomNode.js";
 import * as Proxies from "../Proxies.js";
-import {SourceTree} from "../proxy_tree/ComputedTree.js";
+import {SourceTree} from "../proxy_tree/SrcTree.js";
 
 test('First test of computed tree', () => {
-    const srcTree = new SourceTree(new CustomNode('Root'));
-    expect(srcTree.root.name).toBe('Root');
+    const srcTree = new SourceTree();
+    const rootId = srcTree.addTree({name: "Root", children: [{name: "Banaan"}]});
+    srcTree.setRoot(rootId);
+    // expect(srcTree.root.name).toBe('Root');
+    expect(srcTree.root.children[0].parent).toBe("Hello");
 });
 
 
