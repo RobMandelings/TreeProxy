@@ -12,9 +12,9 @@ export function createProxyNode(proxyTree, id, parentId) {
         children
     });
 
-    // watch(refProxy.stale, (vN) => {
-    //     if (vN && proxyTree.getNode(refProxy.id)) proxyTree.deleteNode(vN);
-    // });
+    watch(refProxy.stale, (vN) => {
+        if (vN && proxyTree.getNode(refProxy.id)) proxyTree.deleteNode(vN);
+    });
 
     const handler = {
         get(t, prop, receiver) {
