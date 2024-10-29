@@ -11,7 +11,7 @@ test('First test of computed tree', () => {
     });
     srcTree.init(rootId);
     // console.warn(srcTree.root.descendants.map(d => d.name));
-    console.warn(srcTree.root.children[0].children[0].ancestors.map(a => a.name));
+    // console.warn(srcTree.root.children[0].children[0].ancestors.map(a => a.name));
     // expect(srcTree.root.children).toBe('Root');
     // expect(srcTree.root.children[0].parent).toBe("Hello");
 });
