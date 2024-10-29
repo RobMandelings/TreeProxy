@@ -1,11 +1,12 @@
 import {NodeMap} from "../NodeMap.js";
 import * as Proxies from "../Proxies.js";
+import {readonly} from "vue";
 
 export class ProxyTree extends NodeMap {
 
     constructor(nodeMap) {
         super();
-        this.nodeMap = nodeMap;
+        this.nodeMap = nodeMap; // TODO make the node map immutable when returned
         this.proxyNodes = new Map();
         this.root = null;
     }

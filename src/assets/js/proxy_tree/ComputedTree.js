@@ -4,7 +4,7 @@ import {ProxyTree} from "./ProxyTree.js";
 
 export class ComputedTree extends ProxyTree {
 
-    constructor(srcProxyTree, rootId) {
+    constructor(srcProxyTree) {
         let computedNodeMap = new ComputedNodeMap(srcProxyTree.nodeMap);
         super(computedNodeMap);
         this.computedNodeMap = computedNodeMap;
