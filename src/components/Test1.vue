@@ -1,11 +1,11 @@
 <script setup>
 
-import * as Proxies from "../assets/js/Proxies.js"
+import * as Proxies from "../assets/js/proxy_tree/RefProxy.js"
 import {computed, reactive, ref, watch} from "vue";
 import {useProxyWatchTest} from "../assets/js/ProxyWatchTest.js";
 import {SourceNodeMap} from "../assets/js/NodeMap.js";
 import {CustomNode} from "../assets/js/CustomNode.js";
-import {createSourceTree} from "../assets/js/Proxies.js";
+import {createSourceTree} from "../assets/js/proxy_tree/RefProxy.js";
 
 // const compTree1 = Proxies.createComputedTree(sourceNodeMap, srcTree.id);
 // const compTree2 = Proxies.createComputedTree(compTree1.computedNodeMap, srcTree.id);

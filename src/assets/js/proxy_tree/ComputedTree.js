@@ -1,6 +1,6 @@
 import {ComputedNodeMap, NodeMap, SourceNodeMap} from "../NodeMap.js";
-import * as Proxies from "../Proxies.js";
 import {ProxyTree} from "./ProxyTree.js";
+import {createCopyOnWriteProxy} from "./RefProxy.js";
 
 export class ComputedTree extends ProxyTree {
 
@@ -23,6 +23,6 @@ export class ComputedTree extends ProxyTree {
     }
 
     createRefProxyNode(id) {
-        return Proxies.createCopyOnWriteProxy(this.nodeMap, id);
+        return createCopyOnWriteProxy(this.nodeMap, id);
     }
 }

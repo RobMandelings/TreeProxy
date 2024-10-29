@@ -1,6 +1,6 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {SourceNodeMap} from "../NodeMap.js";
-import * as Proxies from "../Proxies.js";
+import {createMutableReferenceProxy} from "./RefProxy.js";
 
 export class SourceTree extends ProxyTree {
 
@@ -9,6 +9,6 @@ export class SourceTree extends ProxyTree {
     }
 
     createRefProxyNode(id) {
-        return Proxies.createMutableReferenceProxy(this.nodeMap, id);
+        return createMutableReferenceProxy(this.nodeMap, id);
     }
 }

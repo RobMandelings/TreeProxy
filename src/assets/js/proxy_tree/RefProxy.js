@@ -1,6 +1,6 @@
 // Base Node class
 import {computed, reactive, ref} from "vue";
-import {ComputedNodeMap, SourceNodeMap} from "./NodeMap.js";
+import {ComputedNodeMap, SourceNodeMap} from "../NodeMap.js";
 
 
 // Tree class to manage nodes
@@ -47,22 +47,4 @@ export function createCopyOnWriteProxy(computedNodeMap, initialId) {
         return true;
     }
     return createReferenceProxy(computedNodeMap, initialId, setHandler);
-}
-
-
-
-// Function to create a computed tree
-export function createComputedTree(srcNodeMap, rootId) {
-    const computedNodeMap = reactive(new ComputedNodeMap(srcNodeMap));
-    let tree = createCopyOnWriteProxy(computedNodeMap, rootId);
-    tree = createProxyNode(tree, null);
-    return {tree: tree, computedNodeMap};
-}
-
-export function createSourceTree(rootNode) {
-    const sourceNodeMap = reactive(new SourceNodeMap());
-    const rootId = sourceNodeMap.addNode(rootNode);
-    let tree = createMutableReferenceProxy(sourceNodeMap, rootId);
-    tree = createProxyNode(tree, null)
-    return {srcTree: tree, sourceNodeMap};
 }

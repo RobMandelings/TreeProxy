@@ -1,6 +1,6 @@
 <script setup>
 
-import * as Proxies from "../assets/js/Proxies.js"
+import * as Proxies from "../assets/js/proxy_tree/RefProxy.js"
 import {computed, reactive, ref, watch} from "vue";
 import {useProxyWatchTest} from "../assets/js/ProxyWatchTest.js";
 import {SourceNodeMap} from "../assets/js/NodeMap.js";

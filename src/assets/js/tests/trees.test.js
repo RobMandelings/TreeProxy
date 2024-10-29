@@ -1,6 +1,6 @@
 import {nextTick, watch} from "vue";
 import {CustomNode} from "../CustomNode.js";
-import * as Proxies from "../Proxies.js";
+import * as Proxies from "../proxy_tree/RefProxy.js";
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 
 test('First test of computed tree', () => {

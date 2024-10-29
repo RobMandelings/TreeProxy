@@ -25,6 +25,7 @@ export class ProxyTree extends NodeMap {
     }
 
     deleteNode(id) {
+        this.proxyNodes.delete(id);
         this.nodeMap.deleteNode(id);
     }
 
