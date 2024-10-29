@@ -5,7 +5,7 @@ import {SourceTree} from "../ProxyTree.js";
 
 test('First test of computed tree', () => {
     const srcTree = new SourceTree(new CustomNode('Root'));
-    expect(srcTree.root.children).toBe('Root');
+    expect(srcTree.root.name).toBe('Root');
 });
 
 

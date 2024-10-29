@@ -12,14 +12,18 @@ export class ProxyTree {
 
     }
 
+    getProxyNode(id) {
+        // TODO do a find when there are no proxy nodes inside the map
+        return this.proxyNodes.get(id);
+    }
+
     createProxyChild(id, parentId) {
         console.assert(!this.proxyNodes.has(id));
         console.assert(!parentId || this.proxyNodes.get(parentId),
             `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
 
-        const parentProxy = parentId ? this.proxyNodes.get(parentId) : null;
         let proxyNode = this.createRefProxy(id);
-        proxyNode = createProxyNode(this, proxyNode, parentProxy);
+        proxyNode = createProxyNode(this, proxyNode, parentId);
         this.proxyNodes.set(id, proxyNode);
         return proxyNode;
     }
