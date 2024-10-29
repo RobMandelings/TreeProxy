@@ -15,7 +15,6 @@ export class ProxyTree extends NodeMap {
     init(rootId) {
         this.root = this.createProxyNode(rootId, null);
         const idsToRemove = Utils.difference(this.nodeMap.getNodeIds(), new Set(this.root.getDescendants(true).map(d => d.id)));
-        console.log(idsToRemove);
         // TODO remove the unneeded nodes
     }
 

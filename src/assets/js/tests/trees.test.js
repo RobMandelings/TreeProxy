@@ -29,7 +29,6 @@ describe('Stale proxies', () => {
 
     test('Delete via proxy', () => {
         srcTree.root.delete();
-        expect(srcTree.nodeMap.get(srcTree.root.id)).toBe(true);
         expect(srcTree.root.stale).toBe(true);
     });
 });

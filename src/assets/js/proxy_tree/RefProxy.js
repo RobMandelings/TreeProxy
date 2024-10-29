@@ -17,8 +17,9 @@ function createReferenceProxy(nodeMap, initialId, setHandler) {
     return new Proxy(targetObj, {
         get(t, prop, receiver) {
             if (prop === "__target__") return t;
-            if (prop in t.node) return Reflect.get(t.node, prop, receiver);
+            if (prop === "node") return undefined;
 
+            if (prop in t.node) return Reflect.get(t.node, prop, receiver);
             return Reflect.get(t, prop, receiver);
         },
         set: setHandler
