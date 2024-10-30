@@ -1,5 +1,5 @@
 import {computed, reactive, ref, watch} from "vue";
-import {DirectNodeAccessError, StaleProxyError} from "./ProxyNodeErrors.js";
+import {DirectNodeAccessError, IllegalAccessError, PosOutOfRangeError, StaleProxyError} from "./ProxyNodeErrors.js";
 
 export function useFind(rProxyNode) {
     const findFn = (id) => {
@@ -63,7 +63,7 @@ function useParent(rId, proxyTree, initialParentId) {
     return {rParent: rParentProxy, setParent};
 }
 
-function useChildren(proxyTree) {
+function useChildren(rId, rChildrenIds, proxyTree) {
 
     // descendants.asArray()
     // descendants.asSet()
@@ -82,8 +82,35 @@ function useChildren(proxyTree) {
     // children.ids.asSet()
     // children.ids.has()
 
+    const rChildrenArray = computed(() => proxyTree.getChildren(rId.value));
+    const rSize = computed(() => rChildrenArray.value.length);
+    const getChildrenAsSet = () => new Set(rChildrenArray.value);
 
+    const hasChild = (id) => !!getChildById(id);
+    const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
+    const getChildrenIdsAsSet = new Set(rChildrenIdsAsArray.value);
 
+    const getChildById = (id) => rChildrenIdsAsArray.value.find(c => c.id === id);
+    const getChildByPos = (pos) => {
+        if ((pos < 0 || pos > (rChildrenIdsAsArray.value.length - 1)) && pos !== -1)
+            throw new PosOutOfRangeError(pos);
+        return rChildrenIdsAsArray.value.at(pos);
+    }
+
+    return {
+        asArray: () => rChildrenArray.value,
+        asSet: getChildrenAsSet,
+        hasChild,
+        size: rSize,
+        ids: {
+            asArray: () => rChildrenIdsAsArray.value,
+            asSet: () => getChildrenIdsAsSet
+        },
+        get: {
+            byId: getChildById,
+            byPos: getChildByPos
+        }
+    }
 }
 
 
@@ -93,19 +120,19 @@ export function createProxyNode(proxyTree, id, parentId) {
     const rProxyNode = {
         value: null,
     }
+    const rId = computed(() => rProxyNode.value?.id);
 
-
-    let children = computed(() => proxyTree.getChildren(id));
     const rStale = computed(() => {
         if (!rProxyNode.value) return false; // Still initialising
         return !(refProxy.node && proxyTree.getNode(id));
     });
 
-    const hasChildrenFn = () => !!children.value?.length;
+    const hasChildrenFn = () => !!childrenArray.value?.length;
 
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
     const {findFn} = useFind(rProxyNode);
     const {getAncestors, getDescendants} = useLineage(rProxyNode);
+    const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
     const targetObj = reactive({
@@ -132,10 +159,14 @@ export function createProxyNode(proxyTree, id, parentId) {
             if (prop === "stale") return rStale.value;
             else if (rStale.value) throw new StaleProxyError();
 
+            if (prop === "childrenIds") throw new IllegalAccessError(prop);
+
             return Reflect.get(t, prop, receiver)
                 ?? Reflect.get(t.refProxy, prop, receiver);
         },
         set(t, prop, value, receiver) {
+            if (prop === "childrenIds") throw new IllegalAccessError(prop);
+
             return Reflect.set(t.refProxy, prop, value, receiver);
         }
     }

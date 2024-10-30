@@ -9,3 +9,15 @@ export class StaleProxyError extends Error {
         super("Proxy has become stale");
     }
 }
+
+export class PosOutOfRangeError extends Error {
+    constructor(pos) {
+        super(`Position ${pos} is out of range`);
+    }
+}
+
+export class IllegalAccessError extends Error {
+    constructor(prop) {
+        super(`Property '${prop}' was accessed illegally`);
+    }
+}
