@@ -36,22 +36,27 @@ describe('Stale proxies', () => {
 
 xtest('Hello', () => {
     const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
-    expect(srcTree.root.children.get.first()).toBe(null);
+    expect(srcTree.root.children.get.first).toBe(null);
 })
 
 describe('Children', () => {
 
-    let srcTree;
-    beforeEach(() => {
-        srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
+    let srcTree = new SourceTree();
+    describe('Single child test', () => {
+        beforeEach(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
+        test('Size', () => expect(srcTree.root.children.size).toBe(1));
+        test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
+        test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
     });
 
-    describe('Children data types test', () => {
-
+    describe('No child test test', () => {
+        beforeEach(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
+        test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
+        test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
     });
 
     test('Children as array', () => {
-        expect(srcTree.root.children.asArray()).toBeInstanceOf(Array);
+        expect(srcTree.root.children.asArray).toBeInstanceOf(Array);
     });
 })
 
