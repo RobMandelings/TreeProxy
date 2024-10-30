@@ -2,6 +2,8 @@ import {nextTick, watch} from "vue";
 import {CustomNode} from "../CustomNode.js";
 import * as Proxies from "../proxy_tree/RefProxy.js";
 import {SourceTree} from "../proxy_tree/SrcTree.js";
+import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js"
+import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"
 
 test('First test of computed tree', () => {
     const srcTree = new SourceTree();
@@ -17,6 +19,22 @@ test('First test of computed tree', () => {
     // expect(srcTree.root.children[0].parent).toBe("Hello");
 });
 
+test('Root not initialised', () => {
+    const srcTree = new SourceTree();
+    const rootId = srcTree.addTree({name: "Root"});
+    expect(() => srcTree.root).toThrow(ProxyTreeErrors.RootNotSetError);
+    srcTree.init(rootId)
+    expect(() => srcTree.root).not.toBeNull();
+})
+
+test('Direct proxy node access', () => {
+    const srcTree = new SourceTree();
+    const rootId = srcTree.addTree({name: "Root", children: [{name: "Child 1"}]});
+    srcTree.init(rootId);
+
+    expect(() => srcTree.root.node).toThrow(ProxyNodeErrors.DirectNodeAccessError);
+});
+
 describe('Stale proxies', () => {
 
     let srcTree;
@@ -25,26 +43,23 @@ describe('Stale proxies', () => {
         const rootId = srcTree.addTree({name: "Root", children: [{name: "Child 1"}]});
         srcTree.init(rootId);
         expect(srcTree.root.stale).toBe(false);
-    });
-
-    test('Delete via proxy', () => {
         srcTree.root.delete();
         expect(srcTree.root.stale).toBe(true);
+    });
+
+    test('Stale proxy error', () => {
+        expect(() => srcTree.root.id).toThrow(ProxyNodeErrors.StaleProxyError);
     });
 });
 
 
-// xdescribe('Parent and Child relation', () => {
-//     const {srcTree, sourceNodeMap} = Proxies.createSourceTree(new CustomNode('Root'));
-//     const childId = sourceNodeMap.addNode(new CustomNode('Child 2'));
-//     srcTree.childrenIds = [childId];
-//     const child = srcTree.children[0];
-//     console.log(srcTree.children);
-//
-//     test('Child id test', () => expect(child.id).toBe(childId));
-//     test('Parent relation test', () => expect(child.parent).toBe(srcTree));
-//     test('Child instance via parent equal to child instance', () => expect(child.parent.children[0]).toBe(child));
-// })
+describe('Parent and Child relation', () => {
+    const srcTree = new SourceTree();
+    srcTree.addTreeAndSetRoot({name: "Root", children: [{name: "Child"}]});
+    const child = srcTree.root.children[0];
+    test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
+    test('Child instance via parent equal to child instance', () => expect(child.parent.children[0]).toBe(child));
+});
 
 // xdescribe("Deep watch on source tree", () => {
 //

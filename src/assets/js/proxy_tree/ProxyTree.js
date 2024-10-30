@@ -2,6 +2,7 @@ import {NodeMap} from "../NodeMap.js";
 import * as ProxyNode from "../proxy_tree/ProxyNode.js"
 import {readonly} from "vue";
 import * as Utils from "../Utils.js";
+import {RootNotSetError} from "./ProxyTreeErrors.js";
 
 export class ProxyTree extends NodeMap {
 
@@ -9,13 +10,24 @@ export class ProxyTree extends NodeMap {
         super();
         this.nodeMap = nodeMap; // TODO make the node map immutable when returned
         this.proxyNodes = new Map();
-        this.root = null;
+        this._root = null;
     }
 
     init(rootId) {
-        this.root = this.createProxyNode(rootId, null);
+        this._root = this.createProxyNode(rootId, null);
         const idsToRemove = Utils.difference(this.nodeMap.getNodeIds(), new Set(this.root.getDescendants(true).map(d => d.id)));
         // TODO remove the unneeded nodes
+    }
+
+    addTreeAndSetRoot(tree) {
+        const rootId = this.addTree(tree);
+        this.init(rootId);
+        return rootId;
+    }
+
+    get root() {
+        if (!this._root) throw new RootNotSetError();
+        return this._root;
     }
 
     getNode(id) {

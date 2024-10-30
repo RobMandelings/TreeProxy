@@ -1,4 +1,5 @@
 import {computed, reactive, ref, watch} from "vue";
+import {DirectNodeAccessError, StaleProxyError} from "./ProxyNodeErrors.js";
 
 export function useFind(rProxyNode) {
     const findFn = (id) => {
@@ -64,6 +65,10 @@ export function createProxyNode(proxyTree, id, parentId) {
     let rParentId = ref(parentId);
     let parentProxy = computed(() => proxyTree.getNode(rParentId.value));
     let children = computed(() => proxyTree.getChildren(id));
+    const rStale = computed(() => {
+        if (!rProxyNode.value) return false; // Still initialising
+        return !(refProxy.node && proxyTree.getNode(id));
+    });
 
     const hasChildrenFn = () => !!children.value?.length;
 
@@ -75,6 +80,7 @@ export function createProxyNode(proxyTree, id, parentId) {
         refProxy,
         children,
         parent: parentProxy,
+        stale: rStale,
         getAncestors,
         getDescendants,
         delete: deleteFn,
@@ -89,6 +95,10 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const handler = {
         get(t, prop, receiver) {
+            if (prop === "node") throw new DirectNodeAccessError();
+            if (prop === "stale") return rStale.value;
+            else if (rStale.value) throw new StaleProxyError();
+
             return Reflect.get(t, prop, receiver)
                 ?? Reflect.get(t.refProxy, prop, receiver);
         },
