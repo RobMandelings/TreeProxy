@@ -62,23 +62,6 @@ function useParent(rId, proxyTree, initialParentId) {
 
 function useChildren(rId, rChildrenIds, proxyTree) {
 
-    // descendants.asArray()
-    // descendants.asSet()
-    // descendants.get.byId(id)
-
-    // ancestors.get.byId(id)
-
-    // children.asArray()
-    // children.asSet()
-    // children.has()
-
-    // children.get.byPos()
-    // children.get.byId()
-
-    // children.ids.asArray()
-    // children.ids.asSet()
-    // children.ids.has()
-
     const rChildrenArray = computed(() => proxyTree.getChildren(rId.value));
     const rSize = computed(() => rChildrenArray.value.length);
     const getChildrenAsSet = () => new Set(rChildrenArray.value);
