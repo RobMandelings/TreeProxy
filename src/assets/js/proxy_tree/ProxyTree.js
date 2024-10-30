@@ -22,7 +22,7 @@ export class ProxyTree extends NodeMap {
     addTreeAndSetRoot(tree) {
         const rootId = this.addTree(tree);
         this.init(rootId);
-        return rootId;
+        return this;
     }
 
     get root() {
