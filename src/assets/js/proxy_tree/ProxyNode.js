@@ -89,9 +89,11 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     const getChildById = (id) => rChildrenIdsAsArray.value.find(c => c.id === id);
     const getChildByPos = (pos) => {
-        if ((pos < 0 || pos > (rSize.value - 1)) && pos !== -1)
-            throw new PosOutOfRangeError(pos);
-        return rChildrenIdsAsArray.value.at(pos);
+        if ((pos < 0 || pos > (rSize.value - 1)) && pos !== -1) {
+            console.warn(`Hello there buddy: ${proxyTree.getChildren(rId.value)}`)
+            throw new PosOutOfRangeError(pos, rSize.value - 1);
+        }
+        return rChildrenArray.value.at(pos);
     }
 
     const hasChildrenFn = () => !!rSize.value;
@@ -115,9 +117,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
                 }
             },
             get: {
-                get first() {
-                    return getChildByPos(0)
-                },
+                first: computed(() => getChildByPos(0)),
                 byId: getChildById,
                 byPos: getChildByPos
             }

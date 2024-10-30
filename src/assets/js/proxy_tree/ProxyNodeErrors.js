@@ -11,8 +11,8 @@ export class StaleProxyError extends Error {
 }
 
 export class PosOutOfRangeError extends Error {
-    constructor(pos) {
-        super(`Position ${pos} is out of range`);
+    constructor(pos, maxPos) {
+        super(`Position ${pos} is out of range. Maximum pos: ${maxPos}`);
     }
 }
 

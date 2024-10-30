@@ -2,7 +2,7 @@ import {NodeMap} from "../NodeMap.js";
 import * as ProxyNode from "../proxy_tree/ProxyNode.js"
 import {readonly} from "vue";
 import * as Utils from "../Utils.js";
-import {RootNotSetError} from "./ProxyTreeErrors.js";
+import {NodeNotFoundError, RootNotSetError} from "./ProxyTreeErrors.js";
 
 export class ProxyTree extends NodeMap {
 
@@ -59,7 +59,10 @@ export class ProxyTree extends NodeMap {
     }
 
     getChildren(id) {
-        return this.nodeMap.getNode(id).childrenIds.map(cId => {
+        const node = this.nodeMap.getNode(id);
+        if (!node) throw new NodeNotFoundError(id);
+
+        return node.childrenIds.map(cId => {
             return this.proxyNodes.get(cId)
                 ?? this.createProxyNode(cId, id);
         });

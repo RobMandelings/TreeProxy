@@ -43,14 +43,15 @@ describe('Children', () => {
 
     let srcTree = new SourceTree();
     describe('Single child test', () => {
-        beforeEach(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
+        beforeAll(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
         test('Size', () => expect(srcTree.root.children.size).toBe(1));
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
     });
 
     describe('No child test test', () => {
-        beforeEach(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
+        beforeAll(() => srcTree.init({name: "Root"}));
+        test('Size', () => expect(srcTree.root.children.size).toBe(0))
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
     });
@@ -61,7 +62,7 @@ describe('Children', () => {
 })
 
 
-xdescribe('Parent and Child relation', () => {
+describe('Parent and Child relation', () => {
     const srcTree = new SourceTree();
     srcTree.init({name: "Root", children: [{name: "Child"}]});
     const child = srcTree.root.children.get.first;
@@ -69,31 +70,35 @@ xdescribe('Parent and Child relation', () => {
     test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
 });
 
-xdescribe("Deep watch on source tree", () => {
+describe("Deep watch on source tree", () => {
 
     let srcTree, child, mockCallback, initialChildName;
 
     beforeEach(() => {
         initialChildName = 'Child';
         srcTree = new SourceTree().init({name: 'Root', children: [{name: initialChildName}]});
-        child = srcTree.root.children[0];
+        child = srcTree.root.children.get.byPos(0);
         mockCallback = jest.fn();
         watch(srcTree.root, () => mockCallback());
     })
 
-    test('Test initial child name change', async () => {
+    test('test', () => {
+        expect(srcTree.root.children.asArray).toBe(null);
+    })
+
+    xtest('Test initial child name change', async () => {
         child.name = "Changed";
         await nextTick();
         expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
-    test('Assign with no change', async () => {
+    xtest('Assign with no change', async () => {
         child.name = initialChildName;
         await nextTick();
         expect(mockCallback).toHaveBeenCalledTimes(0);
     })
 
-    test('Many changes', async () => {
+    xtest('Many changes', async () => {
         let count = 0;
         const nrChanges = 5;
         for (let i = 0; i < nrChanges; i++) {
