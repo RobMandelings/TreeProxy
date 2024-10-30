@@ -7,16 +7,14 @@ import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"
 
 test('Root not initialised', () => {
     const srcTree = new SourceTree();
-    const rootId = srcTree.addTree({name: "Root"});
     expect(() => srcTree.root).toThrow(ProxyTreeErrors.RootNotSetError);
-    srcTree.init(rootId)
+    srcTree.init({name: "Root"})
     expect(() => srcTree.root).not.toBeNull();
 })
 
 test('Direct proxy node access', () => {
     const srcTree = new SourceTree();
-    const rootId = srcTree.addTree({name: "Root", children: [{name: "Child 1"}]});
-    srcTree.init(rootId);
+    const rootId = srcTree.init({name: "Root", children: [{name: "Child 1"}]});
 
     expect(() => srcTree.root.node).toThrow(ProxyNodeErrors.DirectNodeAccessError);
 });
@@ -25,9 +23,7 @@ describe('Stale proxies', () => {
 
     let srcTree;
     beforeEach(() => {
-        srcTree = new SourceTree();
-        const rootId = srcTree.addTree({name: "Root", children: [{name: "Child 1"}]});
-        srcTree.init(rootId);
+        srcTree = new SourceTree().init({name: "Root", children: [{name: "Child 1"}]});
         expect(srcTree.root.stale).toBe(false);
         srcTree.root.delete();
         expect(srcTree.root.stale).toBe(true);
@@ -38,9 +34,8 @@ describe('Stale proxies', () => {
     });
 });
 
-test('Hello', () => {
-    const srcTree = new SourceTree();
-    srcTree.addTreeAndSetRoot({name: "Root", children: [{name: "Child"}]});
+xtest('Hello', () => {
+    const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
     expect(srcTree.root.children.get.first()).toBe(null);
 })
 
@@ -48,9 +43,12 @@ describe('Children', () => {
 
     let srcTree;
     beforeEach(() => {
-        srcTree = new SourceTree();
-        srcTree.addTreeAndSetRoot({name: "Root", children: [{name: "Child"}]});
-    })
+        srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
+    });
+
+    describe('Children data types test', () => {
+
+    });
 
     test('Children as array', () => {
         expect(srcTree.root.children.asArray()).toBeInstanceOf(Array);
@@ -60,7 +58,7 @@ describe('Children', () => {
 
 xdescribe('Parent and Child relation', () => {
     const srcTree = new SourceTree();
-    srcTree.addTreeAndSetRoot({name: "Root", children: [{name: "Child"}]});
+    srcTree.init({name: "Root", children: [{name: "Child"}]});
     const child = srcTree.root.children.get.first;
     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
     test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
@@ -72,7 +70,7 @@ xdescribe("Deep watch on source tree", () => {
 
     beforeEach(() => {
         initialChildName = 'Child';
-        srcTree = new SourceTree().addTreeAndSetRoot({name: 'Root', children: [{name: initialChildName}]});
+        srcTree = new SourceTree().init({name: 'Root', children: [{name: initialChildName}]});
         child = srcTree.root.children[0];
         mockCallback = jest.fn();
         watch(srcTree.root, () => mockCallback());

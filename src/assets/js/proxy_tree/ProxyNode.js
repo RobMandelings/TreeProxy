@@ -47,10 +47,7 @@ export function useLineage(rProxyNode) {
 }
 
 export function useDelete(proxyTree, rProxyNode) {
-    const deleteFn = () => {
-        proxyTree.deleteNode(rProxyNode.value.id);
-    }
-
+    const deleteFn = () => proxyTree.deleteNode(rProxyNode.value.id);
     return {deleteFn: deleteFn};
 }
 
@@ -162,7 +159,7 @@ export function createProxyNode(proxyTree, id, parentId) {
             if (prop === "node") throw new DirectNodeAccessError();
             if (prop === "stale") return rStale.value;
             else if (rStale.value) throw new StaleProxyError();
-            
+
             if (prop === "childrenIds") throw new IllegalAccessError(prop);
 
             return Reflect.get(t, prop, receiver)

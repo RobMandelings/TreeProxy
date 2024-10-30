@@ -13,15 +13,10 @@ export class ProxyTree extends NodeMap {
         this._root = null;
     }
 
-    init(rootId) {
-        this._root = this.createProxyNode(rootId, null);
-        const idsToRemove = Utils.difference(this.nodeMap.getNodeIds(), new Set(this.root.getDescendants(true).map(d => d.id)));
-        // TODO remove the unneeded nodes
-    }
-
-    addTreeAndSetRoot(tree) {
+    init(tree) {
+        if (this._root) this._root.delete();
         const rootId = this.addTree(tree);
-        this.init(rootId);
+        this._root = this.createProxyNode(rootId, null);
         return this;
     }
 
@@ -39,6 +34,9 @@ export class ProxyTree extends NodeMap {
     }
 
     deleteNode(id) {
+        const node = this.proxyNodes.get(id);
+        node.children.asArray().forEach(c => c.delete());
+
         this.proxyNodes.delete(id);
         this.nodeMap.deleteNode(id);
     }
@@ -72,7 +70,6 @@ export class ProxyTree extends NodeMap {
         const parent = this.getNode(parentId);
         if (!node) throw new Error("Can't move node to parent: node does not exist");
         if (!parent) throw new Error("Can't move node to parent: parent does not exist");
-
 
 
     }
