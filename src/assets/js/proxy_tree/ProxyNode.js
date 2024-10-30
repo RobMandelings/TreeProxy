@@ -67,7 +67,9 @@ function useChildren(proxyTree) {
 
     // descendants.asArray()
     // descendants.asSet()
-    // descendants.get(id)
+    // descendants.get.byId(id)
+
+    // ancestors.get.byId(id)
 
     // children.asArray()
     // children.asSet()
@@ -79,6 +81,9 @@ function useChildren(proxyTree) {
     // children.ids.asArray()
     // children.ids.asSet()
     // children.ids.has()
+
+
+
 }
 
 
