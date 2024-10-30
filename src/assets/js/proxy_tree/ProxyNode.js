@@ -99,11 +99,11 @@ function useChildren(rId, rChildrenIds, proxyTree) {
     const hasChildrenFn = () => !!rSize.value;
 
     return {
-        children: {
+        children: reactive({
             asArray: () => rChildrenArray.value,
             asSet: getChildrenAsSet,
             hasChild,
-            getSize: () => rSize.value,
+            size: rSize,
             ids: {
                 asArray: () => rChildrenIdsAsArray.value,
                 asSet: getChildrenIdsAsSet
@@ -112,7 +112,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
                 byId: getChildById,
                 byPos: getChildByPos
             }
-        },
+        }),
         hasChildren: hasChildrenFn
     }
 }
