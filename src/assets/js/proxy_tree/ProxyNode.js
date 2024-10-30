@@ -88,7 +88,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     const hasChild = (id) => !!getChildById(id);
     const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
-    const getChildrenIdsAsSet = new Set(rChildrenIdsAsArray.value);
+    const getChildrenIdsAsSet = () => new Set(rChildrenIdsAsArray.value);
 
     const getChildById = (id) => rChildrenIdsAsArray.value.find(c => c.id === id);
     const getChildByPos = (pos) => {
@@ -96,20 +96,24 @@ function useChildren(rId, rChildrenIds, proxyTree) {
             throw new PosOutOfRangeError(pos);
         return rChildrenIdsAsArray.value.at(pos);
     }
+    const hasChildrenFn = () => !!rSize.value;
 
     return {
-        asArray: () => rChildrenArray.value,
-        asSet: getChildrenAsSet,
-        hasChild,
-        size: rSize,
-        ids: {
-            asArray: () => rChildrenIdsAsArray.value,
-            asSet: () => getChildrenIdsAsSet
+        children: {
+            asArray: () => rChildrenArray.value,
+            asSet: getChildrenAsSet,
+            hasChild,
+            getSize: () => rSize.value,
+            ids: {
+                asArray: () => rChildrenIdsAsArray.value,
+                asSet: getChildrenIdsAsSet
+            },
+            get: {
+                byId: getChildById,
+                byPos: getChildByPos
+            }
         },
-        get: {
-            byId: getChildById,
-            byPos: getChildByPos
-        }
+        hasChildren: hasChildrenFn
     }
 }
 
@@ -127,24 +131,22 @@ export function createProxyNode(proxyTree, id, parentId) {
         return !(refProxy.node && proxyTree.getNode(id));
     });
 
-    const hasChildrenFn = () => !!childrenArray.value?.length;
-
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
     const {findFn} = useFind(rProxyNode);
     const {getAncestors, getDescendants} = useLineage(rProxyNode);
-    const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
+    const {children, hasChildren} = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
     const targetObj = reactive({
         refProxy,
         children,
+        hasChildren,
         parent: rParent,
         setParent,
         stale: rStale,
         getAncestors,
         getDescendants,
         delete: deleteFn,
-        hasChildren: hasChildrenFn,
         find: findFn
     });
 
