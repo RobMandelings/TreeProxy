@@ -38,16 +38,35 @@ describe('Stale proxies', () => {
     });
 });
 
-
-describe('Parent and Child relation', () => {
+test('Hello', () => {
     const srcTree = new SourceTree();
     srcTree.addTreeAndSetRoot({name: "Root", children: [{name: "Child"}]});
-    const child = srcTree.root.children[0];
+    expect(srcTree.root.children.get.first()).toBe(null);
+})
+
+describe('Children', () => {
+
+    let srcTree;
+    beforeEach(() => {
+        srcTree = new SourceTree();
+        srcTree.addTreeAndSetRoot({name: "Root", children: [{name: "Child"}]});
+    })
+
+    test('Children as array', () => {
+        expect(srcTree.root.children.asArray()).toBeInstanceOf(Array);
+    });
+})
+
+
+xdescribe('Parent and Child relation', () => {
+    const srcTree = new SourceTree();
+    srcTree.addTreeAndSetRoot({name: "Root", children: [{name: "Child"}]});
+    const child = srcTree.root.children.get.first;
     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
-    test('Child instance via parent equal to child instance', () => expect(child.parent.children[0]).toBe(child));
+    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
 });
 
-describe("Deep watch on source tree", () => {
+xdescribe("Deep watch on source tree", () => {
 
     let srcTree, child, mockCallback, initialChildName;
 

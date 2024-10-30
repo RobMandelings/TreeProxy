@@ -27,7 +27,7 @@ export function useLineage(rProxyNode) {
 
     const rDescendants = computed(() => {
         const proxyNode = rProxyNode.value;
-        return [...proxyNode.children.flatMap(c => c.getDescendants(true))
+        return [...proxyNode.children.asArray().flatMap(c => c.getDescendants(true))
         ];
     });
 
@@ -92,10 +92,11 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     const getChildById = (id) => rChildrenIdsAsArray.value.find(c => c.id === id);
     const getChildByPos = (pos) => {
-        if ((pos < 0 || pos > (rChildrenIdsAsArray.value.length - 1)) && pos !== -1)
+        if ((pos < 0 || pos > (rSize.value - 1)) && pos !== -1)
             throw new PosOutOfRangeError(pos);
         return rChildrenIdsAsArray.value.at(pos);
     }
+
     const hasChildrenFn = () => !!rSize.value;
 
     return {
@@ -109,6 +110,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
                 asSet: getChildrenIdsAsSet
             },
             get: {
+                first: () => getChildByPos(0),
                 byId: getChildById,
                 byPos: getChildByPos
             }
@@ -160,7 +162,7 @@ export function createProxyNode(proxyTree, id, parentId) {
             if (prop === "node") throw new DirectNodeAccessError();
             if (prop === "stale") return rStale.value;
             else if (rStale.value) throw new StaleProxyError();
-
+            
             if (prop === "childrenIds") throw new IllegalAccessError(prop);
 
             return Reflect.get(t, prop, receiver)
