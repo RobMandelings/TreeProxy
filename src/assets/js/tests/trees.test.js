@@ -17,7 +17,7 @@ test('Direct proxy node access', () => {
     expect(() => srcTree.root.node).toThrow(ProxyNodeErrors.DirectNodeAccessError);
 });
 
-xdescribe('Stale proxies', () => {
+describe('Stale proxies', () => {
 
     let srcTree;
     beforeEach(() => {

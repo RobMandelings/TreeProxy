@@ -146,11 +146,6 @@ export function createProxyNode(proxyTree, id, parentId) {
         find: findFn
     });
 
-
-    watch(() => rStale.value, (vN) => {
-        if (vN && proxyTree.getNode(refProxy.id)) proxyTree.deleteNode(vN);
-    });
-
     const handler = {
         get(t, prop, receiver) {
             if (prop === "node") throw new DirectNodeAccessError();
