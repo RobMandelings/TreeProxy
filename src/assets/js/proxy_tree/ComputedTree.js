@@ -1,10 +1,11 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {ComputedNodeMap} from "../node_map/ComputedNodeMap.js";
+import {reactive} from "vue";
 
 export class ComputedTree extends ProxyTree {
 
     constructor(srcProxyTree) {
-        let computedNodeMap = new ComputedNodeMap(srcProxyTree.nodeMap);
+        let computedNodeMap = reactive(new ComputedNodeMap(srcProxyTree.nodeMap));
         super(computedNodeMap);
         this.computedNodeMap = computedNodeMap;
         this.initRootId(srcProxyTree.root.id);

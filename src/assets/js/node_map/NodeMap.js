@@ -1,5 +1,6 @@
 import {CustomNode} from "../CustomNode.js";
 import {createReferenceProxy} from "../proxy_tree/RefProxy.js";
+import {computed, reactive, ref} from "vue";
 
 class NodeNotExistsError extends Error {
     constructor(id) {
@@ -16,7 +17,31 @@ export class NodeMap {
     }
 
     createRefNode(id) {
-        return createReferenceProxy(this, id);
+        return this.createRefProxy(id);
+    }
+
+    createRefProxy(initialId) {
+        const rId = ref(initialId);
+        const node = computed(() => {
+            return this.getNode(rId.value);
+        });
+
+        const targetObj = reactive({node: node, id: rId});
+
+        const setHandler = (t, prop, value) => {
+            this.set(rId.value, prop, value);
+            return true;
+        }
+        const getHandler = (t, prop, receiver) => {
+            if (prop === "__target__") return t;
+
+            if (t.node && prop in t.node) return Reflect.get(t.node, prop, receiver);
+            return Reflect.get(t, prop, receiver);
+        }
+        return new Proxy(targetObj, {
+            get: getHandler,
+            set: setHandler
+        });
     }
 
     _deleteNode(id) {

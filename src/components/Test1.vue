@@ -2,14 +2,14 @@
 
 import {SourceTree} from "../assets/js/proxy_tree/SrcTree.js";
 import {ref} from "vue";
+import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
 
-const srcTree = new SourceTree();
-const rootId = srcTree.addTree({name: "Child1"});
-srcTree.init(rootId);
+const srcTree = new SourceTree().init({name: "Root"});
+const compTree = new ComputedTree(srcTree);
 
 let count = 0;
 const change = () => {
-  srcTree.root.name = `Child${count++}`;
+  compTree.root.name = `Child${count++}`;
 }
 
 </script>
@@ -17,7 +17,7 @@ const change = () => {
 <template>
 
   <div class="card">
-    <div>{{ srcTree.root.name }}</div>
+    <div>{{ compTree.root.name }}</div>
     <button type="button" @click="change">Click me</button>
     <p>
       Edit
