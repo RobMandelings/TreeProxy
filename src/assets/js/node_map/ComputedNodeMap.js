@@ -7,6 +7,7 @@ class ComputedNodeMap extends NodeMap {
         super();
         this.srcNodeMap = srcNodeMap;
         this.computedNodes = new Map();
+        this.deletedNodeIds = new Map(); // Node ids which are deleted from the src map
     }
 
     syncSrc() {
@@ -14,6 +15,10 @@ class ComputedNodeMap extends NodeMap {
         // Old nodes will be overwritten with their new values
         this.computedNodes.forEach((v, k) => this.srcNodeMap.nodes.set(k, v));
         this.computedNodes.clear();
+    }
+
+    setNode(nodeId, node) {
+        this.computedNodes[nodeId] = node;
     }
 
     set(nodeId, prop, val) {
