@@ -71,6 +71,7 @@ describe("Deep watch on source tree", () => {
         srcTree = new SourceTree().init({name: 'Root', children: [{name: initialChildName}]});
         child = srcTree.root.children.get.byPos(0);
         mockCallback = jest.fn();
+        expect(child).not.toBeFalsy();
         watch(srcTree.root, () => mockCallback());
     })
 

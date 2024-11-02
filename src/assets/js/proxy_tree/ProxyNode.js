@@ -28,7 +28,7 @@ export function useLineage(rProxyNode) {
 
     const rDescendants = computed(() => {
         const proxyNode = rProxyNode.value;
-        return [...proxyNode.children.asArray()().flatMap(c => c.getDescendants(true))
+        return [...proxyNode.children.asArray().flatMap(c => c.getDescendants(true))
         ];
     });
 
