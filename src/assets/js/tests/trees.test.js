@@ -33,12 +33,6 @@ describe('Stale proxies', () => {
         expect(() => srcTree.root.id).toThrow(ProxyNodeErrors.StaleProxyError);
     });
 });
-
-xtest('Hello', () => {
-    const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
-    expect(srcTree.root.children.get.first).toBe(null);
-})
-
 describe('Children', () => {
 
     let srcTree = new SourceTree();
@@ -65,9 +59,9 @@ describe('Children', () => {
 describe('Parent and Child relation', () => {
     const srcTree = new SourceTree();
     srcTree.init({name: "Root", children: [{name: "Child"}]});
-    const child = srcTree.root.children.get.byPos(0);
+    const child = srcTree.root.children.get.first;
     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
-    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.byPos(0)).toBe(child));
+    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
 });
 
 describe("Deep watch on source tree", () => {
@@ -82,23 +76,19 @@ describe("Deep watch on source tree", () => {
         watch(srcTree.root, () => mockCallback());
     })
 
-    test('test', () => {
-        // expect(srcTree.root.children.asArray).toBe(null);
-    })
-
-    xtest('Test initial child name change', async () => {
+    test('Test initial child name change', async () => {
         child.name = "Changed";
         await nextTick();
         expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
-    xtest('Assign with no change', async () => {
+    test('Assign with no change', async () => {
         child.name = initialChildName;
         await nextTick();
         expect(mockCallback).toHaveBeenCalledTimes(0);
     })
 
-    xtest('Many changes', async () => {
+    test('Many changes', async () => {
         let count = 0;
         const nrChanges = 5;
         for (let i = 0; i < nrChanges; i++) {
