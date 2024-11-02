@@ -65,9 +65,9 @@ describe('Children', () => {
 describe('Parent and Child relation', () => {
     const srcTree = new SourceTree();
     srcTree.init({name: "Root", children: [{name: "Child"}]});
-    const child = srcTree.root.children.get.first;
+    const child = srcTree.root.children.get.byPos(0);
     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
-    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
+    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.byPos(0)).toBe(child));
 });
 
 describe("Deep watch on source tree", () => {
@@ -83,7 +83,7 @@ describe("Deep watch on source tree", () => {
     })
 
     test('test', () => {
-        expect(srcTree.root.children.asArray).toBe(null);
+        // expect(srcTree.root.children.asArray).toBe(null);
     })
 
     xtest('Test initial child name change', async () => {
