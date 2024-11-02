@@ -37,19 +37,19 @@ describe('Children', () => {
     describe('Single child test', () => {
         beforeAll(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
         test('Size', () => expect(srcTree.root.children.size).toBe(1));
-        test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
-        test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
+        test('Array', () => expect(srcTree.root.children.asArray()).toBeInstanceOf(Array));
+        test('Set', () => expect(srcTree.root.children.asSet()).toBeInstanceOf(Set));
     });
 
     describe('No child test test', () => {
         beforeAll(() => srcTree.init({name: "Root"}));
         test('Size', () => expect(srcTree.root.children.size).toBe(0))
-        test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
-        test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
+        test('Array', () => expect(srcTree.root.children.asArray()).toBeInstanceOf(Array));
+        test('Set', () => expect(srcTree.root.children.asSet()).toBeInstanceOf(Set));
     });
 
     test('Children as array', () => {
-        expect(srcTree.root.children.asArray).toBeInstanceOf(Array);
+        expect(srcTree.root.children.asArray()).toBeInstanceOf(Array);
     });
 })
 
@@ -57,9 +57,9 @@ describe('Children', () => {
 describe('Parent and Child relation', () => {
     const srcTree = new SourceTree();
     srcTree.init({name: "Root", children: [{name: "Child"}]});
-    const child = srcTree.root.children.get.first;
+    const child = srcTree.root.children.get.first();
     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
-    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
+    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first()).toBe(child));
 });
 
 describe("Deep watch on source tree", () => {

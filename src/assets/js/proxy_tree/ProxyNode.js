@@ -28,7 +28,7 @@ export function useLineage(rProxyNode) {
 
     const rDescendants = computed(() => {
         const proxyNode = rProxyNode.value;
-        return [...proxyNode.children.asArray().flatMap(c => c.getDescendants(true))
+        return [...proxyNode.children.asArray()().flatMap(c => c.getDescendants(true))
         ];
     });
 
@@ -74,13 +74,15 @@ function useChildren(rId, rChildrenIds, proxyTree) {
     const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
     const getChildrenIdsAsSet = () => new Set(rChildrenIdsAsArray.value);
 
-    const getChildById = (id) => rChildrenIdsAsArray.value.find(c => c.id === id);
+    const getChildById = (id) => {
+        return rChildrenIdsAsArray.value.find(tmpId => tmpId === id);
+    }
     const getChildByPos = (pos) => {
         const maxPos = rSize.value - 1;
         if ((pos < 0 || pos > maxPos) && pos !== -1) {
             throw new PosOutOfRangeError(pos, maxPos);
         }
-        return rChildrenArray.value.at(pos);
+        return rChildrenArray.value.at(pos) ?? null;
     }
 
     const deleteChildById = (id) => {
@@ -91,24 +93,16 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     return {
         children: reactive({
-            get asArray() {
-                return rChildrenArray.value
-            },
-            get asSet() {
-                return getChildrenAsSet();
-            },
-            hasChild,
+            asArray: () => rChildrenArray.value,
+            asSet: () => getChildrenAsSet(),
+            has: hasChild,
             size: rSize,
             ids: {
-                get asArray() {
-                    return rChildrenIdsAsArray.value
-                },
-                get asSet() {
-                    return getChildrenIdsAsSet();
-                }
+                asArray: () => rChildrenIdsAsArray.value,
+                asSet: () => getChildrenIdsAsSet(),
             },
             get: {
-                get first() {
+                first: () => {
                     if (!rSize.value) return null;
                     return getChildByPos(0);
                 },
