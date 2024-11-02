@@ -40,8 +40,6 @@ export class ComputedNodeMap extends NodeMap {
                 "Node does not exist in the src node map as well as the computed node map.")
             this.computedNodes.set(nodeId, this.srcNodeMap.getNode(nodeId).copy());
         }
-        console.log("Making change");
-        console.log(this.computedNodes);
 
         this.computedNodes.get(nodeId)[prop] = val;
     }

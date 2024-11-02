@@ -1,7 +1,7 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 
-xdescribe('ComputedTree', () => {
+describe('ComputedTree', () => {
     let srcTree, compTree;
 
     beforeEach(() => {
@@ -20,5 +20,6 @@ xdescribe('ComputedTree', () => {
     test('Name change', () => {
         compTree.root.name = "Changed";
         expect(compTree.root.name).toBe("Changed");
+        expect(srcTree.root.name).not.toBe("Changed");
     });
 })

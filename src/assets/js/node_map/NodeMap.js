@@ -23,7 +23,6 @@ export class NodeMap {
     createRefProxy(initialId) {
         const rId = ref(initialId);
         const node = computed(() => {
-            console.log("Node recomputed");
             return this.getNode(rId.value);
         });
 
@@ -36,7 +35,6 @@ export class NodeMap {
         const getHandler = (t, prop, receiver) => {
             if (prop === "__target__") return t;
 
-            console.log(t.node);
             if (t.node && prop in t.node) return Reflect.get(t.node, prop, receiver);
             return Reflect.get(t, prop, receiver);
         }
