@@ -1,14 +1,30 @@
 import * as Utils from "../Utils.js";
-import {NodeMap} from "./NodeMap.js";
 
-export class ComputedNodeMap extends NodeMap {
+class ChangeTracker {
 
     constructor(srcNodeMap) {
-        super();
         this.srcNodeMap = srcNodeMap;
-        this.overwrittenNodes = new Map();
-        this.addedNodes = new Map();
-        this.deletedNodeIds = new Set();
+        this.changes = new Map();
+    }
+
+    set(nodeId, prop, val) {
+        // Sets the property to a value which will be applied to create new nodes
+    }
+
+    get(nodeId, prop) {
+
+    }
+
+    clearPropertyChange(nodeId, prop) {
+
+    }
+
+    clearNodeChanges(nodeId) {
+
+    }
+
+    clearAllChanges() {
+
     }
 
     overwriteNode(id, node) {
