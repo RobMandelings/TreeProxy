@@ -1,17 +1,40 @@
 import * as Utils from "../Utils.js";
+import {NodeMap} from "./NodeMap.js";
 
-class ChangeTracker {
+class ComputedNodeMap extends NodeMap {
 
     constructor(srcNodeMap) {
+        super();
         this.srcNodeMap = srcNodeMap;
-        this.changes = new Map();
+        this.computedNodes = new Map();
+        this.nodeChanges = new Map(); // Separate map to hold the changes. Harder for consistency, but easier to retrieve changes
+    }
+
+    syncSrc() {
+        // Copy the computed nodes from the computed map to the src map.
+        // Old nodes will be overwritten with their new values
+        this.computedNodes.forEach((v, k) => this.srcNodeMap.nodes.set(k, v));
+        this.computedNodes.clear();
+        this.nodeChanges.clear();
     }
 
     set(nodeId, prop, val) {
         // Sets the property to a value which will be applied to create new nodes
+        if (!this.computedNodeExists(nodeId)) {
+            if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: Node does not exist in the src node map as well as the computed node map.")
+            this.nodeChanges[nodeId] = {};
+            this.computedNodes[nodeId] = this.srcNodeMap.getNode(nodeId).copy();
+        }
+
+        this.nodeChanges[nodeId][prop] = val;
+        this.computedNodes[nodeId][prop] = val;
     }
 
     get(nodeId, prop) {
+
+    }
+
+    _deleteNode(nodeId) {
 
     }
 
@@ -42,6 +65,10 @@ class ChangeTracker {
         this.deletedNodeIds.add(id);
     }
 
+    isDeleted(id) {
+        return this.getDeletedNodeIds().has(id);
+    }
+
     getAddedNode(id) {
         return this.addedNodes.get(id);
     }
@@ -70,12 +97,15 @@ class ChangeTracker {
     }
 
     getComputedNode(id) {
-        return this.getAddedNode(id)
-            ?? this.getOverwrittenNode(id)
+        return this.computedNodes.get(id);
+    }
+
+    computedNodeExists(id) {
+        return this.getComputedNode(id);
     }
 
     getNode(id) {
-        if (id in this.deletedNodeIds) throw new Error(`Node with id ${id} is deleted`);
+        if (this.isDeleted(id)) return null;
 
         return this.getComputedNode(id)
             ?? this.srcNodeMap.getNode(id);

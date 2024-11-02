@@ -47,5 +47,9 @@ export class NodeMap {
     getNodeIds() {
 
     }
+
+    nodeExists(id) {
+        return this.getNode(id) != null;
+    }
 }
 
