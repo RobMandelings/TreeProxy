@@ -1,6 +1,4 @@
 import {nextTick, watch} from "vue";
-import {CustomNode} from "../CustomNode.js";
-import * as Proxies from "../proxy_tree/RefProxy.js";
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js"
 import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"

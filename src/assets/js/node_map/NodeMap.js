@@ -1,6 +1,5 @@
 import {CustomNode} from "../CustomNode.js";
-import * as Utils from "../Utils.js";
-import {createMutableReferenceProxy, createReferenceProxy} from "../proxy_tree/RefProxy.js";
+import {createReferenceProxy} from "../proxy_tree/RefProxy.js";
 
 class NodeNotExistsError extends Error {
     constructor(id) {

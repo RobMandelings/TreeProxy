@@ -14,6 +14,13 @@ export class ProxyTree extends NodeMap {
     init(tree) {
         if (this._root) this._root.delete();
         const rootId = this.addTree(tree);
+        this.initRootId(rootId);
+        return this;
+    }
+
+    initRootId(rootId) {
+        if (!this.nodeMap.nodeExists(rootId))
+            throw new Error("Cannot set root: the node does not exist in the node map");
         this._root = this.createProxyNode(rootId, null);
         return this;
     }

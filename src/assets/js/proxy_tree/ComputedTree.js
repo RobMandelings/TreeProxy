@@ -7,6 +7,7 @@ export class ComputedTree extends ProxyTree {
         let computedNodeMap = new ComputedNodeMap(srcProxyTree.nodeMap);
         super(computedNodeMap);
         this.computedNodeMap = computedNodeMap;
+        this.initRootId(srcProxyTree.root.id);
     }
 
     getOverwrittenNodes() {

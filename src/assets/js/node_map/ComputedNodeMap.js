@@ -17,6 +17,10 @@ export class ComputedNodeMap extends NodeMap {
         this.computedNodes.clear();
     }
 
+    createRefNode(id) {
+        return super.createRefNode(id);
+    }
+
     _addNode(node) {
         const id = this.generateId();
         this.computedNodes.set(id, node);
@@ -28,6 +32,7 @@ export class ComputedNodeMap extends NodeMap {
     }
 
     set(nodeId, prop, val) {
+
         // Sets the property to a value which will be applied to create new nodes
         if (!this.computedNodeExists(nodeId)) {
             if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
@@ -99,7 +104,7 @@ export class ComputedNodeMap extends NodeMap {
     }
 
     getComputedNode(id) {
-        return this.computedNodes.get(id);
+        return this.computedNodes[id];
     }
 
     computedNodeExists(id) {

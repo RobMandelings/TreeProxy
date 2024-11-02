@@ -1,5 +1,6 @@
 import {computed, reactive, ref, watch} from "vue";
 import {DirectNodeAccessError, IllegalAccessError, PosOutOfRangeError, StaleProxyError} from "./ProxyNodeErrors.js";
+import {ComputedNodeMap} from "../node_map/ComputedNodeMap.js";
 
 export function useFind(rProxyNode) {
     const findFn = (id) => {
@@ -74,7 +75,6 @@ function useChildren(rId, rChildrenIds, proxyTree) {
     const getChildByPos = (pos) => {
         const maxPos = rSize.value - 1;
         if ((pos < 0 || pos > maxPos) && pos !== -1) {
-            console.warn(`Hello there buddy: ${proxyTree.getChildren(rId.value)}`)
             throw new PosOutOfRangeError(pos, maxPos);
         }
         return rChildrenArray.value.at(pos);
@@ -116,6 +116,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.nodeMap.createRefNode(id);
+    // if (proxyTree.nodeMap instanceof ComputedNodeMap) console.warn("HEEYYY");
 
     const rProxyNode = {
         value: null,
