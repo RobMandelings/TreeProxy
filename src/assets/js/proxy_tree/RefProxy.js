@@ -17,7 +17,7 @@ export function createReferenceProxy(nodeMap, initialId) {
             return Reflect.get(t, prop, receiver);
         },
         set(t, prop, value) {
-            nodeMap.set(rId, prop, value);
+            nodeMap.set(rId.value, prop, value);
             return true;
         }
     });
