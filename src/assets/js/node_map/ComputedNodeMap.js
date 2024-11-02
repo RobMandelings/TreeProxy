@@ -7,7 +7,7 @@ export class ComputedNodeMap extends NodeMap {
     constructor(srcNodeMap) {
         super();
         this.srcNodeMap = srcNodeMap;
-        this.computedNodes = reactive(new Map());
+        this.computedNodes = new Map();
         this.deletedNodeIds = new Map(); // Node ids which are deleted from the src map
     }
 
