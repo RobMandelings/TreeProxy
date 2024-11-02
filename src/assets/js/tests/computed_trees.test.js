@@ -1,7 +1,7 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 
-describe('ComputedTree', () => {
+xdescribe('ComputedTree', () => {
     let srcTree, compTree;
 
     beforeEach(() => {

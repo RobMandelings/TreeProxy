@@ -1,12 +1,13 @@
 import * as Utils from "../Utils.js";
 import {NodeMap} from "./NodeMap.js";
+import {reactive} from "vue";
 
 export class ComputedNodeMap extends NodeMap {
 
     constructor(srcNodeMap) {
         super();
         this.srcNodeMap = srcNodeMap;
-        this.computedNodes = new Map();
+        this.computedNodes = reactive(new Map());
         this.deletedNodeIds = new Map(); // Node ids which are deleted from the src map
     }
 
@@ -37,10 +38,12 @@ export class ComputedNodeMap extends NodeMap {
         if (!this.computedNodeExists(nodeId)) {
             if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
                 "Node does not exist in the src node map as well as the computed node map.")
-            this.computedNodes[nodeId] = this.srcNodeMap.getNode(nodeId).copy();
+            this.computedNodes.set(nodeId, this.srcNodeMap.getNode(nodeId).copy());
         }
+        console.log("Making change");
+        console.log(this.computedNodes);
 
-        this.computedNodes[nodeId][prop] = val;
+        this.computedNodes.get(nodeId)[prop] = val;
     }
 
     get(nodeId, prop) {
@@ -104,7 +107,7 @@ export class ComputedNodeMap extends NodeMap {
     }
 
     getComputedNode(id) {
-        return this.computedNodes[id];
+        return this.computedNodes.get(id);
     }
 
     computedNodeExists(id) {

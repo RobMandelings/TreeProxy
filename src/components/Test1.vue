@@ -1,15 +1,22 @@
 <script setup>
 
 import {SourceTree} from "../assets/js/proxy_tree/SrcTree.js";
-import {ref} from "vue";
+import {reactive, ref, watch} from "vue";
 import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
 
 const srcTree = new SourceTree().init({name: "Root"});
 const compTree = new ComputedTree(srcTree);
 
+const test = compTree.computedNodeMap;
+
+watch(srcTree.root, () => {
+  console.log("Comp tree change");
+})
 let count = 0;
 const change = () => {
   compTree.root.name = `Child${count++}`;
+  console.log(compTree.nodeMap);
+  console.log(compTree.nodeMap.getNode(compTree.root.id));
 }
 
 </script>

@@ -116,7 +116,6 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.nodeMap.createRefNode(id);
-    // if (proxyTree.nodeMap instanceof ComputedNodeMap) console.warn("HEEYYY");
 
     const rProxyNode = {
         value: null,
@@ -148,7 +147,7 @@ export function createProxyNode(proxyTree, id, parentId) {
     });
 
 
-    watch(() => refProxy.stale, (vN) => {
+    watch(() => rStale.value, (vN) => {
         if (vN && proxyTree.getNode(refProxy.id)) proxyTree.deleteNode(vN);
     });
 
