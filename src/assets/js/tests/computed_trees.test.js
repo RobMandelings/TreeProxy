@@ -22,4 +22,19 @@ describe('ComputedTree', () => {
         expect(compTree.root.name).toBe("Changed");
         expect(srcTree.root.name).not.toBe("Changed");
     });
+
+    test('Multi-layered change', () => {
+        const compTree2 = new ComputedTree(compTree);
+        compTree.root.name = "Changed";
+        expect(compTree.root.name).toBe("Changed");
+        expect(compTree2.root.name).toBe("Changed");
+        compTree2.root.name = "Changed2";
+        expect(compTree2.root.name).toBe("Changed2");
+        expect(compTree.root.name).not.toBe("Changed2")
+        expect(srcTree.root.name).not.toBe("Changed2")
+    });
+
+    test('Children adjustments', () => {
+
+    });
 })

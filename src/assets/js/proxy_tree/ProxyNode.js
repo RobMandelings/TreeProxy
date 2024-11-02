@@ -56,7 +56,10 @@ function useParent(rId, proxyTree, initialParentId) {
 
     let rParentId = ref(initialParentId);
     let rParentProxy = computed(() => proxyTree.getNode(rParentId.value));
-    const setParent = (parentId) => proxyTree.moveTo(rId.value, parentId);
+    const setParent = (parentId) => {
+        proxyTree.moveTo(rId.value, parentId);
+        rParentId.value = parentId;
+    }
 
     return {rParent: rParentProxy, setParent};
 }
@@ -78,6 +81,10 @@ function useChildren(rId, rChildrenIds, proxyTree) {
             throw new PosOutOfRangeError(pos, maxPos);
         }
         return rChildrenArray.value.at(pos);
+    }
+
+    const deleteChildById = (id) => {
+
     }
 
     const hasChildrenFn = () => !!rSize.value;
@@ -107,7 +114,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
                 },
                 byId: getChildById,
                 byPos: getChildByPos
-            }
+            },
         }),
         hasChildren: hasChildrenFn
     }
@@ -152,13 +159,10 @@ export function createProxyNode(proxyTree, id, parentId) {
             if (prop === "stale") return rStale.value;
             else if (rStale.value) throw new StaleProxyError();
 
-            if (prop === "childrenIds") throw new IllegalAccessError(prop);
-
             return Reflect.get(t, prop, receiver)
                 ?? Reflect.get(t.refProxy, prop, receiver);
         },
         set(t, prop, value, receiver) {
-            if (prop === "childrenIds") throw new IllegalAccessError(prop);
 
             return Reflect.set(t.refProxy, prop, value, receiver);
         }

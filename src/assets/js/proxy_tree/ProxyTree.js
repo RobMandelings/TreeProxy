@@ -76,6 +76,8 @@ export class ProxyTree extends NodeMap {
         if (!node) throw new Error("Can't move node to parent: node does not exist");
         if (!parent) throw new Error("Can't move node to parent: parent does not exist");
 
+        node.parent.childrenIds = parent.childrenIds.filter(cId => cId !== node.id);
+        parent.childrenIds.push(nodeId);
 
     }
 }
