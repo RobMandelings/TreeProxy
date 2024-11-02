@@ -7,7 +7,6 @@ class ComputedNodeMap extends NodeMap {
         super();
         this.srcNodeMap = srcNodeMap;
         this.computedNodes = new Map();
-        this.nodeChanges = new Map(); // Separate map to hold the changes. Harder for consistency, but easier to retrieve changes
     }
 
     syncSrc() {
@@ -15,18 +14,16 @@ class ComputedNodeMap extends NodeMap {
         // Old nodes will be overwritten with their new values
         this.computedNodes.forEach((v, k) => this.srcNodeMap.nodes.set(k, v));
         this.computedNodes.clear();
-        this.nodeChanges.clear();
     }
 
     set(nodeId, prop, val) {
         // Sets the property to a value which will be applied to create new nodes
         if (!this.computedNodeExists(nodeId)) {
-            if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: Node does not exist in the src node map as well as the computed node map.")
-            this.nodeChanges[nodeId] = {};
+            if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
+                "Node does not exist in the src node map as well as the computed node map.")
             this.computedNodes[nodeId] = this.srcNodeMap.getNode(nodeId).copy();
         }
 
-        this.nodeChanges[nodeId][prop] = val;
         this.computedNodes[nodeId][prop] = val;
     }
 
