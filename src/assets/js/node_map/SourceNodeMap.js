@@ -15,7 +15,7 @@ export class SourceNodeMap extends NodeMap {
 
     set(nodeId, prop, value) {
         if (!this.nodeExists(nodeId)) throw new Error("Cannot set node property: node does not exist");
-        this.nodes[nodeId][prop] = value;
+        this.getNode(nodeId)[prop] = value;
     }
 
     _deleteNode(id) {

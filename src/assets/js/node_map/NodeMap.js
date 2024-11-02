@@ -58,7 +58,7 @@ export class NodeMap {
     }
 
     nodeExists(id) {
-        return this.getNode(id) != null;
+        return !!this.getNode(id);
     }
 }
 
