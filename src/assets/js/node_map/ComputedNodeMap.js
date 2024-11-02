@@ -17,8 +17,14 @@ export class ComputedNodeMap extends NodeMap {
         this.computedNodes.clear();
     }
 
+    _addNode(node) {
+        const id = this.generateId();
+        this.computedNodes.set(id, node);
+        return id;
+    }
+
     setNode(nodeId, node) {
-        this.computedNodes[nodeId] = node;
+        throw new Error("Not implemented");
     }
 
     set(nodeId, prop, val) {
@@ -55,12 +61,6 @@ export class ComputedNodeMap extends NodeMap {
     overwriteNode(id, node) {
         console.assert(this.srcNodeMap.getNode(id), "Node not present in the src node map");
         this.overwrittenNodes.set(id, node);
-    }
-
-    _addNode(node) {
-        const id = this.generateId();
-        this.addedNodes.set(id, node);
-        return id;
     }
 
     _deleteNode(id) {
