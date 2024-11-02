@@ -1,4 +1,4 @@
-import {ComputedNodeMap, NodeMap, SourceNodeMap} from "../NodeMap.js";
+import {ComputedNodeMap, NodeMap, SourceNodeMap} from "../node_map/NodeMap.js";
 import {ProxyTree} from "./ProxyTree.js";
 import {createCopyOnWriteProxy} from "./RefProxy.js";
 

@@ -1,6 +1,6 @@
 // Base Node class
 import {computed, reactive, ref} from "vue";
-import {ComputedNodeMap, SourceNodeMap} from "../NodeMap.js";
+import {ComputedNodeMap, SourceNodeMap} from "../node_map/NodeMap.js";
 
 
 // Tree class to manage nodes

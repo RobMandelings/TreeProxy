@@ -1,4 +1,4 @@
-import {NodeMap} from "../NodeMap.js";
+import {NodeMap} from "../node_map/NodeMap.js";
 import * as ProxyNode from "../proxy_tree/ProxyNode.js"
 import {readonly} from "vue";
 import * as Utils from "../Utils.js";

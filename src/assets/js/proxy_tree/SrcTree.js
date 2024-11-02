@@ -1,5 +1,5 @@
 import {ProxyTree} from "./ProxyTree.js";
-import {SourceNodeMap} from "../NodeMap.js";
+import {SourceNodeMap} from "../node_map/NodeMap.js";
 import {createMutableReferenceProxy} from "./RefProxy.js";
 import {reactive} from "vue";
 
