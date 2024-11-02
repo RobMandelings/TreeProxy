@@ -1,50 +1,24 @@
 // Base Node class
 import {computed, reactive, ref} from "vue";
-import {ComputedNodeMap, SourceNodeMap} from "../node_map/NodeMap.js";
 
+export function createReferenceProxy(nodeMap, initialId) {
 
-// Tree class to manage nodes
-
-function createReferenceProxy(nodeMap, initialId, setHandler) {
-
-    const id = ref(initialId);
+    const rId = ref(initialId);
     const node = computed(() => {
-        return nodeMap.getNode(id.value);
+        return nodeMap.getNode(rId.value);
     });
 
-    const targetObj = reactive({node: node, id: id});
+    const targetObj = reactive({node: node, id: rId});
     return new Proxy(targetObj, {
         get(t, prop, receiver) {
             if (prop === "__target__") return t;
-            
+
             if (t.node && prop in t.node) return Reflect.get(t.node, prop, receiver);
             return Reflect.get(t, prop, receiver);
         },
-        set: setHandler
-    });
-}
-
-// Proxy layer 1: Map IDs to references
-export function createMutableReferenceProxy(nodeMap, initialId) {
-
-    const setHandler = (t, prop, value) => {
-        t.node[prop] = value;
-        return true;
-    }
-    return createReferenceProxy(nodeMap, initialId, setHandler);
-}
-
-// Proxy layer 2: Copy-on-write
-export function createCopyOnWriteProxy(computedNodeMap, initialId) {
-
-    const setHandler = (t, prop, value) => {
-        if (!computedNodeMap.getOverwrittenNode(t.id)) {
-            const srcNode = computedNodeMap.srcNodeMap.getNode(t.id);
-            const newNode = srcNode.copy();
-            computedNodeMap.overwriteNode(t.id, newNode);
+        set(t, prop, value) {
+            nodeMap.set(rId, prop, value);
+            return true;
         }
-        t.node[prop] = value;
-        return true;
-    }
-    return createReferenceProxy(computedNodeMap, initialId, setHandler);
+    });
 }

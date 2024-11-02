@@ -1,5 +1,6 @@
 import {CustomNode} from "../CustomNode.js";
 import * as Utils from "../Utils.js";
+import {createMutableReferenceProxy, createReferenceProxy} from "../proxy_tree/RefProxy.js";
 
 class NodeNotExistsError extends Error {
     constructor(id) {
@@ -15,11 +16,19 @@ export class NodeMap {
         return crypto.randomUUID();
     }
 
+    createRefNode(id) {
+        return createReferenceProxy(this, id);
+    }
+
     _deleteNode(id) {
 
     }
 
     _addNode(node) {
+    }
+
+    set(nodeId, prop, value) {
+        throw new Error("Abstract method");
     }
 
     addNode(node) {

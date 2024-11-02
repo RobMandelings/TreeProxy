@@ -1,7 +1,5 @@
 import {NodeMap} from "../node_map/NodeMap.js";
 import * as ProxyNode from "../proxy_tree/ProxyNode.js"
-import {readonly} from "vue";
-import * as Utils from "../Utils.js";
 import {NodeNotFoundError, RootNotSetError} from "./ProxyTreeErrors.js";
 
 export class ProxyTree extends NodeMap {
@@ -43,9 +41,6 @@ export class ProxyTree extends NodeMap {
 
     deleteNodes(ids) {
         for (let id of ids) this.deleteNode(id);
-    }
-
-    createRefProxyNode(id) {
     }
 
     createProxyNode(id, parentId) {

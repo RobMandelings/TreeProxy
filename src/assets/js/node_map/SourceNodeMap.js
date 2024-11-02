@@ -13,6 +13,11 @@ export class SourceNodeMap extends NodeMap {
         return id;
     }
 
+    set(nodeId, prop, value) {
+        if (!this.nodeExists(nodeId)) throw new Error("Cannot set node property: node does not exist");
+        this.nodes[nodeId][prop] = value;
+    }
+
     _deleteNode(id) {
         this.nodes.delete(id);
     }

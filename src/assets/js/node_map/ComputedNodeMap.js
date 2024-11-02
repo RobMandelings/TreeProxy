@@ -1,7 +1,7 @@
 import * as Utils from "../Utils.js";
 import {NodeMap} from "./NodeMap.js";
 
-class ComputedNodeMap extends NodeMap {
+export class ComputedNodeMap extends NodeMap {
 
     constructor(srcNodeMap) {
         super();

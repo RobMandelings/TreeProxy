@@ -115,7 +115,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
 
 export function createProxyNode(proxyTree, id, parentId) {
-    const refProxy = proxyTree.createRefProxyNode(id);
+    const refProxy = proxyTree.nodeMap.createRefNode(id);
 
     const rProxyNode = {
         value: null,
