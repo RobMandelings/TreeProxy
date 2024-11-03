@@ -1,4 +1,4 @@
-import {nextTick, watch} from "vue";
+import {isReactive, nextTick, watch} from "vue";
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js"
 import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"
@@ -51,7 +51,26 @@ describe('Children', () => {
     test('Children as array', () => {
         expect(srcTree.root.children.asArray()).toBeInstanceOf(Array);
     });
-})
+
+    describe('Proxy reuse on multiple access', () => {
+        test('Single child', () => {
+            const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
+            expect(srcTree.root.children.asArray()).toBe(srcTree.root.children.asArray());
+            expect(srcTree.root.children.get.first()).toBe(srcTree.root.children.get.first());
+
+        })
+    })
+});
+
+describe('Reactivity checks', () => {
+
+    const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
+
+    expect(isReactive(srcTree.root)).toBe(true);
+    expect(isReactive(srcTree.root.children)).toBe(true);
+    expect(isReactive(srcTree.root.children.get.byPos(0))).toBe(true);
+
+});
 
 
 // describe('Parent and Child relation', () => {
