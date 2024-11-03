@@ -83,15 +83,18 @@ describe('Reactivity checks', () => {
 
 describe("Watch on source tree", () => {
 
-    let srcTree, child, mockCallback, initialChildName;
+    let srcTree, child, initialChildName;
+    let rootWatchTrigger, childrenWatchTrigger;
 
     beforeEach(() => {
         initialChildName = 'Child';
         srcTree = new SourceTree().init({name: 'Root', children: [{name: initialChildName}]});
         child = srcTree.root.children.get.byPos(0);
-        mockCallback = jest.fn();
+        rootWatchTrigger = jest.fn();
+        childrenWatchTrigger = jest.fn();
         expect(child).not.toBeFalsy();
-        watch(srcTree.root, () => mockCallback());
+        watch(srcTree.root.children.asArray, () => childrenWatchTrigger());
+        watch(srcTree.root, () => rootWatchTrigger());
     })
 
     describe('Root level watch', () => {
@@ -99,13 +102,13 @@ describe("Watch on source tree", () => {
         test('No change', async () => {
             srcTree.root.name = 'Root';
             await nextTick();
-            expect(mockCallback).toHaveBeenCalledTimes(0);
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(0);
         })
 
         test('Single change', async () => {
             srcTree.root.name = "Changed";
             await nextTick();
-            expect(mockCallback).toHaveBeenCalledTimes(1);
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(1);
         });
 
         test('Many changes', async () => {
@@ -115,7 +118,7 @@ describe("Watch on source tree", () => {
                 srcTree.root.name = `${count++}`;
                 await nextTick();
             }
-            expect(mockCallback).toHaveBeenCalledTimes(nrChanges);
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(nrChanges);
         })
     });
 
@@ -124,13 +127,16 @@ describe("Watch on source tree", () => {
         test('Assign with no change', async () => {
             child.name = initialChildName;
             await nextTick();
-            expect(mockCallback).toHaveBeenCalledTimes(0);
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(0);
+            expect(childrenWatchTrigger).toHaveBeenCalledTimes(0);
         })
 
         test('Test initial child name change', async () => {
             child.name = "Changed";
             await nextTick();
-            expect(mockCallback).toHaveBeenCalledTimes(1);
+
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(1);
+            expect(childrenWatchTrigger).toHaveBeenCalledTimes(1);
         });
 
         test('Many changes', async () => {
@@ -140,7 +146,8 @@ describe("Watch on source tree", () => {
                 child.name = `${count++}`;
                 await nextTick();
             }
-            expect(mockCallback).toHaveBeenCalledTimes(nrChanges);
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(nrChanges);
+            expect(childrenWatchTrigger).toHaveBeenCalledTimes(nrChanges);
         })
     })
 })
