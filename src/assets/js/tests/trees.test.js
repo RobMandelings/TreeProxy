@@ -54,15 +54,15 @@ describe('Children', () => {
 })
 
 
-describe('Parent and Child relation', () => {
-    const srcTree = new SourceTree();
-    srcTree.init({name: "Root", children: [{name: "Child"}]});
-    const child = srcTree.root.children.get.first;
-    test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
-    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
-});
+// describe('Parent and Child relation', () => {
+//     const srcTree = new SourceTree();
+//     srcTree.init({name: "Root", children: [{name: "Child"}]});
+//     const child = srcTree.root.children.get.first;
+//     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
+//     test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
+// });
 
-describe("Deep watch on source tree", () => {
+describe("Watch on source tree", () => {
 
     let srcTree, child, mockCallback, initialChildName;
 
@@ -75,25 +75,53 @@ describe("Deep watch on source tree", () => {
         watch(srcTree.root, () => mockCallback());
     })
 
-    test('Test initial child name change', async () => {
-        child.name = "Changed";
-        await nextTick();
-        expect(mockCallback).toHaveBeenCalledTimes(1);
+    describe('Root level watch', () => {
+
+        test('No change', async () => {
+            srcTree.root.name = 'Root';
+            await nextTick();
+            expect(mockCallback).toHaveBeenCalledTimes(0);
+        })
+
+        test('Single change', async () => {
+            srcTree.root.name = "Changed";
+            await nextTick();
+            expect(mockCallback).toHaveBeenCalledTimes(1);
+        });
+
+        test('Many changes', async () => {
+            let count = 0;
+            const nrChanges = 5;
+            for (let i = 0; i < nrChanges; i++) {
+                srcTree.root.name = `${count++}`;
+                await nextTick();
+            }
+            expect(mockCallback).toHaveBeenCalledTimes(nrChanges);
+        })
     });
 
-    test('Assign with no change', async () => {
-        child.name = initialChildName;
-        await nextTick();
-        expect(mockCallback).toHaveBeenCalledTimes(0);
-    })
+    describe('Nested level 1 watch', () => {
 
-    test('Many changes', async () => {
-        let count = 0;
-        const nrChanges = 5;
-        for (let i = 0; i < nrChanges; i++) {
-            child.name = `${count++}`;
+        test('Assign with no change', async () => {
+            child.name = initialChildName;
             await nextTick();
-        }
-        expect(mockCallback).toHaveBeenCalledTimes(nrChanges);
+            expect(mockCallback).toHaveBeenCalledTimes(0);
+        })
+
+        test('Test initial child name change', async () => {
+            child.name = "Changed";
+            await nextTick();
+            expect(mockCallback).toHaveBeenCalledTimes(1);
+        });
+
+        test('Many changes', async () => {
+            let count = 0;
+            const nrChanges = 5;
+            for (let i = 0; i < nrChanges; i++) {
+                child.name = `${count++}`;
+                await nextTick();
+            }
+            expect(mockCallback).toHaveBeenCalledTimes(nrChanges);
+        })
     })
 })

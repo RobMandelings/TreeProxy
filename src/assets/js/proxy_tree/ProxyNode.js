@@ -89,6 +89,11 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     }
 
+    const getFirst = () => {
+        if (!rSize.value) return null;
+        return getChildByPos(0);
+    }
+
     const hasChildrenFn = () => !!rSize.value;
 
     return {
@@ -102,10 +107,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
                 asSet: () => getChildrenIdsAsSet(),
             },
             get: {
-                get first() {
-                    if (!rSize.value) return null;
-                    return getChildByPos(0);
-                },
+                first: getFirst,
                 byId: getChildById,
                 byPos: getChildByPos
             },
