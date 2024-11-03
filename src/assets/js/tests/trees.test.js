@@ -57,9 +57,9 @@ describe('Children', () => {
 describe('Parent and Child relation', () => {
     const srcTree = new SourceTree();
     srcTree.init({name: "Root", children: [{name: "Child"}]});
-    const child = srcTree.root.children.get.first();
+    const child = srcTree.root.children.get.first;
     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
-    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first()).toBe(child));
+    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
 });
 
 describe("Deep watch on source tree", () => {

@@ -102,7 +102,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
                 asSet: () => getChildrenIdsAsSet(),
             },
             get: {
-                first: () => {
+                get first() {
                     if (!rSize.value) return null;
                     return getChildByPos(0);
                 },
