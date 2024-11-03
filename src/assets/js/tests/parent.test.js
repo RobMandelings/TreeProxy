@@ -32,8 +32,8 @@ describe("Parent relation test", () => {
     // test('Move parent', () => {
     //     expect(subchild1.parent.children.get.byPos(0)).toBe([]);
     // expect(subchild1.parent.id).toBe(child1.id);
-    // expect(child1.children.get.asArray()).toBeNull();
-    // expect(subchild1.parent.children.ids.asArray()).toBeNull();
+    // expect(child1.children.get.asArray).toBeNull();
+    // expect(subchild1.parent.children.ids.asArray).toBeNull();
     // expect(subchild1.parent.children.get.byId(subchild1.id)).toBeNull();
     // subchild1.setParent(child2.id);
     // expect(subchild1.parent.id).toBe(child2.id);

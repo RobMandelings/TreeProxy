@@ -37,25 +37,25 @@ describe('Children', () => {
     describe('Single child test', () => {
         beforeAll(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
         test('Size', () => expect(srcTree.root.children.size).toBe(1));
-        test('Array', () => expect(srcTree.root.children.asArray()).toBeInstanceOf(Array));
+        test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet()).toBeInstanceOf(Set));
     });
 
     describe('No child test test', () => {
         beforeAll(() => srcTree.init({name: "Root"}));
         test('Size', () => expect(srcTree.root.children.size).toBe(0))
-        test('Array', () => expect(srcTree.root.children.asArray()).toBeInstanceOf(Array));
+        test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet()).toBeInstanceOf(Set));
     });
 
     test('Children as array', () => {
-        expect(srcTree.root.children.asArray()).toBeInstanceOf(Array);
+        expect(srcTree.root.children.asArray).toBeInstanceOf(Array);
     });
 
     describe('Proxy reuse on multiple access', () => {
         test('Single child', () => {
             const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
-            expect(srcTree.root.children.asArray()).toBe(srcTree.root.children.asArray());
+            expect(srcTree.root.children.asArray).toBe(srcTree.root.children.asArray);
             expect(srcTree.root.children.get.first()).toBe(srcTree.root.children.get.first());
 
         })

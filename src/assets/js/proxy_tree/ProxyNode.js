@@ -28,7 +28,7 @@ export function useLineage(rProxyNode) {
 
     const rDescendants = computed(() => {
         const proxyNode = rProxyNode.value;
-        return [...proxyNode.children.asArray().flatMap(c => c.getDescendants(true))
+        return [...proxyNode.children.asArray.flatMap(c => c.getDescendants(true))
         ];
     });
 
@@ -98,7 +98,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     return {
         children: reactive({
-            asArray: () => rChildrenArray.value,
+            asArray: rChildrenArray,
             asSet: () => getChildrenAsSet(),
             has: hasChild,
             size: rSize,
