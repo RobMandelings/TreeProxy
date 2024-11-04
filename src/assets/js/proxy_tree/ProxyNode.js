@@ -180,6 +180,22 @@ function useChildren(rId, rChildrenIds, proxyTree) {
     return childrenObj;
 }
 
+function decorateChildren(children) {
+    return new Proxy(children, {
+        get(t, prop, receiver) {
+            if (prop in t) return Reflect.get(t, prop, receiver);
+
+            if (typeof prop === 'string') {
+                if (t.has(prop)) return t.asArray.find(c => c.id === prop);
+                if (!isNaN(prop)) prop = parseInt(prop);
+            }
+
+            if (typeof prop === "number") return t.asArray[prop];
+            return Reflect.get(t, prop, receiver); // Always a Reflect.get required for vue to properly initialise reactivity and such
+        }
+    });
+}
+
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.nodeMap.createRefNode(id);
