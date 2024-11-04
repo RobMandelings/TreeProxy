@@ -1,8 +1,6 @@
-import {isReactive, isRef, nextTick, watch} from "vue";
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js"
 import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"
-import {PosOutOfRangeError} from "../proxy_tree/ProxyNodeErrors.js";
 
 test('Root not initialised', () => {
     const srcTree = new SourceTree();
