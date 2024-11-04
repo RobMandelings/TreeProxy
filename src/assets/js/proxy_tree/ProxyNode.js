@@ -97,20 +97,66 @@ function useDescendants(rProxyNode) {
     return useNodeRelatives(getDescendantsAsArray);
 }
 
+// function useChildren(rId, rChildrenIds, proxyTree) {
+//
+//     const rChildrenArray = computed(() => {
+//         if (!rId.value) return [];
+//         return proxyTree.getChildren(rId.value)
+//     });
+//
+//     const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
+//     const getChildrenIdsAsSet = () => new Set(rChildrenIdsAsArray.value);
+//
+//     const nodeRelativesCore = useNodeRelatives(() => rChildrenArray.value);
+//
+//     const getChildByPos = (pos) => {
+//         const maxPos = nodeRelativesCore.size.value - 1;
+//         if ((pos < 0 || pos > maxPos) && pos !== -1) {
+//             throw new PosOutOfRangeError(pos, maxPos);
+//         }
+//         return rChildrenArray.value.at(pos) ?? null;
+//     }
+//
+//     const getFirst = () => {
+//         if (!nodeRelativesCore.size.value) return null;
+//         return getChildByPos(0);
+//     }
+//
+//     return reactive({
+//         ...nodeRelativesCore,
+//         ids: {
+//             get asArray() {
+//                 return rChildrenIdsAsArray.value;
+//             },
+//             get asSet() {
+//                 return getChildrenIdsAsSet();
+//             },
+//         },
+//         get: {
+//             ...nodeRelativesCore.get,
+//             get first() {
+//                 return getFirst();
+//             },
+//             byPos: getChildByPos
+//         }
+//     });
+// }
+
 function useChildren(rId, rChildrenIds, proxyTree) {
 
-    const rChildrenArray = computed(() => {
-        if (!rId.value) return [];
-        return proxyTree.getChildren(rId.value)
-    });
+    const rChildrenArray = computed(() => proxyTree.getChildren(rId.value));
+    const rSize = computed(() => rChildrenArray.value.length);
+    const getChildrenAsSet = () => new Set(rChildrenArray.value);
 
+    const hasChild = (id) => !!getChildById(id);
     const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
     const getChildrenIdsAsSet = () => new Set(rChildrenIdsAsArray.value);
 
-    const nodeRelativesCore = useNodeRelatives(() => rChildrenArray.value);
-
+    const getChildById = (id) => {
+        return rChildrenIdsAsArray.value.find(tmpId => tmpId === id);
+    }
     const getChildByPos = (pos) => {
-        const maxPos = nodeRelativesCore.size.value - 1;
+        const maxPos = rSize.value - 1;
         if ((pos < 0 || pos > maxPos) && pos !== -1) {
             throw new PosOutOfRangeError(pos, maxPos);
         }
@@ -118,28 +164,63 @@ function useChildren(rId, rChildrenIds, proxyTree) {
     }
 
     const getFirst = () => {
-        if (!nodeRelativesCore.size.value) return null;
+        if (!rSize.value) return null;
         return getChildByPos(0);
     }
 
-    return reactive({
-        ...nodeRelativesCore,
-        ids: {
-            get asArray() {
-                return rChildrenIdsAsArray.value;
-            },
-            get asSet() {
-                return getChildrenIdsAsSet();
-            },
+    const hasChildrenFn = () => !!rSize.value;
+
+    const nodeRelativesCore = useNodeRelatives(() => rChildrenArray.value);
+
+    const deepCopy = Object.create(
+        Object.getPrototypeOf(nodeRelativesCore),
+        Object.getOwnPropertyDescriptors(nodeRelativesCore)
+    );
+
+    Object.defineProperties(deepCopy.get, {
+        first: {
+            get: () => getFirst(),
+            enumerable: true,
+            configurable: true,
         },
-        get: {
-            ...nodeRelativesCore.get,
-            get first() {
-                return getFirst();
-            },
-            byPos: getChildByPos
+        byPos: {
+            get: (pos) => getChildByPos(pos),
+            enumerable: true,
+            configurable: true,
         }
     });
+
+    return {
+        children: reactive({
+            get asArray() {
+                return rChildrenArray.value;
+            },
+            get asSet() {
+                return getChildrenAsSet();
+            },
+            has: hasChild,
+            size: rSize,
+            get hasAny() {
+                return hasChildrenFn();
+            },
+            ids: {
+                get asArray() {
+                    return rChildrenIdsAsArray.value;
+                },
+                get asSet() {
+                    return getChildrenIdsAsSet();
+                },
+            },
+            get: {
+                get first() {
+                    return getFirst();
+                },
+                byId: getChildById,
+                byPos: getChildByPos
+            },
+        }),
+        hasChildrenFn
+    }
 }
 
 
@@ -158,7 +239,7 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
     const {findFn} = useFind(rProxyNode);
-    const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
+    const {children} = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
     const descendants = useDescendants(rProxyNode);
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
