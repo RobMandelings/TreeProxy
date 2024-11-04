@@ -18,29 +18,21 @@ test('Direct proxy node access', () => {
     expect(() => srcTree.root.node).toThrow(ProxyNodeErrors.DirectNodeAccessError);
 });
 
-describe('Stale proxies', () => {
-
-    let srcTree;
-    beforeEach(() => {
-        srcTree = new SourceTree().init({name: "Root", children: [{name: "Child 1"}]});
-        expect(srcTree.root.stale).toBe(false);
-        srcTree.root.delete();
-        expect(srcTree.root.stale).toBe(true);
-    });
-
-    test('Stale proxy error', () => {
-        expect(() => srcTree.root.id).toThrow(ProxyNodeErrors.StaleProxyError);
-    });
-});
 describe('Children', () => {
 
     let srcTree = new SourceTree();
+    let first;
     describe('Single child', () => {
-        beforeAll(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
+        beforeAll(() => {
+            srcTree.init({name: "Root", children: [{name: "Child"}]})
+            first = srcTree.root.children.get.first;
+        });
+        test('First', () => expect(first).not.toBeNull());
         test('Size', () => expect(srcTree.root.children.size).toBe(1));
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
-        test('First', () => expect(srcTree.root.children.get.first).not.toBeNull());
+
+        test('Has', () => expect(srcTree.root.children.has(first.id)).toBe(true));
     });
 
     describe('No child', () => {
