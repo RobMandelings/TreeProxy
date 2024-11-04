@@ -76,7 +76,7 @@ function useAncestors(rProxyNode) {
         if (!proxyNode) return [];
 
         if (!proxyNode.parent) return [rProxyNode.value];
-        return [rProxyNode.value, ...proxyNode.parent.ancestors.asArray];
+        return [rProxyNode.value, ...proxyNode.parent.selfAndAncestors.asArray];
     }
 
     return useNodeRelatives(getAncestorsAsArrayFn);
@@ -197,12 +197,14 @@ export function createProxyNode(proxyTree, id, parentId) {
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
     const {findFn} = useFind(rProxyNode);
     const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
+    const selfAndAncestors = useAncestors(rProxyNode);
     const selfAndDescendants = useDescendants(rProxyNode);
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
     const targetObj = reactive({
         refProxy,
         children,
+        selfAndAncestors,
         selfAndDescendants,
         parent: rParent,
         setParent,
