@@ -45,10 +45,10 @@ describe('Relatives', () => {
 
     describe('Complex tree', () => {
 
-        let srcTree = new SourceTree();
-        let childLvl1, childLvl2;
+        let srcTree, root, childLvl1, childLvl2;
         beforeEach(() => {
-            srcTree.init(createTree([1, 2, [3, 4]]));
+            srcTree = new SourceTree().init(createTree([1, 2, [3, 4]]));
+            root = srcTree.root;
             childLvl1 = srcTree.root.children[2];
             childLvl2 = srcTree.root.descendants["2, 0, 0"];
         })
@@ -64,5 +64,20 @@ describe('Relatives', () => {
             test('Child lvl 1', () => expect(childLvl1.descendants.size).toBe(9));
             test('Child lvl 2', () => expect(childLvl2.descendants.size).toBe(3));
         });
+
+        describe('Boolean relative checks', () => {
+
+            test('Ancestor of', () => {
+                expect(root.isAncestorOf(childLvl1.id)).toBe(true);
+                expect(root.isAncestorOf(childLvl2.id)).toBe(true);
+                expect(childLvl2.isAncestorOf(root.id)).toBe(false);
+            });
+
+            test('Descendant of', () => {
+                expect(childLvl1.isDescendantOf(root.id)).toBe(true);
+                expect(childLvl2.isDescendantOf(root.id)).toBe(true);
+                expect(root.isDescendantOf(childLvl2.id)).toBe(false);
+            });
+        })
     });
 })
