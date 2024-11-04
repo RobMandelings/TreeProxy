@@ -118,7 +118,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
                 byPos: getChildByPos
             },
         }),
-        hasChildren: hasChildrenFn
+        hasChildrenFn
     }
 }
 
@@ -139,13 +139,15 @@ export function createProxyNode(proxyTree, id, parentId) {
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
     const {findFn} = useFind(rProxyNode);
     const {getAncestors, getDescendants} = useLineage(rProxyNode);
-    const {children, hasChildren} = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
+    const {children, hasChildrenFn} = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
     const targetObj = reactive({
         refProxy,
         children,
-        hasChildren,
+        get hasChildren() {
+            return hasChildrenFn();
+        },
         parent: rParent,
         setParent,
         stale: rStale,

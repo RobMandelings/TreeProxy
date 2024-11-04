@@ -25,7 +25,7 @@ describe("Parent relation test", () => {
     });
 
     test('Parent children test', () => {
-        expect(child1.hasChildren()).toBe(true);
+        expect(child1.hasChildren).toBe(true);
         expect(child1.children.has(subchild1.id)).toBe(true);
     });
 
