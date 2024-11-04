@@ -1,6 +1,7 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js"
 import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"
+import {watch} from "vue";
 
 test('Root not initialised', () => {
     const srcTree = new SourceTree();
@@ -15,6 +16,45 @@ test('Direct proxy node access', () => {
 
     expect(() => srcTree.root.node).toThrow(ProxyNodeErrors.DirectNodeAccessError);
 });
+
+describe('Delayed child computation', () => {
+
+    let srcTree, spy;
+    beforeEach(() => {
+        const originalMethod = SourceTree.prototype.getChildren;
+        // spy = jest.spyOn(SourceTree.prototype, 'getChildren');
+        spy = jest.spyOn(SourceTree.prototype, 'getChildren').mockImplementation(function (id) {
+            // Log the method call
+            // console.log('Method called with args:', args);
+
+            console.log(`Method called with id: ${id} and name ${this.getNode(id).name}`)
+            // Call the original implementation and store the result
+            const result = originalMethod.apply(this, [id]);
+
+            // Log the result
+            // console.log('Method returned:', result);
+
+            // Return the original result
+            return result;
+        });
+        srcTree = new SourceTree().init({
+            name: "Root",
+            children: [{name: "Child1"}, {name: "Child2", children: [{name: "Subchild1"}]}, {name: "Child3"}]
+        });
+        expect(spy).toHaveBeenCalledTimes(0);
+    });
+
+    afterEach(() => {
+        spy.mockRestore();
+    });
+
+    test('Watch install', () => {
+        watch(srcTree.root, () => undefined);
+        const callCount = spy.mock.calls.length;
+        spy.mockRestore();
+        // expect(callCount).toBe();
+    });
+})
 
 describe('Children', () => {
 
