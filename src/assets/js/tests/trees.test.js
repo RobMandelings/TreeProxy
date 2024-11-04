@@ -2,6 +2,7 @@ import {isReactive, isRef, nextTick, watch} from "vue";
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js"
 import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"
+import {PosOutOfRangeError} from "../proxy_tree/ProxyNodeErrors.js";
 
 test('Root not initialised', () => {
     const srcTree = new SourceTree();
@@ -34,18 +35,21 @@ describe('Stale proxies', () => {
 describe('Children', () => {
 
     let srcTree = new SourceTree();
-    describe('Single child test', () => {
+    describe('Single child', () => {
         beforeAll(() => srcTree.init({name: "Root", children: [{name: "Child"}]}));
         test('Size', () => expect(srcTree.root.children.size).toBe(1));
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
+        test('First', () => expect(srcTree.root.children.get.first).not.toBeNull());
     });
 
-    describe('No child test test', () => {
+    describe('No child', () => {
         beforeAll(() => srcTree.init({name: "Root"}));
         test('Size', () => expect(srcTree.root.children.size).toBe(0))
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
+        // test('byPos out of range', () => expect(srcTree.root.children.get.byPos(0)).toThrow(ProxyNodeErrors.PosOutOfRangeError));
+        test('First', () => expect(srcTree.root.children.get.first).toBeNull())
     });
 
     test('Children as array', () => {

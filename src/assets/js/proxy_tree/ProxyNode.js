@@ -85,10 +85,6 @@ function useChildren(rId, rChildrenIds, proxyTree) {
         return rChildrenArray.value.at(pos) ?? null;
     }
 
-    const deleteChildById = (id) => {
-
-    }
-
     const getFirst = () => {
         if (!rSize.value) return null;
         return getChildByPos(0);
