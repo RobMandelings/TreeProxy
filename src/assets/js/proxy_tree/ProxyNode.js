@@ -180,20 +180,28 @@ function useChildren(rId, rChildrenIds, proxyTree) {
     return decorateChildren(childrenObj);
 }
 
-function decorateChildren(children) {
-    return new Proxy(children, {
+function decorateNodeRelatives(nodeRelatives, customGetHandler) {
+    return new Proxy(nodeRelatives, {
         get(t, prop, receiver) {
             if (prop in t) return Reflect.get(t, prop, receiver);
 
             if (typeof prop === 'string') {
                 if (t.has(prop)) return t.asArray.find(c => c.id === prop);
-                if (!isNaN(prop)) prop = parseInt(prop);
             }
 
-            if (typeof prop === "number") return t.asArray[prop];
+            const res = customGetHandler(t, prop, receiver);
+            if (res !== undefined) return res;
+
             return Reflect.get(t, prop, receiver); // Always a Reflect.get required for vue to properly initialise reactivity and such
         }
     });
+}
+
+function decorateChildren(children) {
+    return decorateNodeRelatives(children, (t, prop, receiver) => {
+        if (typeof prop === "string" && !isNaN(prop)) prop = parseInt(prop);
+        if (typeof prop === "number") return t.asArray[prop];
+    })
 }
 
 
