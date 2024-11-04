@@ -6,9 +6,12 @@ function createTreeRec(treeObj, depth, pos) {
             children: treeObj.map((d, i) => createTreeRec(d, depth + 1, i))
         }
     } else if (treeObj instanceof Object) {
+        let children;
+        if (treeObj.children.length) children = treeObj.children.map((c, i) => createTreeRec(c, depth + 1, i));
+        else children = [];
         return {
             name: treeObj.name,
-            children: treeObj.children.map((c, i) => createTreeRec(c, depth + 1, i))
+            children: children
         };
     } else if (typeof treeObj === "number") {
         return createTreeRec(Array.from({length: treeObj}, () => []), depth, pos);
