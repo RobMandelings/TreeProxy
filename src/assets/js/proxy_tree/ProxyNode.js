@@ -94,7 +94,33 @@ function useDescendants(rProxyNode) {
         return [proxyNode, ...descendants];
     }
 
-    return useNodeRelatives(getDescendantsAsArray);
+    const nodeRelativesCore = useNodeRelatives(getDescendantsAsArray);
+    const descendantsObj = Object.create(
+        Object.getPrototypeOf(nodeRelativesCore),
+        Object.getOwnPropertyDescriptors(nodeRelativesCore)
+    );
+
+    const getDescendantFromPath = (posPath) => {
+        const proxyNode = rProxyNode.value;
+        if (!proxyNode) return null;
+        let curChild = proxyNode.children.get.byPos(posPath.shift());
+        while (posPath.length > 1) {
+            if (!curChild) break;
+            curChild = curChild.children.get.byPos(posPath.shift());
+        }
+
+        return curChild;
+    }
+
+    Object.defineProperties(descendantsObj.get, {
+        fromPath: {
+            get: () => getDescendantFromPath,
+            enumerable: true,
+            configurable: true,
+        },
+    });
+
+    return descendantsObj;
 }
 
 function useChildren(rId, rChildrenIds, proxyTree) {

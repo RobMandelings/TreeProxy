@@ -38,7 +38,7 @@ describe('Relatives', () => {
             })
 
             test('Child lvl 2', () => {
-                expect(srcTree.root.children.get.byPos(2).children.get.byPos(0).selfAndDescendants.size).toBe(4);
+                expect(srcTree.root.selfAndDescendants.get.fromPath([2, 0, 0]).selfAndDescendants.size).toBe(4);
             });
         });
     });
