@@ -40,7 +40,13 @@ describe('Relatives', () => {
                 expect(child.isDescendantOf(root.id)).toBe(true);
                 expect(root.isDescendantOf(child.id)).toBe(false);
             });
-        })
+        });
+
+        describe('Finding nodes', () => {
+            describe('Finding ancestors', () => {
+                test('Root via index', () => expect(child.parent).toBe(root));
+            });
+        });
     });
 
     describe('Complex tree', () => {

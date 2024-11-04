@@ -73,6 +73,12 @@ function useAncestors(rProxyNode) {
         return [proxyNode.parent, ...proxyNode.parent.ancestors.asArray];
     }
 
+    const decorateAncestors = (ancestors) => {
+        return decorateNodeRelatives(ancestors, (t, prop) => {
+            if (typeof prop === "number") return t.asArray[prop]; // ancestors[n] -> retrieve the n-th ancestor
+        });
+    }
+
     return decorateAncestors(useNodeRelatives(getAncestorsAsArrayFn));
 }
 
@@ -88,6 +94,29 @@ function useDescendants(rProxyNode) {
         return [...descendants];
     }
     const nodeRelativesCore = useNodeRelatives(getDescendantsAsArray);
+
+    const decorateDescendants = (descendants, rProxyNode) => {
+        const getDescendantFromPath = (posPath) => {
+            const proxyNode = rProxyNode.value;
+            if (!proxyNode) return null;
+            let curChild = proxyNode.children[posPath.shift()];
+            while (posPath.length > 1) {
+                if (!curChild) break;
+                curChild = curChild.children[posPath.shift()];
+            }
+
+            return curChild;
+        }
+
+        return decorateNodeRelatives(descendants, (t, prop) => {
+            if (typeof prop === "string") {
+                const numbers = prop.split(',').map(num => parseInt(num.trim()));
+                if (numbers.some(n => isNaN(n))) return undefined; // Incorrect format
+                if (numbers.length > 0) return getDescendantFromPath(numbers);
+            }
+        })
+    }
+
     return decorateDescendants(nodeRelativesCore, rProxyNode);
 }
 
@@ -132,6 +161,13 @@ function useChildren(rId, rChildrenIds, proxyTree) {
         }
     });
 
+    const decorateChildren = (children) => {
+        return decorateNodeRelatives(children, (t, prop) => {
+            if (typeof prop === "string" && !isNaN(prop)) prop = parseInt(prop);
+            if (typeof prop === "number") return t.asArray[prop];
+        })
+    }
+
     return decorateChildren(childrenObj);
 }
 
@@ -144,46 +180,11 @@ function decorateNodeRelatives(nodeRelatives, customGetHandler) {
                 if (t.has(prop)) return t.asArray.find(c => c.id === prop);
             }
 
-            const res = customGetHandler(t, prop, receiver);
+            const res = customGetHandler(t, prop);
             if (res !== undefined) return res;
 
             return Reflect.get(t, prop, receiver); // Always a Reflect.get required for vue to properly initialise reactivity and such
         }
-    });
-}
-
-function decorateChildren(children) {
-    return decorateNodeRelatives(children, (t, prop, receiver) => {
-        if (typeof prop === "string" && !isNaN(prop)) prop = parseInt(prop);
-        if (typeof prop === "number") return t.asArray[prop];
-    })
-}
-
-function decorateDescendants(descendants, rProxyNode) {
-    const getDescendantFromPath = (posPath) => {
-        const proxyNode = rProxyNode.value;
-        if (!proxyNode) return null;
-        let curChild = proxyNode.children[posPath.shift()];
-        while (posPath.length > 1) {
-            if (!curChild) break;
-            curChild = curChild.children[posPath.shift()];
-        }
-
-        return curChild;
-    }
-
-    return decorateNodeRelatives(descendants, (t, prop, receiver) => {
-        if (typeof prop === "string") {
-            const numbers = prop.split(',').map(num => parseInt(num.trim()));
-            if (numbers.some(n => isNaN(n))) return undefined; // Incorrect format
-            if (numbers.length > 0) return getDescendantFromPath(numbers);
-        }
-    })
-}
-
-function decorateAncestors(ancestors) {
-    return decorateNodeRelatives(ancestors, (t, prop, _) => {
-        if (typeof prop === "number") return t.asArray[prop]; // ancestors[n] -> retrieve the n-th ancestor
     });
 }
 
