@@ -223,7 +223,15 @@ export function createProxyNode(proxyTree, id, parentId) {
         setParent,
         stale: rStale,
         delete: deleteFn,
-        find: findFn
+        find: findFn,
+        toJSON: () => {
+            let obj = {
+                id: rId.value,
+                name: refProxy.name,
+            }
+            if (children.size) obj.children = children.asArray.map(c => c.toJSON());
+            return obj;
+        }
     });
 
     const handler = {

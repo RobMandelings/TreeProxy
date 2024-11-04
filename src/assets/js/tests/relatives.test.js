@@ -44,7 +44,12 @@ describe('Relatives', () => {
 
         describe('Finding nodes', () => {
             describe('Finding ancestors', () => {
-                test('Root via index', () => expect(child.parent).toBe(root));
+                // test('Hallo', () => {
+                //     const anc = root.ancestors;
+                //     console.log(anc.toString());
+                //     expect(true).toBe(true);
+                // })
+                test('Root via index', () => expect(root.ancestors).toBe(root));
             });
         });
     });
