@@ -4,8 +4,12 @@ import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 describe('ComputedTree', () => {
     let srcTree, compTree;
 
+    const initial = "Root";
+    const change1 = "Changed";
+    const change2 = "Changed2";
+
     beforeEach(() => {
-        srcTree = new SourceTree().init({name: "Root"});
+        srcTree = new SourceTree().init({name: initial});
         compTree = new ComputedTree(srcTree);
     });
 
@@ -18,20 +22,20 @@ describe('ComputedTree', () => {
     })
 
     test('Name change', () => {
-        compTree.root.name = "Changed";
-        expect(compTree.root.name).toBe("Changed");
-        expect(srcTree.root.name).not.toBe("Changed");
+        compTree.root.name = change1;
+        expect(compTree.root.name).toBe(change1);
+        expect(srcTree.root.name).not.toBe(change1);
     });
 
     test('Multi-layered change', () => {
         const compTree2 = new ComputedTree(compTree);
-        compTree.root.name = "Changed";
-        expect(compTree.root.name).toBe("Changed");
-        expect(compTree2.root.name).toBe("Changed");
-        compTree2.root.name = "Changed2";
-        expect(compTree2.root.name).toBe("Changed2");
-        expect(compTree.root.name).not.toBe("Changed2")
-        expect(srcTree.root.name).not.toBe("Changed2")
+        compTree.root.name = change1;
+        expect(compTree.root.name).toBe(change1);
+        expect(compTree2.root.name).toBe(change1);
+        compTree2.root.name = change2;
+        expect(compTree2.root.name).toBe(change2);
+        expect(compTree.root.name).toBe(change1);
+        expect(srcTree.root.name).toBe(initial);
     });
 
     test('Children adjustments', () => {
