@@ -93,34 +93,8 @@ function useDescendants(rProxyNode) {
         const descendants = [...proxyNode.children.asArray.flatMap(c => c.selfAndDescendants.asArray)];
         return [proxyNode, ...descendants];
     }
-
     const nodeRelativesCore = useNodeRelatives(getDescendantsAsArray);
-    const descendantsObj = Object.create(
-        Object.getPrototypeOf(nodeRelativesCore),
-        Object.getOwnPropertyDescriptors(nodeRelativesCore)
-    );
-
-    const getDescendantFromPath = (posPath) => {
-        const proxyNode = rProxyNode.value;
-        if (!proxyNode) return null;
-        let curChild = proxyNode.children[posPath.shift()];
-        while (posPath.length > 1) {
-            if (!curChild) break;
-            curChild = curChild.children[posPath.shift()];
-        }
-
-        return curChild;
-    }
-
-    Object.defineProperties(descendantsObj.get, {
-        fromPath: {
-            get: () => getDescendantFromPath,
-            enumerable: true,
-            configurable: true,
-        },
-    });
-
-    return descendantsObj;
+    return decorateDescendants(nodeRelativesCore, rProxyNode);
 }
 
 function useChildren(rId, rChildrenIds, proxyTree) {
@@ -201,6 +175,28 @@ function decorateChildren(children) {
     return decorateNodeRelatives(children, (t, prop, receiver) => {
         if (typeof prop === "string" && !isNaN(prop)) prop = parseInt(prop);
         if (typeof prop === "number") return t.asArray[prop];
+    })
+}
+
+function decorateDescendants(descendants, rProxyNode) {
+    const getDescendantFromPath = (posPath) => {
+        const proxyNode = rProxyNode.value;
+        if (!proxyNode) return null;
+        let curChild = proxyNode.children[posPath.shift()];
+        while (posPath.length > 1) {
+            if (!curChild) break;
+            curChild = curChild.children[posPath.shift()];
+        }
+
+        return curChild;
+    }
+
+    return decorateNodeRelatives(descendants, (t, prop, receiver) => {
+        if (typeof prop === "string") {
+            const numbers = prop.split(',').map(num => parseInt(num.trim()));
+            if (numbers.some(n => isNaN(n))) return undefined; // Incorrect format
+            if (numbers.length > 0) return getDescendantFromPath(numbers);
+        }
     })
 }
 

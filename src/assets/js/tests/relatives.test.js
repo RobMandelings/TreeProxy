@@ -33,7 +33,7 @@ describe('Relatives', () => {
         beforeEach(() => {
             srcTree.init(createTree([1, 2, [3, 4]]));
             childLvl1 = srcTree.root.children[2];
-            childLvl2 = srcTree.root.selfAndDescendants.get.fromPath([2, 0, 0]);
+            childLvl2 = srcTree.root.selfAndDescendants["2, 0, 0"];
         })
 
         describe('Nr ancestors', () => {
