@@ -79,7 +79,7 @@ function useAncestors(rProxyNode) {
         return [rProxyNode.value, ...proxyNode.parent.selfAndAncestors.asArray];
     }
 
-    return useNodeRelatives(getAncestorsAsArrayFn);
+    return decorateNodeRelatives(useNodeRelatives(getAncestorsAsArrayFn), (t, p, c) => undefined);
 }
 
 function useDescendants(rProxyNode) {
@@ -123,19 +123,6 @@ function useChildren(rId, rChildrenIds, proxyTree) {
         Object.getPrototypeOf(nodeRelativesCore),
         Object.getOwnPropertyDescriptors(nodeRelativesCore)
     );
-
-    Object.defineProperties(childrenObj.get, {
-        first: {
-            get: () => getFirst(),
-            enumerable: true,
-            configurable: true,
-        },
-        byPos: {
-            get: () => (pos) => getChildByPos(pos),
-            enumerable: true,
-            configurable: true,
-        }
-    });
 
     childrenObj.ids = {};
     Object.defineProperties(childrenObj.ids, {
