@@ -58,7 +58,7 @@ function useNodeRelatives(asArrayFn) {
         },
         has: hasFn,
         get hasAny() {
-            return hasAnyFn
+            return hasAnyFn();
         },
         get size() {
             return getSizeFn();
@@ -145,18 +145,14 @@ function useDescendants(rProxyNode) {
 function useChildren(rId, rChildrenIds, proxyTree) {
 
     const rChildrenArray = computed(() => proxyTree.getChildren(rId.value));
-    const rSize = computed(() => rChildrenArray.value.length);
-    const getChildrenAsSet = () => new Set(rChildrenArray.value);
 
-    const hasChild = (id) => !!getChildById(id);
     const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
     const getChildrenIdsAsSet = () => new Set(rChildrenIdsAsArray.value);
 
-    const getChildById = (id) => {
-        return rChildrenIdsAsArray.value.find(tmpId => tmpId === id);
-    }
+    const nodeRelativesCore = useNodeRelatives(() => rChildrenArray.value);
+
     const getChildByPos = (pos) => {
-        const maxPos = rSize.value - 1;
+        const maxPos = nodeRelativesCore.size - 1;
         if ((pos < 0 || pos > maxPos) && pos !== -1) {
             throw new PosOutOfRangeError(pos, maxPos);
         }
@@ -164,63 +160,43 @@ function useChildren(rId, rChildrenIds, proxyTree) {
     }
 
     const getFirst = () => {
-        if (!rSize.value) return null;
+        if (!nodeRelativesCore.size) return null;
         return getChildByPos(0);
     }
 
-    const hasChildrenFn = () => !!rSize.value;
-
-    const nodeRelativesCore = useNodeRelatives(() => rChildrenArray.value);
-
-    const deepCopy = Object.create(
+    const childrenObj = Object.create(
         Object.getPrototypeOf(nodeRelativesCore),
         Object.getOwnPropertyDescriptors(nodeRelativesCore)
     );
 
-    Object.defineProperties(deepCopy.get, {
+    Object.defineProperties(childrenObj.get, {
         first: {
             get: () => getFirst(),
             enumerable: true,
             configurable: true,
         },
         byPos: {
-            get: (pos) => getChildByPos(pos),
+            get: () => (pos) => getChildByPos(pos),
             enumerable: true,
             configurable: true,
         }
     });
 
-    return {
-        children: reactive({
-            get asArray() {
-                return rChildrenArray.value;
-            },
-            get asSet() {
-                return getChildrenAsSet();
-            },
-            has: hasChild,
-            size: rSize,
-            get hasAny() {
-                return hasChildrenFn();
-            },
-            ids: {
-                get asArray() {
-                    return rChildrenIdsAsArray.value;
-                },
-                get asSet() {
-                    return getChildrenIdsAsSet();
-                },
-            },
-            get: {
-                get first() {
-                    return getFirst();
-                },
-                byId: getChildById,
-                byPos: getChildByPos
-            },
-        }),
-        hasChildrenFn
-    }
+    childrenObj.ids = {};
+    Object.defineProperties(childrenObj.ids, {
+        asArray: {
+            get: () => rChildrenIdsAsArray.value,
+            enumerable: true,
+            configurable: true,
+        },
+        asSet: {
+            get: getChildrenIdsAsSet,
+            enumerable: true,
+            configurable: true,
+        }
+    });
+
+    return childrenObj;
 }
 
 
@@ -239,7 +215,7 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
     const {findFn} = useFind(rProxyNode);
-    const {children} = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
+    const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
     const descendants = useDescendants(rProxyNode);
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
