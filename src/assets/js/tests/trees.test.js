@@ -71,7 +71,7 @@ describe('Children', () => {
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
 
-        test('HasChildren', () => expect(srcTree.root.hasChildren).toBe(true));
+        test('HasChildren', () => expect(srcTree.root.children.hasAny).toBe(true));
         test('Has', () => expect(srcTree.root.children.has(first.id)).toBe(true));
     });
 
@@ -83,7 +83,7 @@ describe('Children', () => {
         // test('byPos out of range', () => expect(srcTree.root.children.get.byPos(0)).toThrow(ProxyNodeErrors.PosOutOfRangeError));
         test('First', () => expect(srcTree.root.children.get.first).toBeNull());
 
-        test('HasChildren', () => expect(srcTree.root.hasChildren).toBe(false));
+        test('HasChildren', () => expect(srcTree.root.children.hasAny).toBe(false));
     });
 
     describe('Proxy reuse on multiple access', () => {
