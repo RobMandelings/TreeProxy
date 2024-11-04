@@ -19,7 +19,7 @@ describe('Deletion', () => {
 
     test('Parent remove child relation', () => {
 
-        const child = srcTree.root.children.get.first;
+        const child = srcTree.root.children[0];
         const childId = child.id;
         expect(srcTree.root.children.has(childId)).toBe(true);
         child.delete();

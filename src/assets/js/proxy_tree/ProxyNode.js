@@ -103,10 +103,10 @@ function useDescendants(rProxyNode) {
     const getDescendantFromPath = (posPath) => {
         const proxyNode = rProxyNode.value;
         if (!proxyNode) return null;
-        let curChild = proxyNode.children.get.byPos(posPath.shift());
+        let curChild = proxyNode.children[posPath.shift()];
         while (posPath.length > 1) {
             if (!curChild) break;
-            curChild = curChild.children.get.byPos(posPath.shift());
+            curChild = curChild.children[posPath.shift()];
         }
 
         return curChild;
@@ -177,7 +177,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
         }
     });
 
-    return childrenObj;
+    return decorateChildren(childrenObj);
 }
 
 function decorateChildren(children) {

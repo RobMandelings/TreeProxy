@@ -64,9 +64,9 @@ describe('Children', () => {
     describe('Single child', () => {
         beforeAll(() => {
             srcTree.init({name: "Root", children: [{name: "Child"}]})
-            first = srcTree.root.children.get.first;
+            first = srcTree.root.children[0];
         });
-        test('First', () => expect(first).not.toBeNull());
+        test('First', () => expect(first).not.toBeUndefined());
         test('Size', () => expect(srcTree.root.children.size).toBe(1));
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
@@ -81,7 +81,7 @@ describe('Children', () => {
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
         // test('byPos out of range', () => expect(srcTree.root.children.get.byPos(0)).toThrow(ProxyNodeErrors.PosOutOfRangeError));
-        test('First', () => expect(srcTree.root.children.get.first).toBeNull());
+        test('First', () => expect(srcTree.root.children[0]).toBeUndefined());
 
         test('HasChildren', () => expect(srcTree.root.children.hasAny).toBe(false));
     });
@@ -90,7 +90,7 @@ describe('Children', () => {
         test('Single child', () => {
             const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
             expect(srcTree.root.children.asArray).toBe(srcTree.root.children.asArray);
-            expect(srcTree.root.children.get.first).toBe(srcTree.root.children.get.first);
+            expect(srcTree.root.children[0]).toBe(srcTree.root.children[0]);
 
         })
     })
@@ -100,7 +100,7 @@ describe('Children', () => {
 describe('Parent and Child relation', () => {
     const srcTree = new SourceTree();
     srcTree.init({name: "Root", children: [{name: "Child"}]});
-    const child = srcTree.root.children.get.first;
+    const child = srcTree.root.children[0];
     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
-    test('Child instance via parent equal to child instance', () => expect(child.parent.children.get.first).toBe(child));
+    test('Child instance via parent equal to child instance', () => expect(child.parent.children[0]).toBe(child));
 });

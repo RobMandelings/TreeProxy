@@ -11,13 +11,8 @@ describe('Relatives', () => {
         });
 
         describe('Nr ancestors', () => {
-            test('Root', () => {
-                expect(srcTree.root.selfAndAncestors.size).toBe(1);
-            });
-
-            test('Child', () => {
-                expect(srcTree.root.children.get.first.selfAndAncestors.size).toBe(2);
-            });
+            test('Root', () => expect(srcTree.root.selfAndAncestors.size).toBe(1));
+            test('Child', () => expect(srcTree.root.children[0].selfAndAncestors.size).toBe(2));
         })
 
         describe('Nr descendants', () => {
@@ -26,7 +21,7 @@ describe('Relatives', () => {
             })
 
             test('Child', () => {
-                expect(srcTree.root.children.get.first.selfAndDescendants.size).toBe(1); // Root + 5
+                expect(srcTree.root.children[0].selfAndDescendants.size).toBe(1); // Root + 5
             })
         });
     });
@@ -37,7 +32,7 @@ describe('Relatives', () => {
         let childLvl1, childLvl2;
         beforeEach(() => {
             srcTree.init(createTree([1, 2, [3, 4]]));
-            childLvl1 = srcTree.root.children.get.byPos(2);
+            childLvl1 = srcTree.root.children[2];
             childLvl2 = srcTree.root.selfAndDescendants.get.fromPath([2, 0, 0]);
         })
 

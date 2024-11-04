@@ -7,7 +7,7 @@ describe('Reactivity checks', () => {
 
     expect(isReactive(srcTree.root)).toBe(true);
     expect(isReactive(srcTree.root.children)).toBe(true);
-    expect(isReactive(srcTree.root.children.get.byPos(0))).toBe(true);
+    expect(isReactive(srcTree.root.children[0])).toBe(true);
 
 });
 
@@ -57,7 +57,7 @@ describe("Watch on source tree", () => {
     beforeEach(() => {
         initialChildName = 'Child';
         srcTree = new SourceTree().init({name: 'Root', children: [{name: initialChildName}]});
-        child = srcTree.root.children.get.byPos(0);
+        child = srcTree.root.children[0];
         rootWatchTrigger = jest.fn();
         childrenWatchTrigger = jest.fn();
         expect(child).not.toBeFalsy();
