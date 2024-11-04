@@ -90,7 +90,7 @@ function useDescendants(rProxyNode) {
     const getDescendantsAsArray = () => {
         const proxyNode = rProxyNode.value;
         if (!proxyNode) return [];
-        const descendants = [...proxyNode.children.asArray.flatMap(c => c.descendants.asArray)];
+        const descendants = [...proxyNode.children.asArray.flatMap(c => c.selfAndDescendants.asArray)];
         return [proxyNode, ...descendants];
     }
 
@@ -171,13 +171,13 @@ export function createProxyNode(proxyTree, id, parentId) {
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
     const {findFn} = useFind(rProxyNode);
     const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
-    const descendants = useDescendants(rProxyNode);
+    const selfAndDescendants = useDescendants(rProxyNode);
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
     const targetObj = reactive({
         refProxy,
         children,
-        descendants,
+        selfAndDescendants,
         parent: rParent,
         setParent,
         stale: rStale,
