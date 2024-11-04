@@ -163,7 +163,6 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     const decorateChildren = (children) => {
         return decorateNodeRelatives(children, (t, prop) => {
-            if (typeof prop === "string" && !isNaN(prop)) prop = parseInt(prop);
             if (typeof prop === "number") return t.asArray[prop];
         })
     }
@@ -178,6 +177,7 @@ function decorateNodeRelatives(nodeRelatives, customGetHandler) {
 
             if (typeof prop === 'string') {
                 if (t.has(prop)) return t.asArray.find(c => c.id === prop);
+                if (!isNaN(prop)) prop = parseInt(prop);
             }
 
             const res = customGetHandler(t, prop);

@@ -44,13 +44,14 @@ describe('Relatives', () => {
 
         describe('Finding nodes', () => {
             describe('Finding ancestors', () => {
-                // test('Hallo', () => {
-                //     const anc = root.ancestors;
-                //     console.log(anc.toString());
-                //     expect(true).toBe(true);
-                // })
-                test('Root via index', () => expect(root.ancestors).toBe(root));
+                test('No ancestor', () => expect(root.ancestors[0]).toBeUndefined());
+                test('Root via index', () => expect(child.ancestors[0]).toBe(root));
+                test('Root via id', () => expect(child.ancestors[root.id]).toBe(root));
             });
+
+            test('Descendant via id', () => {
+                expect(root.descendants[child.id]).toBe(child);
+            })
         });
     });
 
