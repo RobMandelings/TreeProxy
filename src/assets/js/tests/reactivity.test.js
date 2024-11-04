@@ -11,6 +11,44 @@ describe('Reactivity checks', () => {
 
 });
 
+function runWatchTests(description, getTarget, getWatchTriggers, initialValue) {
+    describe(description, () => {
+        let target, watchTriggers;
+
+        beforeEach(() => {
+            target = getTarget();
+            watchTriggers = getWatchTriggers();
+        });
+
+        test('No change', async () => {
+            target.name = initialValue;
+            await nextTick();
+            Object.values(watchTriggers).forEach(trigger =>
+                expect(trigger).toHaveBeenCalledTimes(0)
+            );
+        });
+
+        test('Single change', async () => {
+            target.name = "Changed";
+            await nextTick();
+            Object.values(watchTriggers).forEach(trigger =>
+                expect(trigger).toHaveBeenCalledTimes(1)
+            );
+        });
+
+        test('Many changes', async () => {
+            const nrChanges = 5;
+            for (let i = 0; i < nrChanges; i++) {
+                target.name = `${i}`;
+                await nextTick();
+            }
+            Object.values(watchTriggers).forEach(trigger =>
+                expect(trigger).toHaveBeenCalledTimes(nrChanges)
+            );
+        });
+    });
+}
+
 describe("Watch on source tree", () => {
 
     let srcTree, child, initialChildName;
@@ -27,57 +65,17 @@ describe("Watch on source tree", () => {
         watch(srcTree.root, () => rootWatchTrigger());
     })
 
-    describe('Root level watch', () => {
+    runWatchTests(
+        'Root level watch',
+        () => srcTree.root,
+        () => ({rootWatchTrigger}),
+        'Root'
+    );
 
-        test('No change', async () => {
-            srcTree.root.name = 'Root';
-            await nextTick();
-            expect(rootWatchTrigger).toHaveBeenCalledTimes(0);
-        })
-
-        test('Single change', async () => {
-            srcTree.root.name = "Changed";
-            await nextTick();
-            expect(rootWatchTrigger).toHaveBeenCalledTimes(1);
-        });
-
-        test('Many changes', async () => {
-            let count = 0;
-            const nrChanges = 5;
-            for (let i = 0; i < nrChanges; i++) {
-                srcTree.root.name = `${count++}`;
-                await nextTick();
-            }
-            expect(rootWatchTrigger).toHaveBeenCalledTimes(nrChanges);
-        })
-    });
-
-    describe('Nested level 1 watch', () => {
-
-        test('Assign with no change', async () => {
-            child.name = initialChildName;
-            await nextTick();
-            expect(rootWatchTrigger).toHaveBeenCalledTimes(0);
-            expect(childrenWatchTrigger).toHaveBeenCalledTimes(0);
-        })
-
-        test('Test initial child name change', async () => {
-            child.name = "Changed";
-            await nextTick();
-
-            expect(rootWatchTrigger).toHaveBeenCalledTimes(1);
-            expect(childrenWatchTrigger).toHaveBeenCalledTimes(1);
-        });
-
-        test('Many changes', async () => {
-            let count = 0;
-            const nrChanges = 5;
-            for (let i = 0; i < nrChanges; i++) {
-                child.name = `${count++}`;
-                await nextTick();
-            }
-            expect(rootWatchTrigger).toHaveBeenCalledTimes(nrChanges);
-            expect(childrenWatchTrigger).toHaveBeenCalledTimes(nrChanges);
-        })
-    })
+    runWatchTests(
+        'Nested level 1 watch',
+        () => child,
+        () => ({rootWatchTrigger, childrenWatchTrigger}),
+        'Child'
+    );
 })
