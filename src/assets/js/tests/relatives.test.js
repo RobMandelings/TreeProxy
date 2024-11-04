@@ -11,17 +11,17 @@ describe('Relatives', () => {
         });
 
         describe('Nr ancestors', () => {
-            test('Root', () => expect(srcTree.root.selfAndAncestors.size).toBe(1));
-            test('Child', () => expect(srcTree.root.children[0].selfAndAncestors.size).toBe(2));
+            test('Root', () => expect(srcTree.root.ancestors.size).toBe(0));
+            test('Child', () => expect(srcTree.root.children[0].ancestors.size).toBe(1));
         })
 
         describe('Nr descendants', () => {
             test('Root', () => {
-                expect(srcTree.root.selfAndDescendants.size).toBe(6); // Root + 5
+                expect(srcTree.root.descendants.size).toBe(5); // Root + 5
             })
 
             test('Child', () => {
-                expect(srcTree.root.children[0].selfAndDescendants.size).toBe(1); // Root + 5
+                expect(srcTree.root.children[0].descendants.size).toBe(0); // Root + 5
             })
         });
     });
@@ -33,19 +33,19 @@ describe('Relatives', () => {
         beforeEach(() => {
             srcTree.init(createTree([1, 2, [3, 4]]));
             childLvl1 = srcTree.root.children[2];
-            childLvl2 = srcTree.root.selfAndDescendants["2, 0, 0"];
+            childLvl2 = srcTree.root.descendants["2, 0, 0"];
         })
 
         describe('Nr ancestors', () => {
-            test('Root', () => expect(srcTree.root.selfAndAncestors.size).toBe(1));
-            test('Child lvl 1', () => expect(childLvl1.selfAndAncestors.size).toBe(2));
-            test('Child lvl 2', () => expect(childLvl2.selfAndAncestors.size).toBe(3));
+            test('Root', () => expect(srcTree.root.ancestors.size).toBe(0));
+            test('Child lvl 1', () => expect(childLvl1.ancestors.size).toBe(1));
+            test('Child lvl 2', () => expect(childLvl2.ancestors.size).toBe(2));
         });
 
         describe('Nr descendants', () => {
-            test('Root', () => expect(srcTree.root.selfAndDescendants.size).toBe(16));
-            test('Child lvl 1', () => expect(childLvl1.selfAndDescendants.size).toBe(10));
-            test('Child lvl 2', () => expect(childLvl2.selfAndDescendants.size).toBe(4));
+            test('Root', () => expect(srcTree.root.descendants.size).toBe(15));
+            test('Child lvl 1', () => expect(childLvl1.descendants.size).toBe(9));
+            test('Child lvl 2', () => expect(childLvl2.descendants.size).toBe(3));
         });
     });
 })

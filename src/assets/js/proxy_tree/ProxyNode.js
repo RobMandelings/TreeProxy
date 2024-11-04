@@ -17,12 +17,6 @@ export function useFind(rProxyNode) {
     return {findFn}
 }
 
-export function useLineage(rProxyNode) {
-
-
-    return {getAncestors};
-}
-
 export function useDelete(proxyTree, rProxyNode) {
     const deleteFn = () => proxyTree.deleteNode(rProxyNode.value.id);
     return {deleteFn: deleteFn};
@@ -75,11 +69,11 @@ function useAncestors(rProxyNode) {
         const proxyNode = rProxyNode.value;
         if (!proxyNode) return [];
 
-        if (!proxyNode.parent) return [rProxyNode.value];
-        return [rProxyNode.value, ...proxyNode.parent.selfAndAncestors.asArray];
+        if (!proxyNode.parent) return [];
+        return [proxyNode.parent, ...proxyNode.parent.ancestors.asArray];
     }
 
-    return decorateNodeRelatives(useNodeRelatives(getAncestorsAsArrayFn), (t, p, c) => undefined);
+    return decorateAncestors(useNodeRelatives(getAncestorsAsArrayFn));
 }
 
 function useDescendants(rProxyNode) {
@@ -90,8 +84,8 @@ function useDescendants(rProxyNode) {
     const getDescendantsAsArray = () => {
         const proxyNode = rProxyNode.value;
         if (!proxyNode) return [];
-        const descendants = [...proxyNode.children.asArray.flatMap(c => c.selfAndDescendants.asArray)];
-        return [proxyNode, ...descendants];
+        const descendants = [...proxyNode.children.asArray.flatMap(c => [c, ...c.descendants.asArray])];
+        return [...descendants];
     }
     const nodeRelativesCore = useNodeRelatives(getDescendantsAsArray);
     return decorateDescendants(nodeRelativesCore, rProxyNode);
@@ -187,6 +181,12 @@ function decorateDescendants(descendants, rProxyNode) {
     })
 }
 
+function decorateAncestors(ancestors) {
+    return decorateNodeRelatives(ancestors, (t, prop, _) => {
+        if (typeof prop === "number") return t.asArray[prop]; // ancestors[n] -> retrieve the n-th ancestor
+    });
+}
+
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.nodeMap.createRefNode(id);
@@ -204,15 +204,18 @@ export function createProxyNode(proxyTree, id, parentId) {
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
     const {findFn} = useFind(rProxyNode);
     const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
-    const selfAndAncestors = useAncestors(rProxyNode);
-    const selfAndDescendants = useDescendants(rProxyNode);
+    const ancestors = useAncestors(rProxyNode);
+    const descendants = useDescendants(rProxyNode);
+    const isDescendantOf = (id) => !!ancestors.has(id);
+    const isAncestorOf = (id) => !!descendants.has(id);
+
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
     const targetObj = reactive({
         refProxy,
         children,
-        selfAndAncestors,
-        selfAndDescendants,
+        ancestors,
+        descendants,
         parent: rParent,
         setParent,
         stale: rStale,
