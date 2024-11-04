@@ -216,6 +216,8 @@ export function createProxyNode(proxyTree, id, parentId) {
         children,
         ancestors,
         descendants,
+        isDescendantOf,
+        isAncestorOf,
         parent: rParent,
         setParent,
         stale: rStale,
