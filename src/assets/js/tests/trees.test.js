@@ -49,6 +49,7 @@ describe('Delayed child computation', () => {
     });
 
     test('Watch install', () => {
+        // Deep watching triggers nested properties to be tracked as well. This triggers therefore .children (getChildren) on each node.
         watch(srcTree.root, () => undefined);
         const callCount = spy.mock.calls.length;
         spy.mockRestore();
