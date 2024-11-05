@@ -35,10 +35,10 @@ describe('Deletion', () => {
 });
 
 test('Delete many at once check', () => {
-    const srcTree = new SourceTree().init(createTree([1, 3, 1]));
+    const srcTree = new SourceTree().init(createTree([0, 3, 0]));
     const nrDescendants1 = srcTree.root.descendants.size;
     const nrDeleted = srcTree.root.children[1].delete();
     expect(nrDeleted).toBe(4);
     expect(srcTree.root.descendants.size).toBe(nrDescendants1 - nrDeleted);
-
+    expect(srcTree.root.children.size).toBe(2);
 });
