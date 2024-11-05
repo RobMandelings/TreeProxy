@@ -9,8 +9,39 @@ class NodeNotExistsError extends Error {
     }
 }
 
+function createRefProxy(nodeMap, initialId) {
+    const rId = ref(initialId);
+    const node = computed(() => {
+        return nodeMap.getNode(rId.value);
+    });
+
+    const targetObj = reactive({node: node, id: rId});
+
+    const setHandler = (t, prop, value) => {
+        nodeMap.set(rId.value, prop, value);
+        return true;
+    }
+
+    const excludeProps = getExcludeProperties(targetObj);
+    const getHandler = (t, prop, receiver) => {
+        if (prop === "__target__") return t;
+        if (prop in excludeProps) return Reflect.get(t, prop, receiver);
+
+        if (t.node && prop in t.node) return Reflect.get(t.node, prop, receiver);
+        return Reflect.get(t, prop, receiver);
+    }
+    return new Proxy(targetObj, {
+        get: getHandler,
+        set: setHandler
+    });
+}
+
 export class NodeMap {
     constructor() {
+    }
+
+    isDirty(id) {
+        throw new Error('Abstract method');
     }
 
     generateId() {
@@ -22,30 +53,7 @@ export class NodeMap {
     }
 
     createRefProxy(initialId) {
-        const rId = ref(initialId);
-        const node = computed(() => {
-            return this.getNode(rId.value);
-        });
-
-        const targetObj = reactive({node: node, id: rId});
-
-        const setHandler = (t, prop, value) => {
-            this.set(rId.value, prop, value);
-            return true;
-        }
-
-        const excludeProps = getExcludeProperties(targetObj);
-        const getHandler = (t, prop, receiver) => {
-            if (prop === "__target__") return t;
-            if (prop in excludeProps) return Reflect.get(t, prop, receiver);
-
-            if (t.node && prop in t.node) return Reflect.get(t.node, prop, receiver);
-            return Reflect.get(t, prop, receiver);
-        }
-        return new Proxy(targetObj, {
-            get: getHandler,
-            set: setHandler
-        });
+        return createRefProxy(this, initialId);
     }
 
     _addNode(node) {

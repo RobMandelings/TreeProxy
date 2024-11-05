@@ -7,6 +7,10 @@ export class SourceNodeMap extends NodeMap {
         this.nodes = new Map();
     }
 
+    isDirty(id) {
+        return false;
+    }
+
     _addNode(node) {
         const id = this.generateId();
         this.nodes.set(id, node);
