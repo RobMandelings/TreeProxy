@@ -11,11 +11,16 @@ describe('Deletion', () => {
         expect(srcTree.root.stale).toBe(false);
     });
 
-    xtest('Stale proxy', () => {
+    test('Stale proxy', () => {
 
+        const id = srcTree.root.id;
+        expect(srcTree.nodeMap.getNode(id)).toBeTruthy();
+        expect(srcTree.getNode(id)).toBeTruthy();
         srcTree.root.delete();
         expect(srcTree.root.stale).toBe(true);
         expect(() => srcTree.root.id).toThrow(ProxyNodeErrors.StaleProxyError);
+        expect(srcTree.getNode(id)).toBeFalsy();
+        expect(srcTree.nodeMap.getNode(id)).toBeFalsy();
     });
 
     test('Parent remove child relation', () => {
@@ -29,11 +34,11 @@ describe('Deletion', () => {
     });
 });
 
-test('Delete with descendants check', () => {
+test('Delete many at once check', () => {
     const srcTree = new SourceTree().init(createTree([1, 3, 1]));
     const nrDescendants1 = srcTree.root.descendants.size;
     const nrDeleted = srcTree.root.children[1].delete();
     expect(nrDeleted).toBe(4);
     expect(srcTree.root.descendants.size).toBe(nrDescendants1 - nrDeleted);
 
-})
+});
