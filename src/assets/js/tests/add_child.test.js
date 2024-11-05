@@ -22,11 +22,12 @@ describe('Multiple children', () => {
         root = srcTree.root;
         expect(root.children.size).toBe(3);
     });
+    // TODO test on index-out-of-range
 
     test('Add to last index', () => testAddChildToIndex(root, -1));
     test('Add to 2nth', () => testAddChildToIndex(root, 2));
     test('Add to first index', () => testAddChildToIndex(root, 0));
-})
+});
 
 const testAddChildToIndex = (root, index) => {
     const prevSize = root.children.size;
