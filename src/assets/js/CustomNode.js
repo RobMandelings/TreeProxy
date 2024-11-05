@@ -1,3 +1,5 @@
+import {isValidUUID} from "./Utils.js";
+
 export class CustomNode {
     constructor(name, childrenIds) {
         this.name = name;
@@ -6,5 +8,9 @@ export class CustomNode {
 
     copy() {
         return new CustomNode(this.name, this.childrenIds);
+    }
+
+    static isValidID(id) {
+        return isValidUUID(id);
     }
 }

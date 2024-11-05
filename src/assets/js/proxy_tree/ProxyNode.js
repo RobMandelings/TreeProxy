@@ -1,5 +1,6 @@
 import {computed, reactive, ref} from "vue";
 import {DirectNodeAccessError, PosOutOfRangeError, StaleProxyError} from "./ProxyNodeErrors.js";
+import {CustomNode} from "../CustomNode.js";
 
 export function useFind(rProxyNode) {
     const findFn = (id) => {
@@ -192,7 +193,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 }
 
 function findById(t, prop) {
-    if (typeof prop === 'string' && t.has(prop)) {
+    if (typeof prop === 'string' && CustomNode.isValidID(prop)) {
         return t.asArray.find(c => c.id === prop);
     }
 }
@@ -259,11 +260,16 @@ export function createProxyNode(proxyTree, id, parentId) {
     const handler = {
         get(t, prop, receiver) {
             if (prop === "node") throw new DirectNodeAccessError();
-            if (prop === "stale") return rStale.value;
-            else if (rStale.value) throw new StaleProxyError();
 
-            return Reflect.get(t, prop, receiver)
-                ?? Reflect.get(t.refProxy, prop, receiver);
+            if (prop in t || prop in t.refProxy) {
+                if (prop === "stale") return rStale.value;
+                else if (rStale.value) throw new StaleProxyError();
+
+                return Reflect.get(t, prop, receiver)
+                    ?? Reflect.get(t.refProxy, prop, receiver);
+            }
+
+            return Reflect.get(t, prop, receiver) ?? Reflect.get(t.refProxy, prop, receiver);
         },
         set(t, prop, value, receiver) {
 
