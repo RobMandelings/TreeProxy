@@ -44,10 +44,6 @@ export class NodeMap {
         });
     }
 
-    _deleteNode(id) {
-
-    }
-
     _addNode(node) {
     }
 
@@ -68,9 +64,7 @@ export class NodeMap {
     }
 
     deleteNode(id) {
-        if (!this.getNode(id)) throw new NodeNotExistsError(id);
-        this._deleteNode(id);
-        console.assert(!this.getNode(id));
+        throw new Error("Abstract method");
     }
 
     getNode(id) {

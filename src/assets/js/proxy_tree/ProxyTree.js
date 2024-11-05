@@ -44,10 +44,12 @@ export class ProxyTree extends NodeMap {
             const newChildrenIds = node.parent.childrenIds.filter(cId => cId !== id);
             node.parent.childrenIds = newChildrenIds; // Removing child from parent
         }
-        node.children.asArray.forEach(c => c.delete());
+        const nrDeleted = node.children.asArray.reduce((acc, c) => acc + c.delete(), 1);
 
         this.proxyNodes.delete(id);
         this.nodeMap.deleteNode(id);
+
+        return nrDeleted;
     }
 
     deleteNodes(ids) {

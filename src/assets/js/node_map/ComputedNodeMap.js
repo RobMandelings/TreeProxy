@@ -48,10 +48,6 @@ export class ComputedNodeMap extends NodeMap {
 
     }
 
-    _deleteNode(nodeId) {
-
-    }
-
     clearPropertyChange(nodeId, prop) {
 
     }
@@ -69,8 +65,9 @@ export class ComputedNodeMap extends NodeMap {
         this.overwrittenNodes.set(id, node);
     }
 
-    _deleteNode(id) {
+    deleteNode(id) {
         this.deletedNodeIds.add(id);
+        return 1;
     }
 
     isDeleted(id) {

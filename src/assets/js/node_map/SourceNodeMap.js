@@ -18,7 +18,7 @@ export class SourceNodeMap extends NodeMap {
         this.getNode(nodeId)[prop] = value;
     }
 
-    _deleteNode(id) {
+    deleteNode(id) {
         this.nodes.delete(id);
     }
 
