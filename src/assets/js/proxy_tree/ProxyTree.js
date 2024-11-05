@@ -40,6 +40,10 @@ export class ProxyTree extends NodeMap {
 
     deleteNode(id) {
         const node = this.proxyNodes.get(id);
+        if (node.parent) {
+            const newChildrenIds = node.parent.childrenIds.filter(cId => cId !== id);
+            node.parent.childrenIds = newChildrenIds; // Removing child from parent
+        }
         node.children.asArray.forEach(c => c.delete());
 
         this.proxyNodes.delete(id);

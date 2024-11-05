@@ -1,7 +1,7 @@
 import {computed, reactive, ref} from "vue";
 import {DirectNodeAccessError, PosOutOfRangeError, StaleProxyError} from "./ProxyNodeErrors.js";
 import {CustomNode} from "../CustomNode.js";
-import {getReactiveTarget} from "../Utils.js";
+import {getExcludeProperties, getReactiveTarget} from "../Utils.js";
 
 export function useFind(rProxyNode) {
     const findFn = (id) => {
@@ -236,7 +236,7 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
-    const target = {
+    const theTarget = {
         refProxy,
         children,
         ancestors,
@@ -256,18 +256,22 @@ export function createProxyNode(proxyTree, id, parentId) {
             if (children.size) obj.children = children.asArray.map(c => c.toJSON());
             return obj;
         }
-    };
-    const {reactiveTarget, vueProps} = getReactiveTarget(target);
+    }
+    const targetReactive = reactive(theTarget);
+    const excludeProps = getExcludeProperties(targetReactive);
 
     const handler = {
         get(t, prop, receiver) {
-            if (prop in vueProps) return Reflect.get(t, prop, receiver);
+            if (prop in excludeProps) return Reflect.get(t, prop, receiver);
 
             if (prop === "node") throw new DirectNodeAccessError();
 
             if (prop in t || prop in t.refProxy) {
                 if (prop === "stale") return rStale.value;
-                else if (rStale.value) throw new StaleProxyError();
+                else if (rStale.value) {
+                    if (prop === "toJSON") return {msg: "This proxy is stale"};
+                    else throw new StaleProxyError();
+                }
 
                 return Reflect.get(t, prop, receiver)
                     ?? Reflect.get(t.refProxy, prop, receiver);
@@ -281,6 +285,6 @@ export function createProxyNode(proxyTree, id, parentId) {
             return Reflect.set(t.refProxy, prop, value, receiver);
         }
     }
-    rProxyNode.value = new Proxy(reactiveTarget, handler);
+    rProxyNode.value = new Proxy(targetReactive, handler);
     return rProxyNode.value;
 }

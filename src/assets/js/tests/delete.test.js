@@ -23,9 +23,7 @@ describe('Deletion', () => {
         const id = child.id; // Need to capture id before it becomes stale
         expect(srcTree.root.children[id]).toBeTruthy();
         child.delete();
-        expect(srcTree.root.children[0]).toBeFalsy();
-
-        // expect(srcTree.root.children.has(childId)).toBe(false);
-
+        expect(srcTree.root.children[id]).toBeFalsy();
+        expect(child.stale).toBeTruthy();
     });
 });
