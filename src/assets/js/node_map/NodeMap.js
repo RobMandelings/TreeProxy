@@ -1,6 +1,7 @@
 import {CustomNode} from "../CustomNode.js";
 import {createReferenceProxy} from "../proxy_tree/RefProxy.js";
 import {computed, reactive, ref} from "vue";
+import {getExcludeProperties} from "../Utils.js";
 
 class NodeNotExistsError extends Error {
     constructor(id) {
@@ -32,8 +33,11 @@ export class NodeMap {
             this.set(rId.value, prop, value);
             return true;
         }
+
+        const excludeProps = getExcludeProperties(targetObj);
         const getHandler = (t, prop, receiver) => {
             if (prop === "__target__") return t;
+            if (prop in excludeProps) return Reflect.get(t, prop, receiver);
 
             if (t.node && prop in t.node) return Reflect.get(t.node, prop, receiver);
             return Reflect.get(t, prop, receiver);
