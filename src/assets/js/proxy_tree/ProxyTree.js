@@ -1,6 +1,7 @@
 import {NodeMap} from "../node_map/NodeMap.js";
 import * as ProxyNode from "../proxy_tree/ProxyNode.js"
 import {NodeNotFoundError, RootNotSetError} from "./ProxyTreeErrors.js";
+import {IncorrectIndexError, InvalidPositionError, UndefinedIndexError} from "./ProxyNodeErrors.js";
 
 export class ProxyTree extends NodeMap {
 
@@ -36,6 +37,22 @@ export class ProxyTree extends NodeMap {
 
     addNode(node) {
         return this.nodeMap.addNode(node);
+    }
+
+    addChild(parentId, node, index) {
+        if (index == null) throw new UndefinedIndexError();
+        if (isNaN(index)) throw new IncorrectIndexError(index);
+        if (typeof index === "string") index = parseInt(index);
+
+        const parent = this.getNode(parentId);
+        if (!parent) throw new Error("Cannot add child: parent not found");
+        const id = this.nodeMap.addNode(node);
+
+        // Apparently splice with -1 index
+        // does not insert at the last position, we have to use array.length.
+        if (index === -1) index = parent.childrenIds.length;
+        parent.childrenIds.splice(index, 0, id);
+        return id;
     }
 
     deleteNode(id) {

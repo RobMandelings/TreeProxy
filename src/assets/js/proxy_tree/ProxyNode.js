@@ -77,7 +77,7 @@ function useAncestors(rProxyNode) {
             const res = findById(t, prop);
             if (res !== undefined) return res;
 
-            if (typeof prop === "number") return t.asArray[prop]; // ancestors[n] -> retrieve the n-th ancestor
+            if (typeof prop === "number") return t.asArray.at(prop); // ancestors[n] -> retrieve the n-th ancestor
         });
     }
 
@@ -138,14 +138,19 @@ function useDescendants(rProxyNode, proxyTree) {
     return decorateDescendants(nodeRelativesCore, rProxyNode);
 }
 
+function useAddChild(rId, proxyTree) {
+
+    const addNodeFn = (node, index = undefined) => proxyTree.addChild(rId.value, node, index);
+    return {addNodeFn}
+}
+
 function useChildren(rId, rChildrenIds, proxyTree) {
 
     const rChildrenArray = computed(() => proxyTree.getChildren(rId.value));
-
     const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
     const getChildrenIdsAsSet = () => new Set(rChildrenIdsAsArray.value);
-
     const nodeRelativesCore = useNodeRelatives(() => rChildrenArray.value);
+    const {addNodeFn} = useAddChild(rId, proxyTree);
 
     const getChildByPos = (pos) => {
         const maxPos = nodeRelativesCore.size - 1;
@@ -179,6 +184,8 @@ function useChildren(rId, rChildrenIds, proxyTree) {
         }
     });
 
+    childrenObj.addNode = addNodeFn;
+
     const decorateChildren = (children) => {
         return decorateNodeRelatives(children, (t, prop) => {
             if (typeof prop === 'string' && !isNaN(prop)) prop = parseInt(prop);
@@ -186,7 +193,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
             const res = findById(t, prop);
             if (res !== undefined) return res;
 
-            if (typeof prop === "number") return t.asArray[prop];
+            if (typeof prop === "number") return t.asArray.at(prop);
         })
     }
 

@@ -10,6 +10,24 @@ export class StaleProxyError extends Error {
     }
 }
 
+export class AddChildError extends Error {
+    constructor(submsg) {
+        super(`Cannot add child: ${submsg}`);
+    }
+}
+
+export class UndefinedIndexError extends AddChildError {
+    constructor() {
+        super("Index was not defined");
+    }
+}
+
+export class IncorrectIndexError extends AddChildError {
+    constructor(index) {
+        super(`Index '${index}' is incorrect`);
+    }
+}
+
 export class PosOutOfRangeError extends Error {
     constructor(pos, maxPos) {
         super(`Position ${pos} is out of range. Maximum pos: ${maxPos}`);

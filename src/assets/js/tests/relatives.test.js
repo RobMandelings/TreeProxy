@@ -69,6 +69,11 @@ describe('Relatives', () => {
             expect(childLvl2.children.size).toBe(3);
         })
 
+        describe('Negative index to find last', () => {
+            test('Root via ancestors', () => expect(childLvl2.ancestors[-1]).toBe(root));
+            test('Last child', () => expect(root.children[-1]).toBe(childLvl1));
+        })
+
         describe('Nr ancestors', () => {
             test('Root', () => expect(srcTree.root.ancestors.size).toBe(0));
             test('Child lvl 1', () => expect(childLvl1.ancestors.size).toBe(1));
