@@ -105,7 +105,7 @@ function useDescendants(rProxyNode, proxyTree) {
             const proxyNode = rProxyNode.value;
             if (!proxyNode) return null;
             let curChild = proxyNode.children[posPath.shift()];
-            while (posPath.length > 1) {
+            while (posPath.length) {
                 if (!curChild) break;
                 curChild = curChild.children[posPath.shift()];
             }

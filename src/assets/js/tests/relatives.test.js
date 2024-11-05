@@ -53,6 +53,7 @@ describe('Relatives', () => {
                 expect(root.descendants[child.id]).toBe(child);
                 expect(child.descendants[root.id]).toBeUndefined();
                 expect(root.descendants["0"]).toBe(child);
+                expect(root.descendants["0,0"]).toBeUndefined();
             })
         });
     });
@@ -64,7 +65,7 @@ describe('Relatives', () => {
             srcTree = new SourceTree().init(createTree([1, 2, [3, 4]]));
             root = srcTree.root;
             childLvl1 = srcTree.root.children[2];
-            childLvl2 = srcTree.root.descendants["2, 0, 0"];
+            childLvl2 = srcTree.root.descendants["2, 0"];
         })
 
         describe('Nr ancestors', () => {
