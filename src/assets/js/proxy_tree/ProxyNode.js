@@ -41,8 +41,6 @@ function useNodeRelatives(asArrayFn) {
     const asSetFn = () => new Set(asArrayFn());
     const getSizeFn = () => asArrayFn().length;
 
-    const hasAnyFn = () => !!getSizeFn();
-
     return {
         get asArray() {
             return asArrayFn();
@@ -51,9 +49,6 @@ function useNodeRelatives(asArrayFn) {
             return asSetFn();
         },
         has: hasFn,
-        get hasAny() {
-            return hasAnyFn();
-        },
         get size() {
             return getSizeFn();
         },
