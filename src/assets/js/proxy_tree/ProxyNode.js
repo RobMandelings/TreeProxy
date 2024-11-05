@@ -6,22 +6,6 @@ import {useChildren} from "./proxy_node/useChildren.js";
 import {useAncestors} from "./proxy_node/useAncestors.js";
 import {useDescendants} from "./proxy_node/useDescendants.js";
 
-export function useFind(rProxyNode) {
-    const findFn = (id) => {
-        const proxyNode = rProxyNode.value;
-        if (!proxyNode.children.length)
-            if (proxyNode.id === id) return proxyNode;
-
-        for (let c of proxyNode.children) {
-            const res = c.find(id);
-            if (res) return res;
-        }
-        return null;
-    }
-
-    return {findFn}
-}
-
 export function useDelete(proxyTree, rProxyNode) {
     const deleteFn = () => proxyTree.deleteNode(rProxyNode.value.id);
     return {deleteFn: deleteFn};
@@ -54,7 +38,6 @@ export function createProxyNode(proxyTree, id, parentId) {
     });
 
     const {rParent, setParent} = useParent(computed(() => rProxyNode.value?.id), proxyTree, parentId)
-    const {findFn} = useFind(rProxyNode);
     const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
     const ancestors = useAncestors(rProxyNode);
     const descendants = useDescendants(rProxyNode, proxyTree);
@@ -74,7 +57,6 @@ export function createProxyNode(proxyTree, id, parentId) {
         setParent,
         stale: rStale,
         delete: deleteFn,
-        find: findFn,
         toJSON: () => {
             let obj = {
                 id: rId.value,
