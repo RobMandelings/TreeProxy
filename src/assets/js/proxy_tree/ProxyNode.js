@@ -75,6 +75,10 @@ function useAncestors(rProxyNode) {
 
     const decorateAncestors = (ancestors) => {
         return decorateNodeRelatives(ancestors, (t, prop) => {
+
+            const res = findById(t, prop);
+            if (res !== undefined) return res;
+
             if (typeof prop === "number") return t.asArray[prop]; // ancestors[n] -> retrieve the n-th ancestor
         });
     }
@@ -82,7 +86,7 @@ function useAncestors(rProxyNode) {
     return decorateAncestors(useNodeRelatives(getAncestorsAsArrayFn));
 }
 
-function useDescendants(rProxyNode) {
+function useDescendants(rProxyNode, proxyTree) {
 
     /**
      * Descendants are inclusive: the node itself is also part of the list
@@ -108,8 +112,24 @@ function useDescendants(rProxyNode) {
             return curChild;
         }
 
+        const findDescendantById = (t, id) => {
+            // Try to find in the efficient way.
+            // Doing a map query and then finding the proper ancestor should be more efficient.
+            const node = proxyTree.getNode(id);
+            if (node && node.ancestors.has(rProxyNode.value?.id)) return node;
+
+            // Traverse all descendants
+            const res = findById(t, id);
+            if (res !== undefined) return res;
+        }
+
         return decorateNodeRelatives(descendants, (t, prop) => {
+
             if (typeof prop === "string") {
+                const res = findDescendantById(t, prop);
+                if (res !== undefined) return res;
+
+                // Try to find the descendant via path
                 const numbers = prop.split(',').map(num => parseInt(num.trim()));
                 if (numbers.some(n => isNaN(n))) return undefined; // Incorrect format
                 if (numbers.length > 0) return getDescendantFromPath(numbers);
@@ -163,6 +183,10 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     const decorateChildren = (children) => {
         return decorateNodeRelatives(children, (t, prop) => {
+
+            const res = findById(t, prop);
+            if (res !== undefined) return res;
+
             if (typeof prop === "number") return t.asArray[prop];
         })
     }
@@ -170,15 +194,18 @@ function useChildren(rId, rChildrenIds, proxyTree) {
     return decorateChildren(childrenObj);
 }
 
+function findById(t, prop) {
+    if (typeof prop === 'string' && t.has(prop)) {
+        return t.asArray.find(c => c.id === prop);
+    }
+}
+
 function decorateNodeRelatives(nodeRelatives, customGetHandler) {
     return new Proxy(nodeRelatives, {
         get(t, prop, receiver) {
             if (prop in t) return Reflect.get(t, prop, receiver);
 
-            if (typeof prop === 'string') {
-                if (t.has(prop)) return t.asArray.find(c => c.id === prop);
-                if (!isNaN(prop)) prop = parseInt(prop);
-            }
+            if (typeof prop === 'string' && !isNaN(prop)) prop = parseInt(prop);
 
             const res = customGetHandler(t, prop);
             if (res !== undefined) return res;
@@ -206,7 +233,7 @@ export function createProxyNode(proxyTree, id, parentId) {
     const {findFn} = useFind(rProxyNode);
     const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
     const ancestors = useAncestors(rProxyNode);
-    const descendants = useDescendants(rProxyNode);
+    const descendants = useDescendants(rProxyNode, proxyTree);
     const isDescendantOf = (id) => !!ancestors.has(id);
     const isAncestorOf = (id) => !!descendants.has(id);
 
