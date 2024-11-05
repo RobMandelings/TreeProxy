@@ -23,9 +23,14 @@ describe('Multiple children', () => {
         expect(root.children.size).toBe(3);
     });
 
-    test('Add to last index', () => {
-        const id = root.children.addNode(new CustomNode("Child"), -1);
-        expect(root.children.size).toBe(4);
-        expect(root.children[3]?.id).toBe(id);
-    })
+    test('Add to last index', () => testAddChildToIndex(root, -1));
+    test('Add to 2nth', () => testAddChildToIndex(root, 2));
+    test('Add to first index', () => testAddChildToIndex(root, 0));
 })
+
+const testAddChildToIndex = (root, index) => {
+    const prevSize = root.children.size;
+    const id = root.children.addNode(new CustomNode("Child"), index);
+    expect(root.children.size).toBe(prevSize + 1);
+    expect(root.children[index]?.id).toBe(id);
+}
