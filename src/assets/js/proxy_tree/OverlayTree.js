@@ -4,11 +4,11 @@ import {reactive} from "vue";
 
 export class OverlayTree extends ProxyTree {
 
-    constructor(srcProxyTree) {
-        let computedNodeMap = reactive(new OverlayNodeMap(srcProxyTree.nodeMap));
+    constructor(srcTree) {
+        let computedNodeMap = reactive(new OverlayNodeMap(srcTree.nodeMap));
         super(computedNodeMap);
         this.computedNodeMap = computedNodeMap;
-        this.initRootId(srcProxyTree.root.id);
+        this.initRootId(srcTree.root.id);
     }
 
     getOverwrittenNodes() {
