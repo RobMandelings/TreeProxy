@@ -75,6 +75,7 @@ function useAncestors(rProxyNode) {
 
     const decorateAncestors = (ancestors) => {
         return decorateNodeRelatives(ancestors, (t, prop) => {
+            if (typeof prop === 'string' && !isNaN(prop)) prop = parseInt(prop);
 
             const res = findById(t, prop);
             if (res !== undefined) return res;
@@ -183,6 +184,7 @@ function useChildren(rId, rChildrenIds, proxyTree) {
 
     const decorateChildren = (children) => {
         return decorateNodeRelatives(children, (t, prop) => {
+            if (typeof prop === 'string' && !isNaN(prop)) prop = parseInt(prop);
 
             const res = findById(t, prop);
             if (res !== undefined) return res;
@@ -204,8 +206,6 @@ function decorateNodeRelatives(nodeRelatives, customGetHandler) {
     return new Proxy(nodeRelatives, {
         get(t, prop, receiver) {
             if (prop in t) return Reflect.get(t, prop, receiver);
-
-            if (typeof prop === 'string' && !isNaN(prop)) prop = parseInt(prop);
 
             const res = customGetHandler(t, prop);
             if (res !== undefined) return res;

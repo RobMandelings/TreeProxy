@@ -51,6 +51,8 @@ describe('Relatives', () => {
 
             test('Descendant via id', () => {
                 expect(root.descendants[child.id]).toBe(child);
+                expect(child.descendants[root.id]).toBeUndefined();
+                expect(root.descendants["0"]).toBe(child);
             })
         });
     });
