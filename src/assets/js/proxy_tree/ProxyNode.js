@@ -1,6 +1,7 @@
 import {computed, reactive, ref} from "vue";
 import {DirectNodeAccessError, PosOutOfRangeError, StaleProxyError} from "./ProxyNodeErrors.js";
 import {CustomNode} from "../CustomNode.js";
+import {getReactiveTarget} from "../Utils.js";
 
 export function useFind(rProxyNode) {
     const findFn = (id) => {
@@ -235,7 +236,7 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
-    const targetObj = reactive({
+    const target = {
         refProxy,
         children,
         ancestors,
@@ -255,10 +256,13 @@ export function createProxyNode(proxyTree, id, parentId) {
             if (children.size) obj.children = children.asArray.map(c => c.toJSON());
             return obj;
         }
-    });
+    };
+    const {reactiveTarget, vueProps} = getReactiveTarget(target);
 
     const handler = {
         get(t, prop, receiver) {
+            if (prop in vueProps) return Reflect.get(t, prop, receiver);
+
             if (prop === "node") throw new DirectNodeAccessError();
 
             if (prop in t || prop in t.refProxy) {
@@ -269,13 +273,14 @@ export function createProxyNode(proxyTree, id, parentId) {
                     ?? Reflect.get(t.refProxy, prop, receiver);
             }
 
-            return Reflect.get(t, prop, receiver) ?? Reflect.get(t.refProxy, prop, receiver);
+            return Reflect.get(t, prop, receiver)
+                ?? Reflect.get(t.refProxy, prop, receiver);
         },
         set(t, prop, value, receiver) {
 
             return Reflect.set(t.refProxy, prop, value, receiver);
         }
     }
-    rProxyNode.value = new Proxy(targetObj, handler);
+    rProxyNode.value = new Proxy(reactiveTarget, handler);
     return rProxyNode.value;
 }

@@ -1,3 +1,5 @@
+import {reactive} from "vue";
+
 export function difference(setA, setB) {
     const resultSet = new Set(setA); // Create a new set from setA
     for (const elem of setB) {
@@ -9,4 +11,14 @@ export function difference(setA, setB) {
 export function isValidUUID(uuid) {
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
     return uuidRegex.test(uuid);
+}
+
+export function getReactiveTarget(target) {
+    const reactiveTarget = reactive(target);
+
+    const allProps = Object.getOwnPropertyNames(reactiveTarget);
+    const plainProps = Object.getOwnPropertyNames(target);
+    const vueProps = allProps.filter(prop => !plainProps.includes(prop));
+
+    return {reactiveTarget, vueProps};
 }
