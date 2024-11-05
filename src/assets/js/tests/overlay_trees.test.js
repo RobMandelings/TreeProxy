@@ -1,5 +1,5 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
-import {ComputedTree} from "../proxy_tree/ComputedTree.js";
+import {OverlayTree} from "../proxy_tree/OverlayTree.js";
 
 describe('ComputedTree', () => {
     let srcTree, compTree;
@@ -10,7 +10,7 @@ describe('ComputedTree', () => {
 
     beforeEach(() => {
         srcTree = new SourceTree().init({name: initial});
-        compTree = new ComputedTree(srcTree);
+        compTree = new OverlayTree(srcTree);
     });
 
     test('Equivalence to src tree', () => {
@@ -28,7 +28,7 @@ describe('ComputedTree', () => {
     });
 
     test('Multi-layered change', () => {
-        const compTree2 = new ComputedTree(compTree);
+        const compTree2 = new OverlayTree(compTree);
         compTree.root.name = change1;
         expect(compTree.root.name).toBe(change1);
         expect(compTree2.root.name).toBe(change1);

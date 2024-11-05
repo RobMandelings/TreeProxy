@@ -2,20 +2,20 @@ import * as Utils from "../Utils.js";
 import {NodeMap} from "./NodeMap.js";
 import {reactive} from "vue";
 
-export class ComputedNodeMap extends NodeMap {
+export class OverlayNodeMap extends NodeMap {
 
     constructor(srcNodeMap) {
         super();
         this.srcNodeMap = srcNodeMap;
-        this.computedNodes = new Map();
+        this.overlayedNodes = new Map();
         this.deletedNodeIds = new Map(); // Node ids which are deleted from the src map
     }
 
     syncSrc() {
         // Copy the computed nodes from the computed map to the src map.
         // Old nodes will be overwritten with their new values
-        this.computedNodes.forEach((v, k) => this.srcNodeMap.nodes.set(k, v));
-        this.computedNodes.clear();
+        this.overlayedNodes.forEach((v, k) => this.srcNodeMap.nodes.set(k, v));
+        this.overlayedNodes.clear();
     }
 
     createRefNode(id) {
@@ -24,7 +24,7 @@ export class ComputedNodeMap extends NodeMap {
 
     _addNode(node) {
         const id = this.generateId();
-        this.computedNodes.set(id, node);
+        this.overlayedNodes.set(id, node);
         return id;
     }
 
@@ -38,10 +38,10 @@ export class ComputedNodeMap extends NodeMap {
         if (!this.computedNodeExists(nodeId)) {
             if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
                 "Node does not exist in the src node map as well as the computed node map.")
-            this.computedNodes.set(nodeId, this.srcNodeMap.getNode(nodeId).copy());
+            this.overlayedNodes.set(nodeId, this.srcNodeMap.getNode(nodeId).copy());
         }
 
-        this.computedNodes.get(nodeId)[prop] = val;
+        this.overlayedNodes.get(nodeId)[prop] = val;
     }
 
     get(nodeId, prop) {
@@ -102,7 +102,7 @@ export class ComputedNodeMap extends NodeMap {
     }
 
     getComputedNode(id) {
-        return this.computedNodes.get(id);
+        return this.overlayedNodes.get(id);
     }
 
     computedNodeExists(id) {
