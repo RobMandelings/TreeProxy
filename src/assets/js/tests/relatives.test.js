@@ -49,11 +49,11 @@ describe('Relatives', () => {
                 test('Root via id', () => expect(child.ancestors[root.id]).toBe(root));
             });
 
-            test('Descendant via id', () => {
-                expect(root.descendants[child.id]).toBe(child);
-                expect(child.descendants[root.id]).toBeUndefined();
-                expect(root.descendants["0"]).toBe(child);
-                expect(root.descendants["0,0"]).toBeUndefined();
+            describe('Finding descendants', () => {
+                test('Child from root by id', () => expect(root.descendants[child.id]).toBe(child));
+                test('Root from child by id (undefined)', () => expect(child.descendants[root.id]).toBeUndefined());
+                test('Child from root via path', () => expect(root.descendants["0"]).toBe(child));
+                test('Undefined from root via path', () => expect(root.descendants["0,0"]).toBeUndefined());
             })
         });
     });
@@ -66,6 +66,7 @@ describe('Relatives', () => {
             root = srcTree.root;
             childLvl1 = srcTree.root.children[2];
             childLvl2 = srcTree.root.descendants["2, 0"];
+            expect(childLvl2.children.size).toBe(3);
         })
 
         describe('Nr ancestors', () => {
@@ -93,6 +94,42 @@ describe('Relatives', () => {
                 expect(childLvl2.isDescendantOf(root.id)).toBe(true);
                 expect(root.isDescendantOf(childLvl2.id)).toBe(false);
             });
-        })
+        });
+
+        describe('Finding nodes', () => {
+
+            let c1, c2, c3, root
+            beforeAll(() => {
+                root = srcTree.root;
+                c1 = root.descendants["2"];
+                c2 = root.descendants["2, 1"];
+                c3 = root.descendants["2,1,3"];
+            })
+
+            describe('Finding descendants', () => {
+
+                test('Descendants from path correctness', () => {
+
+                    expect(c1.parent).toBe(root);
+                    expect(c1.children.size).toBe(2);
+                    expect(c2?.parent?.parent).toBe(root);
+                    expect(c2.children.size).toBe(4);
+                    expect(c3?.parent?.parent?.parent?.id).toBe(root.id);
+                    expect(c3.children.size).toBe(0);
+                });
+            });
+
+            describe('Finding ancestors', () => {
+
+                test('Ancestors via child 3', () => {
+                    expect(c3.ancestors[root.id]).toBe(root);
+                    expect(c3.ancestors[c1.id]).toBe(c1);
+                    expect(c3.ancestors[c2.id]).toBe(c2);
+                    expect(c3.ancestors[0]).toBe(c2);
+                    expect(c3.ancestors[1]).toBe(c1);
+                    expect(c3.ancestors[2]).toBe(root);
+                });
+            });
+        });
     });
 })
