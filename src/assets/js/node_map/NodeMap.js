@@ -70,6 +70,10 @@ export class NodeMap {
         return id;
     }
 
+    replaceNode(id, node) {
+        throw new Error("Abstract method");
+    }
+
     addTree(tree) {
         let childrenIds = (tree.children?.length) ? tree.children.map(c => this.addTree(c)) : [];
         return this.addNode(new CustomNode(tree.name, childrenIds));

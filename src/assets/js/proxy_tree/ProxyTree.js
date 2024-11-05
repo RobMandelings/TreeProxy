@@ -39,6 +39,14 @@ export class ProxyTree extends NodeMap {
         return this.nodeMap.addNode(node);
     }
 
+    replaceNode(id, node) {
+        const prevNode = this.getNode(id);
+        if (!prevNode) throw new Error(`Can't replace node: node with id ${id} does not exist in this proxy tree`);
+        // Delete all children. TODO: replacement involving trees. Allow for nested nodes to remain if position in tree is the same.
+        prevNode.children.asArray.map(c => c.delete());
+        this.nodeMap.replaceNode(id, node);
+    }
+
     addChild(parentId, node, index) {
         if (index == null) throw new UndefinedIndexError();
         if (isNaN(index)) throw new IncorrectIndexError(index);

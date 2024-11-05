@@ -23,6 +23,12 @@ function useParent(rId, proxyTree, initialParentId) {
     return {rParent: rParentProxy, setParent};
 }
 
+function useReplace(rId, proxyTree) {
+
+    const replaceFn = (node) => proxyTree.replaceNode(rId.value, node);
+    return {replaceFn};
+}
+
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.nodeMap.createRefNode(id);
@@ -45,6 +51,7 @@ export function createProxyNode(proxyTree, id, parentId) {
     const isAncestorOf = (id) => !!descendants.has(id);
 
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
+    const {replaceFn} = useReplace(rId, proxyTree);
 
     const target = reactive({
         refProxy,
@@ -53,6 +60,7 @@ export function createProxyNode(proxyTree, id, parentId) {
         descendants,
         isDescendantOf,
         isAncestorOf,
+        replace: replaceFn,
         parent: rParent,
         setParent,
         stale: rStale,
