@@ -16,14 +16,6 @@ export function useChildren(rId, rChildrenIds, proxyTree) {
     const nodeRelativesCore = useNodeRelatives(() => rChildrenArray.value);
     const {addNodeFn} = useAddChild(rId, proxyTree);
 
-    const getChildByPos = (pos) => {
-        const maxPos = nodeRelativesCore.size - 1;
-        if ((pos < 0 || pos > maxPos) && pos !== -1) {
-            throw new PosOutOfRangeError(pos, maxPos);
-        }
-        return rChildrenArray.value.at(pos) ?? null;
-    }
-
     const childrenObj = Object.create(
         Object.getPrototypeOf(nodeRelativesCore),
         Object.getOwnPropertyDescriptors(nodeRelativesCore)
