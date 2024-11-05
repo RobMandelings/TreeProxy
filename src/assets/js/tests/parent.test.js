@@ -29,13 +29,13 @@ describe("Parent relation test", () => {
         expect(child1.children.has(subchild1.id)).toBe(true);
     });
 
-    // test('Move parent', () => {
-    //     expect(subchild1.parent.children[0]).toBe([]);
-    // expect(subchild1.parent.id).toBe(child1.id);
-    // expect(child1.children.asArray).toBeNull();
-    // expect(subchild1.parent.children.ids.asArray).toBeNull();
-    // expect(subchild1.parent.children[subchild1.id]).toBeNull();
-    // subchild1.setParent(child2.id);
-    // expect(subchild1.parent.id).toBe(child2.id);
-    // });
+    test('Move parent', () => {
+        expect(subchild1.parent).toBe(child1);
+        subchild1.setParent(child2.id);
+        expect(subchild1.parent).toBe(child2);
+        expect(child1.children.size).toBe(0);
+        expect(child1.children[subchild1.id]).toBeUndefined();
+        expect(child2.children[subchild1.id]).toBe(subchild1);
+        expect(child2.children.size).toBe(1);
+    });
 })
