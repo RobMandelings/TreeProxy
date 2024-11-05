@@ -1,5 +1,6 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js";
+import {createTree} from "./TreeUtil.js";
 
 
 describe('Deletion', () => {
@@ -22,8 +23,17 @@ describe('Deletion', () => {
         const child = srcTree.root.children[0];
         const id = child.id; // Need to capture id before it becomes stale
         expect(srcTree.root.children[id]).toBeTruthy();
-        const nr = child.delete();
+        child.delete();
         expect(srcTree.root.children[id]).toBeFalsy();
         expect(child.stale).toBeTruthy();
     });
 });
+
+test('Delete with descendants check', () => {
+    const srcTree = new SourceTree().init(createTree([1, 3, 1]));
+    const nrDescendants1 = srcTree.root.descendants.size;
+    const nrDeleted = srcTree.root.children[1].delete();
+    expect(nrDeleted).toBe(4);
+    expect(srcTree.root.descendants.size).toBe(nrDescendants1 - nrDeleted);
+
+})
