@@ -236,7 +236,7 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
 
-    const theTarget = {
+    const target = reactive({
         refProxy,
         children,
         ancestors,
@@ -256,9 +256,9 @@ export function createProxyNode(proxyTree, id, parentId) {
             if (children.size) obj.children = children.asArray.map(c => c.toJSON());
             return obj;
         }
-    }
-    const targetReactive = reactive(theTarget);
-    const excludeProps = getExcludeProperties(targetReactive);
+    });
+
+    const excludeProps = getExcludeProperties(target);
 
     const handler = {
         get(t, prop, receiver) {
@@ -285,6 +285,6 @@ export function createProxyNode(proxyTree, id, parentId) {
             return Reflect.set(t.refProxy, prop, value, receiver);
         }
     }
-    rProxyNode.value = new Proxy(targetReactive, handler);
+    rProxyNode.value = new Proxy(target, handler);
     return rProxyNode.value;
 }
