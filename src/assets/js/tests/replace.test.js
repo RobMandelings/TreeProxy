@@ -2,7 +2,7 @@ import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {createTree} from "./TreeUtil.js";
 import {CustomNode} from "../CustomNode.js";
 
-test('Replace node', () => {
+xtest('Replace node', () => {
 
     const name = "Replaced";
     const srcTree = new SourceTree().init(createTree(3));

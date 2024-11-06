@@ -40,6 +40,7 @@ export class ProxyTree extends NodeMap {
     }
 
     replaceNode(id, node) {
+        throw new Error("Node replacement is not yet implemented for computed trees either");
         const prevNode = this.getNode(id);
         if (!prevNode) throw new Error(`Can't replace node: node with id ${id} does not exist in this proxy tree`);
         // Delete all children. TODO: replacement involving trees. Allow for nested nodes to remain if position in tree is the same.
