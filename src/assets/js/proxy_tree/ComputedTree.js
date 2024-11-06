@@ -9,7 +9,7 @@ export class ComputedTree extends ProxyTree {
         let overlayNodeMap = reactive(new OverlayNodeMap(srcTree.nodeMap));
         super(overlayNodeMap);
         this.overlayNodeMap = overlayNodeMap;
-        this.recomputeFn = recomputeFn;
+        this.recomputeFn = recomputeFn ?? ((_) => undefined);
         this.shouldRecompute = false;
         this.isRecomputing = false;
         this.srcTree = srcTree;
