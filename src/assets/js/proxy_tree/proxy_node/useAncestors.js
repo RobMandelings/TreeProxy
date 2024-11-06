@@ -21,5 +21,20 @@ export function useAncestors(rProxyNode) {
         });
     }
 
-    return decorateAncestors(useNodeRelatives(getAncestorsAsArrayFn));
+    const nodeRelativesCore = useNodeRelatives(getAncestorsAsArrayFn)
+
+    const ancestorsObj = Object.create(
+        Object.getPrototypeOf(nodeRelativesCore),
+        Object.getOwnPropertyDescriptors(nodeRelativesCore)
+    );
+
+    Object.defineProperties(ancestorsObj, {
+        root: {
+            get: () => nodeRelativesCore.asArray.at(-1),
+            enumerable: true,
+            configurable: true,
+        },
+    });
+
+    return decorateAncestors(ancestorsObj);
 }

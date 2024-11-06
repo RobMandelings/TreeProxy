@@ -80,6 +80,8 @@ describe('Relatives', () => {
             test('Child lvl 2', () => expect(childLvl2.ancestors.size).toBe(2));
         });
 
+        test('Ancestor from child lvl 2', () => expect(childLvl2.ancestors.root).toBe(root));
+
         describe('Nr descendants', () => {
             test('Root', () => expect(srcTree.root.descendants.size).toBe(15));
             test('Child lvl 1', () => expect(childLvl1.descendants.size).toBe(9));
