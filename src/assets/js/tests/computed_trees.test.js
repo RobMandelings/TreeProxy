@@ -48,8 +48,9 @@ describe('ComputedTree', () => {
             expect(compTree.root.name).toBe(srcTree.root.name)
             expect(compTree.shouldRecompute).toBe(false);
             srcTree.root.name = "Changed2";
-            expect(compTree.shouldRecompute).toBe(true)
-            expect(recomputeSpy).toBeCalledTimes(1);
+            expect(compTree.shouldRecompute).toBe(true) // Another change is made to the src tree, so the layer above should be re-evaluated
+            expect(compTree.root.name).toBe(srcTree.root.name);
+            expect(recomputeSpy).toBeCalledTimes(2);
         });
 
         test('Equivalence to src tree', () => {
