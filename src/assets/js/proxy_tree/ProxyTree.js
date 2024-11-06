@@ -13,6 +13,10 @@ export class ProxyTree extends NodeMap {
         this._root = null;
     }
 
+    flagOverlaysForRecompute() {
+        this.computedTreeOverlays.forEach(t => t.flagForRecompute());
+    }
+
     addComputedTreeOverlay(tree) {
         this.computedTreeOverlays.push(tree);
     }
@@ -92,9 +96,13 @@ export class ProxyTree extends NodeMap {
         console.assert(!parentId || this.proxyNodes.get(parentId),
             `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
 
-        const proxyNode = ProxyNode.createProxyNode(this, id, parentId);
+        const proxyNode = this.createProxyNodeFn(id, parentId);
         this.proxyNodes.set(id, proxyNode);
         return proxyNode;
+    }
+
+    createProxyNodeFn() {
+        throw new Error("Abstract method");
     }
 
     getChildren(id) {

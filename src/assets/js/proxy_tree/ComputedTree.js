@@ -1,6 +1,7 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {OverlayNodeMap} from "../node_map/OverlayNodeMap.js";
 import {reactive} from "vue";
+import {createSrcProxyNode} from "./ProxyNode.js";
 
 export class ComputedTree extends ProxyTree {
 
@@ -17,6 +18,10 @@ export class ComputedTree extends ProxyTree {
 
     flagForRecompute() {
         this.shouldRecompute = true;
+    }
+
+    createProxyNodeFn(id, parentId) {
+        return createSrcProxyNode(this, id, parentId);
     }
 
     recompute() {

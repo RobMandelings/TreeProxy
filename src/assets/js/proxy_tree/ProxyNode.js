@@ -1,7 +1,6 @@
 import {computed, reactive, ref} from "vue";
-import {DirectNodeAccessError, PosOutOfRangeError, StaleProxyError} from "./ProxyNodeErrors.js";
-import {CustomNode} from "../CustomNode.js";
-import {getExcludeProperties, getReactiveTarget} from "../Utils.js";
+import {DirectNodeAccessError, StaleProxyError} from "./ProxyNodeErrors.js";
+import {getExcludeProperties} from "../Utils.js";
 import {useChildren} from "./proxy_node/useChildren.js";
 import {useAncestors} from "./proxy_node/useAncestors.js";
 import {useDescendants} from "./proxy_node/useDescendants.js";
@@ -35,7 +34,7 @@ function useHeight(children) {
     return {rHeight};
 }
 
-export function createProxyNode(proxyTree, id, parentId) {
+function createProxyNode(proxyTree, id, parentId, setHandler) {
     const refProxy = proxyTree.nodeMap.createRefProxy(id);
 
     const rProxyNode = {
@@ -106,11 +105,24 @@ export function createProxyNode(proxyTree, id, parentId) {
             return Reflect.get(t, prop, receiver)
                 ?? Reflect.get(t.refProxy, prop, receiver);
         },
-        set(t, prop, value, receiver) {
-
-            return Reflect.set(t.refProxy, prop, value, receiver);
-        }
+        set: setHandler
     }
     rProxyNode.value = new Proxy(target, handler);
     return rProxyNode.value;
+}
+
+function getCoreSetHandler(proxyTree) {
+    return (t, prop, value, receiver) => {
+        const success = Reflect.set(t.refProxy, prop, value, receiver);
+        if (success) proxyTree.flagOverlaysForRecompute();
+        return success;
+    };
+}
+
+export function createSrcProxyNode(srcProxyTree, id, parentId) {
+    return createProxyNode(srcProxyTree, id, parentId, getCoreSetHandler(srcProxyTree))
+}
+
+export function createComputedProxyNode(computedProxyTree, id, parentId) {
+
 }
