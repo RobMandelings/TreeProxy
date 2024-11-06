@@ -1,7 +1,7 @@
 import {NodeMap} from "../node_map/NodeMap.js";
 import * as ProxyNode from "../proxy_tree/ProxyNode.js"
 import {NodeNotFoundError, RootNotSetError} from "./ProxyTreeErrors.js";
-import {IncorrectIndexError, InvalidPositionError, UndefinedIndexError} from "./ProxyNodeErrors.js";
+import {IncorrectIndexError, UndefinedIndexError} from "./ProxyNodeErrors.js";
 
 export class ProxyTree extends NodeMap {
 
@@ -9,7 +9,12 @@ export class ProxyTree extends NodeMap {
         super();
         this.nodeMap = nodeMap; // TODO make the node map immutable when returned
         this.proxyNodes = new Map();
+        this.computedTreeOverlays = [];
         this._root = null;
+    }
+
+    addComputedTreeOverlay(tree) {
+        this.computedTreeOverlays.push(tree);
     }
 
     init(tree) {

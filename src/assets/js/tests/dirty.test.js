@@ -1,5 +1,5 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
-import {OverlayTree} from "../proxy_tree/OverlayTree.js";
+import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 
 
 xdescribe('', () => {
@@ -7,7 +7,7 @@ xdescribe('', () => {
     let srcTree, ovTree;
     beforeEach(() => {
         srcTree = new SourceTree().init(0);
-        ovTree = new OverlayTree(srcTree);
+        ovTree = new ComputedTree(srcTree);
         expect(srcTree.root.dirty).toBe(false);
         expect(ovTree.root.dirty).toBe(false);
     })

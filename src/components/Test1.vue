@@ -2,12 +2,12 @@
 
 import {SourceTree} from "../assets/js/proxy_tree/SrcTree.js";
 import {reactive, ref, watch} from "vue";
-import {OverlayTree} from "../assets/js/proxy_tree/OverlayTree.js";
+import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
 
 const srcTree = new SourceTree().init({name: "Root"});
-const compTree = new OverlayTree(srcTree);
+const compTree = new ComputedTree(srcTree);
 
-const test = compTree.computedNodeMap;
+const test = compTree.overlayNodeMap;
 
 watch(srcTree.root, () => {
   console.log("Comp tree change");
