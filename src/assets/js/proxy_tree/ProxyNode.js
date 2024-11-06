@@ -29,6 +29,11 @@ function useReplace(rId, proxyTree) {
     return {replaceFn};
 }
 
+function useHeight(children) {
+
+    const rHeight = computed(() => Math.max(...children.asArray.map(c => c.height + 1), 0));
+    return {rHeight};
+}
 
 export function createProxyNode(proxyTree, id, parentId) {
     const refProxy = proxyTree.nodeMap.createRefProxy(id);
@@ -52,6 +57,8 @@ export function createProxyNode(proxyTree, id, parentId) {
 
     const {deleteFn} = useDelete(proxyTree, rProxyNode);
     const {replaceFn} = useReplace(rId, proxyTree);
+    const rDepth = computed(() => ancestors.size);
+    const {rHeight} = useHeight(children);
 
     const target = reactive({
         refProxy,
@@ -65,6 +72,8 @@ export function createProxyNode(proxyTree, id, parentId) {
         setParent,
         stale: rStale,
         delete: deleteFn,
+        depth: rDepth,
+        height: rHeight,
         toJSON: () => {
             let obj = {
                 id: rId.value,

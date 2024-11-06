@@ -81,6 +81,16 @@ describe('Relatives', () => {
         });
 
         test('Ancestor from child lvl 2', () => expect(childLvl2.ancestors.root).toBe(root));
+        describe('Depth tests', () => {
+            test('Root', () => expect(root.depth).toBe(0))
+            test('Child lvl 1', () => expect(childLvl1.depth).toBe(1))
+            test('Child lvl 2', () => expect(childLvl2.depth).toBe(2))
+        });
+        describe('Height tests', () => {
+            test('Root', () => expect(root.height).toBe(3))
+            test('Child lvl 1', () => expect(childLvl1.height).toBe(2))
+            test('Child lvl 2', () => expect(childLvl2.height).toBe(1))
+        })
 
         describe('Nr descendants', () => {
             test('Root', () => expect(srcTree.root.descendants.size).toBe(15));
