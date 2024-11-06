@@ -34,7 +34,7 @@ function useHeight(children) {
     return {rHeight};
 }
 
-function createProxyNode(proxyTree, id, parentId, setHandler) {
+function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
     const refProxy = proxyTree.nodeMap.createRefProxy(id);
 
     const rProxyNode = {
@@ -85,44 +85,50 @@ function createProxyNode(proxyTree, id, parentId, setHandler) {
 
     const excludeProps = getExcludeProperties(target);
 
-    const handler = {
-        get(t, prop, receiver) {
-            if (prop in excludeProps) return Reflect.get(t, prop, receiver);
+    const coreGetHandler = (t, prop, receiver) => {
+        if (prop in excludeProps) return Reflect.get(t, prop, receiver);
 
-            if (prop === "node") throw new DirectNodeAccessError();
+        if (prop === "node") throw new DirectNodeAccessError();
 
-            if (prop in t || prop in t.refProxy) {
-                if (prop === "stale") return rStale.value;
-                else if (rStale.value) {
-                    if (prop === "toJSON") return {msg: "This proxy is stale"};
-                    else throw new StaleProxyError();
-                }
-
-                return Reflect.get(t, prop, receiver)
-                    ?? Reflect.get(t.refProxy, prop, receiver);
+        if (prop in t || prop in t.refProxy) {
+            if (prop === "stale") return rStale.value;
+            else if (rStale.value) {
+                if (prop === "toJSON") return {msg: "This proxy is stale"};
+                else throw new StaleProxyError();
             }
 
             return Reflect.get(t, prop, receiver)
                 ?? Reflect.get(t.refProxy, prop, receiver);
+        }
+
+        return Reflect.get(t, prop, receiver)
+            ?? Reflect.get(t.refProxy, prop, receiver);
+    }
+
+    const handler = {
+        get: (t, prop, receiver) => {
+            if (beforeGetFn) beforeGetFn(t, prop, receiver);
+            return coreGetHandler(t, prop, receiver);
         },
-        set: setHandler
+        set: (t, prop, value, receiver) => {
+            const success = Reflect.set(t.refProxy, prop, value, receiver);
+            if (success) proxyTree.flagOverlaysForRecompute();
+            return success;
+        }
     }
     rProxyNode.value = new Proxy(target, handler);
     return rProxyNode.value;
 }
 
-function getCoreSetHandler(proxyTree) {
-    return (t, prop, value, receiver) => {
-        const success = Reflect.set(t.refProxy, prop, value, receiver);
-        if (success) proxyTree.flagOverlaysForRecompute();
-        return success;
-    };
-}
-
 export function createSrcProxyNode(srcProxyTree, id, parentId) {
-    return createProxyNode(srcProxyTree, id, parentId, getCoreSetHandler(srcProxyTree))
+    return createProxyNode(srcProxyTree, id, parentId, null)
 }
 
 export function createComputedProxyNode(computedProxyTree, id, parentId) {
+    const beforeGetFn = (t, prop, receiver) => {
+        if (computedProxyTree.shouldRecompute && !computedProxyTree.isRecomputing)
+            computedProxyTree.recompute();
+    }
 
+    return createProxyNode(computedProxyTree, id, parentId, beforeGetFn)
 }
