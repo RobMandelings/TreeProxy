@@ -1,39 +1,11 @@
 import {CustomNode} from "../CustomNode.js";
-import {createReferenceProxy} from "../proxy_tree/RefProxy.js";
-import {computed, reactive, ref} from "vue";
-import {getExcludeProperties} from "../Utils.js";
+import {createRefProxy} from "./RefProxy.js";
+import {computed, ref} from "vue";
 
 class NodeNotExistsError extends Error {
     constructor(id) {
         super(`Node ${id} doesn't exist`);
     }
-}
-
-function createRefProxy(nodeMap, initialId) {
-    const rId = ref(initialId);
-    const node = computed(() => {
-        return nodeMap.getNode(rId.value);
-    });
-
-    const targetObj = reactive({node: node, id: rId});
-
-    const setHandler = (t, prop, value) => {
-        nodeMap.set(rId.value, prop, value);
-        return true;
-    }
-
-    const excludeProps = getExcludeProperties(targetObj);
-    const getHandler = (t, prop, receiver) => {
-        if (prop === "__target__") return t;
-        if (prop in excludeProps) return Reflect.get(t, prop, receiver);
-
-        if (t.node && prop in t.node) return Reflect.get(t.node, prop, receiver);
-        return Reflect.get(t, prop, receiver);
-    }
-    return new Proxy(targetObj, {
-        get: getHandler,
-        set: setHandler
-    });
 }
 
 export class NodeMap {
@@ -44,16 +16,16 @@ export class NodeMap {
         throw new Error('Abstract method');
     }
 
+    isDirtyProp(id, prop) {
+        throw new Error('Abstract method');
+    }
+
     generateId() {
         return crypto.randomUUID();
     }
 
-    createRefNode(id) {
-        return this.createRefProxy(id);
-    }
-
     createRefProxy(initialId) {
-        return createRefProxy(this, initialId);
+        throw new Error("Abstract method");
     }
 
     _addNode(node) {

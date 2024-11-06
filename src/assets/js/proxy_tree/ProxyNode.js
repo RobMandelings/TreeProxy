@@ -31,7 +31,7 @@ function useReplace(rId, proxyTree) {
 
 
 export function createProxyNode(proxyTree, id, parentId) {
-    const refProxy = proxyTree.nodeMap.createRefNode(id);
+    const refProxy = proxyTree.nodeMap.createRefProxy(id);
 
     const rProxyNode = {
         value: null,

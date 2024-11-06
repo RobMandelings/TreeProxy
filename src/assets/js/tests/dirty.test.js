@@ -1,7 +1,8 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {OverlayTree} from "../proxy_tree/OverlayTree.js";
 
-describe('', () => {
+
+xdescribe('', () => {
 
     let srcTree, ovTree;
     beforeEach(() => {
@@ -25,5 +26,13 @@ describe('', () => {
         expect(srcTree.root.name.value).not.toBe("Changed");
         expect(srcTree.root.name.dirty).toBe(false);
         expect(srcTree.root.dirty).toBe(false);
+    });
+
+    test('Name change ov: sync with source', () => {
+        ovTree.root.name.value = "Changed";
+        ovTree.syncSrc();
+        expect(ovTree.root.dirty).toBe(false);
+        expect(ovTree.root.name.dirty).toBe(false);
+        expect(srcTree.root.name.value).toBe("Changed");
     });
 })

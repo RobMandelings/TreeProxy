@@ -1,4 +1,6 @@
 import {NodeMap} from "./NodeMap.js";
+import {computed, ref} from "vue";
+import * as RefProxy from "./RefProxy.js"
 
 export class SourceNodeMap extends NodeMap {
 
@@ -9,6 +11,16 @@ export class SourceNodeMap extends NodeMap {
 
     isDirty(id) {
         return false;
+    }
+
+    isDirtyProp(id, prop) {
+        return false;
+    }
+
+    createRefProxy(initialId) {
+        const rId = ref(initialId);
+        const rNode = computed(() => this.getNode(rId.value));
+        return RefProxy.createRefProxy(this, rId, rNode);
     }
 
     _addNode(node) {

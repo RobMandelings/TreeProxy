@@ -1,30 +1,70 @@
 import * as Utils from "../Utils.js";
 import {NodeMap} from "./NodeMap.js";
-import {reactive} from "vue";
+import {computed, reactive, ref} from "vue";
+import * as RefProxy from "./RefProxy.js";
+
+function applyChanges(node, changes) {
+    Object.entries(changes).forEach(([key, value]) => {
+        if (!node.hasOwnProperty(key)) throw new Error("Cannot apply changes: this node does not have ")
+        node[key] = value;
+    });
+}
 
 export class OverlayNodeMap extends NodeMap {
 
     constructor(srcNodeMap) {
         super();
         this.srcNodeMap = srcNodeMap;
-        this.overlayedNodes = new Map();
+
+        // Tracks the changes of the nodes on previous layer by keeping an object with the new property values
+        this.nodeChanges = new Map();
+
+        // Copies of the nodes that use the node changes
+        this.changedNodes = new Map();
+
+        this.addedNodes = new Map();
         this.deletedNodeIds = new Map(); // Node ids which are deleted from the src map
+    }
+
+    isDirty(id) {
+    }
+
+    isDirtyProp(id, prop) {
+        super.isDirtyProp(id, prop);
+    }
+
+    createRefProxy(initialId) {
+        const rId = ref(initialId);
+
+        let copy, prevId;
+
+        const rNode = computed(() => {
+            const id = rId.value;
+            // Only a copy is made on each recomputation. Still quite inexpensive as no deep copies are required.
+            if (this.changedNodes.has(id)) {
+                if (prevId !== id) copy = undefined; // Node reference id has changed. Old copy is invalid.
+                if (!copy) copy = this.srcNodeMap.getNode(id).copy();
+                applyChanges(copy, this.changedNodes[id]);
+                return copy;
+            } else {
+                if (copy) copy = undefined;
+
+                return this.getNode(rId.value)
+            }
+        });
+        return RefProxy.createRefProxy(this, rId, rNode);
     }
 
     syncSrc() {
         // Copy the computed nodes from the computed map to the src map.
         // Old nodes will be overwritten with their new values
-        this.overlayedNodes.forEach((v, k) => this.srcNodeMap.nodes.set(k, v));
-        this.overlayedNodes.clear();
-    }
-
-    createRefNode(id) {
-        return super.createRefNode(id);
+        this.changedNodes.forEach((v, k) => this.srcNodeMap.nodes.set(k, v));
+        this.changedNodes.clear();
     }
 
     _addNode(node) {
         const id = this.generateId();
-        this.overlayedNodes.set(id, node);
+        this.changedNodes.set(id, node);
         return id;
     }
 
@@ -38,10 +78,10 @@ export class OverlayNodeMap extends NodeMap {
         if (!this.computedNodeExists(nodeId)) {
             if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
                 "Node does not exist in the src node map as well as the computed node map.")
-            this.overlayedNodes.set(nodeId, this.srcNodeMap.getNode(nodeId).copy());
+            this.changedNodes.set(nodeId, this.srcNodeMap.getNode(nodeId).copy());
         }
 
-        this.overlayedNodes.get(nodeId)[prop] = val;
+        this.changedNodes.get(nodeId)[prop] = val;
     }
 
     get(nodeId, prop) {
@@ -102,7 +142,7 @@ export class OverlayNodeMap extends NodeMap {
     }
 
     getComputedNode(id) {
-        return this.overlayedNodes.get(id);
+        return this.changedNodes.get(id);
     }
 
     computedNodeExists(id) {
