@@ -21,7 +21,7 @@ export class OverlayNodeMap extends NodeMap {
         this.nodeChanges = new Map();
 
         this.addedNodes = new Map();
-        this.deletedNodeIds = new Map(); // Node ids which are deleted from the src map
+        this.deletedNodeIds = new Set(); // Node ids which are deleted from the src map
     }
 
     isDirty(id) {
@@ -103,7 +103,9 @@ export class OverlayNodeMap extends NodeMap {
     }
 
     clearAllChanges() {
-
+        this.nodeChanges.clear();
+        this.addedNodes.clear();
+        this.deletedNodeIds.clear();
     }
 
     deleteNode(id) {

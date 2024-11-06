@@ -26,13 +26,14 @@ describe('ComputedTree', () => {
     let recomputeSpy;
     beforeEach(() => {
         copySpy = jest.spyOn(CustomNode.prototype, 'copy');
+        copySpy.mockClear()
         recomputeSpy = createRecomputeSpy();
     })
 
     describe('Simple tree', () => {
         beforeEach(() => {
             srcTree = new SourceTree().init({name: initial});
-            compTree = new ComputedTree(srcTree, (tree) => console.log(tree.root.name));
+            compTree = new ComputedTree(srcTree, (_) => undefined);
             expect(srcTree.computedTreeOverlays.length).not.toBeFalsy();
         });
 
@@ -70,7 +71,6 @@ describe('ComputedTree', () => {
             expect(compTree.root.name).toBe(change2);
             expect(srcTree.root.name).toBe(initial);
             expect(copySpy).toBeCalledTimes(1);
-            copySpy.mockRestore()
         });
 
         xtest('Multi-layered change', () => {
@@ -87,6 +87,14 @@ describe('ComputedTree', () => {
         test('Children adjustments', () => {
 
         });
+
+        test('Clear on recompute', () => {
+            compTree.root.weight = 5;
+            expect(compTree.root.weight).toBe(5);
+            expect(srcTree.root.weight).not.toBe(5);
+            srcTree.root.name = change1;
+            // expect(compTree.root.weight).not.toBe(5);
+        });
     });
 
     describe('Complex tree', () => {
@@ -98,6 +106,7 @@ describe('ComputedTree', () => {
         });
 
         test('Name change', () => {
+
             const srcNode = getAdjustedNode(srcTree.root);
             const ovNode = getAdjustedNode(compTree.root);
             ovNode.name = change1;

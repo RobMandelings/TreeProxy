@@ -48,7 +48,7 @@ export class NodeMap {
 
     addTree(tree) {
         let childrenIds = (tree.children?.length) ? tree.children.map(c => this.addTree(c)) : [];
-        return this.addNode(new CustomNode(tree.name, childrenIds));
+        return this.addNode(new CustomNode(tree.name, tree.weight, childrenIds));
     }
 
     deleteNode(id) {
