@@ -64,7 +64,11 @@ describe('ComputedTree', () => {
         test('Name change', () => {
             compTree.root.name = change1;
             expect(compTree.root.name).toBe(change1);
-            expect(srcTree.root.name).not.toBe(change1);
+            expect(srcTree.root.name).toBe(initial);
+            expect(copySpy).toBeCalledTimes(1);
+            compTree.root.name = change2;
+            expect(compTree.root.name).toBe(change2);
+            expect(srcTree.root.name).toBe(initial);
             expect(copySpy).toBeCalledTimes(1);
             copySpy.mockRestore()
         });

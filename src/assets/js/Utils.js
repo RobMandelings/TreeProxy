@@ -23,3 +23,14 @@ export function getExcludeProperties(obj) {
 
     return Array.from(properties);
 }
+
+export function equalKeys(obj1, obj2) {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    // First, check if the number of keys is the same
+    if (keys1.length !== keys2.length) return false;
+
+    // Then, check if all keys in obj1 exist in obj2
+    return keys1.every(key => obj2.hasOwnProperty(key));
+}
