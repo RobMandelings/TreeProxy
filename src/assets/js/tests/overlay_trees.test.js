@@ -67,6 +67,7 @@ describe('ComputedTree', () => {
             ovNode.name = change1;
             expect(srcNode.name).not.toBe(change1);
             expect(ovNode.name).toBe(change1);
+            expect(ovNode.parent.id).toBe(srcNode.parent.id);
             expect(copySpy).toBeCalledTimes(1);
         });
     });
