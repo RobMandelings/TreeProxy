@@ -41,6 +41,7 @@ export class OverlayNodeMap extends NodeMap {
             if (this.nodeChanges.has(id)) {
                 const curChanges = this.nodeChanges.get(id);
                 let remakeCopy = false;
+                if (!copy) remakeCopy = true;
                 if (prevId !== id) {
                     remakeCopy = true;
                     prevId = id;

@@ -15,6 +15,7 @@ export class ComputedTree extends ProxyTree {
         this.srcTree = srcTree;
         this.srcTree.addComputedTreeOverlay(this);
         this.initRootId(srcTree.root.id);
+        this.recompute(true);
 
         // Return a proxied version of this instance
         return new Proxy(this, {
@@ -44,12 +45,13 @@ export class ComputedTree extends ProxyTree {
         return createComputedProxyNode(this, id, parentId);
     }
 
-    recompute() {
-        if (this.isRecomputing || !this.shouldRecompute) return;
+    recompute(force = false) {
+        if (this.isRecomputing) return;
+        if (!this.shouldRecompute && !force) return;
 
         this.isRecomputing = true;
         this.overlayNodeMap.clearAllChanges();
-        this.recomputeFn(this);
+        this.recomputeFn(this.root);
         this.computedTreeOverlays.forEach(t => t.flagForRecompute());
         this.isRecomputing = false;
         this.shouldRecompute = false;
