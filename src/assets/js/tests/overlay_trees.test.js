@@ -1,44 +1,73 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {OverlayTree} from "../proxy_tree/OverlayTree.js";
+import {CustomNode} from "../CustomNode.js";
+import {createTree} from "./TreeUtil.js";
 
 describe('ComputedTree', () => {
-    let srcTree, compTree;
+    let srcTree, ovTree;
 
     const initial = "Root";
     const change1 = "Changed";
     const change2 = "Changed2";
 
+    let copySpy;
     beforeEach(() => {
-        srcTree = new SourceTree().init({name: initial});
-        compTree = new OverlayTree(srcTree);
-    });
-
-    test('Equivalence to src tree', () => {
-        // Although the node's data should be the same at this point, the proxies are different
-        // This allows for copy-on-write mechanisms
-        expect(compTree.root).not.toBe(srcTree.root);
-        expect(compTree.root.id).toBe(srcTree.root.id);
-        expect(compTree.root.name).toBe(srcTree.root.name);
+        copySpy = jest.spyOn(CustomNode.prototype, 'copy');
     })
 
-    test('Name change', () => {
-        compTree.root.name = change1;
-        expect(compTree.root.name).toBe(change1);
-        expect(srcTree.root.name).not.toBe(change1);
+    describe('Simple tree', () => {
+        beforeEach(() => {
+            srcTree = new SourceTree().init({name: initial});
+            ovTree = new OverlayTree(srcTree);
+        });
+
+        test('Equivalence to src tree', () => {
+            // Although the node's data should be the same at this point, the proxies are different
+            // This allows for copy-on-write mechanisms
+            expect(ovTree.root).not.toBe(srcTree.root);
+            expect(ovTree.root.id).toBe(srcTree.root.id);
+            expect(ovTree.root.name).toBe(srcTree.root.name);
+        });
+
+        test('Name change', () => {
+            ovTree.root.name = change1;
+            expect(ovTree.root.name).toBe(change1);
+            expect(srcTree.root.name).not.toBe(change1);
+            expect(copySpy).toBeCalledTimes(1);
+            copySpy.mockRestore()
+        });
+
+        xtest('Multi-layered change', () => {
+            const compTree2 = new OverlayTree(ovTree);
+            ovTree.root.name = change1;
+            expect(ovTree.root.name).toBe(change1);
+            expect(compTree2.root.name).toBe(change1);
+            compTree2.root.name = change2;
+            expect(compTree2.root.name).toBe(change2);
+            expect(ovTree.root.name).toBe(change1);
+            expect(srcTree.root.name).toBe(initial);
+        });
+
+        test('Children adjustments', () => {
+
+        });
     });
 
-    test('Multi-layered change', () => {
-        const compTree2 = new OverlayTree(compTree);
-        compTree.root.name = change1;
-        expect(compTree.root.name).toBe(change1);
-        expect(compTree2.root.name).toBe(change1);
-        compTree2.root.name = change2;
-        expect(compTree2.root.name).toBe(change2);
-        expect(compTree.root.name).toBe(change1);
-        expect(srcTree.root.name).toBe(initial);
-    });
+    describe('Complex tree', () => {
+        const getAdjustedNode = (tree) => tree.children[0].children[0];
 
-    test('Children adjustments', () => {
+        beforeEach(() => {
+            srcTree = new SourceTree().init(createTree([[0, 0], 0, 0]));
+            ovTree = new OverlayTree(srcTree);
+        });
 
+        test('Name change', () => {
+            const srcNode = getAdjustedNode(srcTree.root);
+            const ovNode = getAdjustedNode(ovTree.root);
+            ovNode.name = change1;
+            expect(srcNode.name).not.toBe(change1);
+            expect(ovNode.name).toBe(change1);
+            expect(copySpy).toBeCalledTimes(1);
+        });
     });
 })

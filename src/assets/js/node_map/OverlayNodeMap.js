@@ -38,13 +38,15 @@ export class OverlayNodeMap extends NodeMap {
             const id = rId.value;
             // Only a copy is made on each recomputation. Still quite inexpensive as no deep copies are required.
             if (this.nodeChanges.has(id)) {
-                if (prevId !== id) copy = undefined; // Node reference id has changed. Old copy is invalid.
+                if (prevId !== id) {
+                    copy = undefined;
+                    prevId = id;
+                } // Node reference id has changed. Old copy is invalid.
                 if (!copy) copy = this.srcNodeMap.getNode(id).copy();
-                applyChanges(copy, this.nodeChanges[id]);
+                applyChanges(copy, this.nodeChanges.get(id));
                 return copy;
             } else {
                 if (copy) copy = undefined;
-
                 return this.getNode(rId.value)
             }
         });
@@ -125,14 +127,10 @@ export class OverlayNodeMap extends NodeMap {
         return set;
     }
 
-    getComputedNode(id) {
-        return this.changedNodes.get(id);
-    }
-
     getNode(id) {
         if (this.isDeleted(id)) return null;
 
-        return this.getComputedNode(id)
+        return this.getAddedNode(id)
             ?? this.srcNodeMap.getNode(id);
     }
 }
