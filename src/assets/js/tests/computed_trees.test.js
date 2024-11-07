@@ -94,7 +94,10 @@ describe('ComputedTree', () => {
             const initWeight = srcTree.root.weight;
             const nxtWeight = initWeight + 1;
             recomputeSpy.mockClear();
-            const compTree2 = new ComputedTree(srcTree, (root) => root.weight = nxtWeight);
+            const compTree2 = new ComputedTree(srcTree, (root) => {
+                root.weight = nxtWeight;
+                console.log("Recomputed");
+            });
             expect(recomputeSpy).toBeCalledTimes(1);
             expect(compTree2.root.weight).toBe(nxtWeight);
             srcTree.root.name = change1;
