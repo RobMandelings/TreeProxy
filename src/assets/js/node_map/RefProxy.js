@@ -1,4 +1,5 @@
-import {computed, reactive, ref} from "vue";
+import {computed, reactive} from "vue";
+import {isVueProperty, wrappedProxyTargetGetter} from "../ProxyUtils.js";
 import {getExcludeProperties} from "../Utils.js";
 
 function useDirty(rId, nodeMap) {
@@ -22,9 +23,8 @@ export function createRefProxy(nodeMap, rId, rNode) {
     const getHandler = (t, prop, receiver) => {
         if (prop === "__target__") return t;
         if (prop in excludeProps) return Reflect.get(t, prop, receiver);
-
-        if (t.node && prop in t.node) return Reflect.get(t.node, prop, receiver);
-        return Reflect.get(t, prop, receiver);
+        if (isVueProperty(prop)) return Reflect.get(t, prop, receiver);
+        return wrappedProxyTargetGetter(t, t.node, prop, receiver);
     }
     return new Proxy(targetObj, {
         get: getHandler,

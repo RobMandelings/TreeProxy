@@ -11,13 +11,20 @@ function applyChanges(node, changes) {
     });
 }
 
-function useOverlayNode(inst, nodeChanges, srcNodeMap, rId) {
+function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
     let copy, prevId, prevChanges = {};
+
+    let srcNodeChanged = false;
+    const rSrcNode = computed(() => {
+        srcNodeChanged = true;
+        return srcNodeMap.getNode(rId.value);
+    });
+
     const rOverlayNode = computed(() => {
-        const hi = inst;
         const id = rId.value;
         // Only a copy is made on each recomputation. Still quite inexpensive as no deep copies are required.
+        const n = nodeChanges;
         if (nodeChanges.has(id)) {
             const curChanges = nodeChanges.get(id);
             let remakeCopy = false;
@@ -69,7 +76,7 @@ export class OverlayNodeMap extends NodeMap {
 
     createRefProxy(initialId) {
         const rId = ref(initialId);
-        const {rOverlayNode} = useOverlayNode(this, this.nodeChanges, this.srcNodeMap, rId);
+        const {rOverlayNode} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
         const rNode = computed(() => {
             return rOverlayNode.value
                 ?? this.getNode(rId.value)

@@ -1,5 +1,6 @@
 import {computed, reactive, ref} from "vue";
 import {DirectNodeAccessError, StaleProxyError} from "./ProxyNodeErrors.js";
+import {isVueProperty, wrappedProxyTargetGetter} from "../ProxyUtils.js";
 import {getExcludeProperties} from "../Utils.js";
 import {useChildren} from "./proxy_node/useChildren.js";
 import {useAncestors} from "./proxy_node/useAncestors.js";
@@ -87,6 +88,7 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
 
     const coreGetHandler = (t, prop, receiver) => {
         if (prop in excludeProps) return Reflect.get(t, prop, receiver);
+        if (isVueProperty(prop)) return Reflect.get(t, prop, receiver);
 
         if (prop === "node") throw new DirectNodeAccessError();
 
@@ -96,13 +98,9 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
                 if (prop === "toJSON") return {msg: "This proxy is stale"};
                 else throw new StaleProxyError();
             }
-
-            return Reflect.get(t, prop, receiver)
-                ?? Reflect.get(t.refProxy, prop, receiver);
         }
 
-        return Reflect.get(t, prop, receiver)
-            ?? Reflect.get(t.refProxy, prop, receiver);
+        return wrappedProxyTargetGetter(t, t.refProxy, prop, receiver);
     }
 
     const handler = {
