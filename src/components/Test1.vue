@@ -15,7 +15,7 @@ const computeFn = (root) => {
 };
 
 const compTree = new ComputedTree(srcTree, computeFn);
-const compTree2 = new ComputedTree(srcTree, (root) => root.weight = rCount.value * 2);
+// const compTree2 = new ComputedTree(srcTree, (root) => root.weight = rCount.value * 2);
 
 const change = () => {
   rCount.value++;
@@ -27,7 +27,7 @@ const change = () => {
 
   <div class="card">
     <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>
-    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>
+    <!--    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>-->
     <button type="button" @click="change">Click me</button>
     <p>
       Edit

@@ -39,23 +39,27 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
     let count = 0;
     let prevChanges = {};
-    const rCopy = ref(null);
-    watchSyncEffect(() => {
+    let copy;
+
+    const rCopy = computed(() => {
         // TODO too many sync effects are triggered. Try to lower it.
         console.log(`Overlay node recompute: ${count++}`);
+        console.log(copy?.name);
 
         const id = rId.value;
         const srcNode = rSrcNode.value;
         const curChanges = nodeChanges.get(id);
         let changesToApply;
         if (srcNodeChanged) { // In this case we need to create a new copy and apply all changes again
-            rCopy.value = reactive(srcNode.copy());
+            copy = reactive(srcNode.copy());
             changesToApply = curChanges; // It is a fresh copy, so previous changes is irrelevant here
             srcNodeChanged = false;
         } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
 
-        if (changesToApply) applyChanges(rCopy.value, changesToApply);
+        if (changesToApply) applyChanges(copy, changesToApply);
         prevChanges = curChanges;
+
+        return copy;
     });
 
     return {rCopy};
