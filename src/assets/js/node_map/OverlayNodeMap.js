@@ -79,6 +79,7 @@ export class OverlayNodeMap extends NodeMap {
 
         // Tracks the changes of the nodes on previous layer by keeping an object with the new property values
         this.nodeChanges = new Map();
+        this.overlayNodes = new Map();
 
         this.addedNodes = new Map();
         this.deletedNodeIds = new Set(); // Node ids which are deleted from the src map
@@ -105,7 +106,7 @@ export class OverlayNodeMap extends NodeMap {
             return rOverlayNode.value
                 ?? this.getNode(rId.value)
         });
-
+        this.overlayNodes.set(rId.value, rNode);
 
         return RefProxy.createRefProxy(this, rId, rNode);
     }

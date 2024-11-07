@@ -1,26 +1,29 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {OverlayNodeMap} from "../node_map/OverlayNodeMap.js";
-import {reactive} from "vue";
+import {computed, reactive} from "vue";
 import {createComputedProxyNode, createSrcProxyNode} from "./ProxyNode.js";
 
 export class ComputedTree extends ProxyTree {
 
-    constructor(srcTree, recomputeFn) {
+    constructor(srcTree, customRecomputeFn) {
         let overlayNodeMap = reactive(new OverlayNodeMap(srcTree.nodeMap));
         super(overlayNodeMap);
         this.overlayNodeMap = overlayNodeMap;
-        this.recomputeFn = recomputeFn ?? ((_) => undefined);
         this.shouldRecompute = false;
         this.isRecomputing = false;
         this.srcTree = srcTree;
         this.srcTree.addComputedTreeOverlay(this);
+        this.recomputeFn = this.createReactiveRecomputeFn(customRecomputeFn);
         this.initRootId(srcTree.root.id);
         this.flagForRecompute();
 
         // Return a proxied version of this instance
         return new Proxy(this, {
+
+
             get: (target, prop, receiver) => {
                 if (prop !== 'shouldRecompute' && prop !== 'isRecomputing') {
+                    console.log("Should recompute at computed tree");
                     if (target.shouldRecompute)
                         target.recompute();
                 }
@@ -34,7 +37,18 @@ export class ComputedTree extends ProxyTree {
                 return result;
             }
         });
+    }
 
+    createReactiveRecomputeFn(customRecomputeFn) {
+        if (!customRecomputeFn) customRecomputeFn = (_) => undefined;
+        const rCustomRecomputeFn = computed(() => {
+            console.log("CUstom recomputed executed");
+            customRecomputeFn(this.root);
+        });
+        return () => {
+            console.log("REco")
+            rCustomRecomputeFn.value;
+        }
     }
 
     flagForRecompute() {
@@ -51,7 +65,7 @@ export class ComputedTree extends ProxyTree {
 
         this.isRecomputing = true;
         this.overlayNodeMap.clearAllChanges();
-        this.recomputeFn(this.root);
+        this.recomputeFn();
         this.computedTreeOverlays.forEach(t => t.flagForRecompute());
         this.isRecomputing = false;
         this.shouldRecompute = false;

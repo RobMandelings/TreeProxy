@@ -5,26 +5,33 @@ import {reactive, ref, watch} from "vue";
 import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
 
 const srcTree = new SourceTree().init({name: "Root"});
-const compTree = new ComputedTree(srcTree);
 
-const test = compTree.overlayNodeMap;
+let rCount = ref(0);
+const computeFn = (root) => {
+  console.log(`Triggered ${root.weight}`);
+  root.weight += rCount.value;
+  root.name = `Weight: ${root.weight}`;
+};
 
-watch(srcTree.root, () => {
-  console.log("Comp tree change");
-})
-let count = 0;
+const compTree = new ComputedTree(srcTree, computeFn);
+
 const change = () => {
-  compTree.root.name = `Child${count++}`;
-  console.log(compTree.nodeMap);
-  console.log(compTree.nodeMap.getNode(compTree.root.id));
+  if (rCount.value === 1) rCount.value = 0;
+  else if (rCount.value === 0) rCount.value = 1;
+  console.log(`Count: ${rCount.value}`);
+  console.log(`The name is: ${compTree.root.name};`);
 }
+
+watch(compTree.root, () => {
+  console.log("Changed!");
+});
 
 </script>
 
 <template>
 
   <div class="card">
-    <div>{{ compTree.root.name }}</div>
+    <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>
     <button type="button" @click="change">Click me</button>
     <p>
       Edit
