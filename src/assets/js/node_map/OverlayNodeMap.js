@@ -1,6 +1,6 @@
 import * as Utils from "../Utils.js";
 import {NodeMap} from "./NodeMap.js";
-import {computed, reactive, ref} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import * as RefProxy from "./RefProxy.js";
 import {equalKeys} from "../Utils.js";
 
@@ -13,33 +13,41 @@ function applyChanges(node, changes) {
 
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
-    let copy, prevId, prevChanges = {};
-
+    let copy, prevChanges = {};
     let srcNodeChanged = false;
     const rSrcNode = computed(() => {
+        console.log(`rSrcNode called`);
         srcNodeChanged = true;
-        return srcNodeMap.getNode(rId.value);
+        const srcNode = srcNodeMap.getNode(rId.value);
+
+        // This one is essential to make the computed prop reactive on deep changes
+        // It seems like it does nothing, but this makes sure that the computed prop is recalled whenever any of the properties in the srcNode changes
+        // E.g. name change, weight change, or anything else. This will indirectly invalidate the copy of the overlay node.
+        Object.values(srcNode);
+        return srcNode;
     });
 
     const rOverlayNode = computed(() => {
         const id = rId.value;
-        // Only a copy is made on each recomputation. Still quite inexpensive as no deep copies are required.
-        if (nodeChanges.has(id)) {
-            const curChanges = nodeChanges.get(id);
-            let remakeCopy = false;
-            if (!copy) remakeCopy = true;
-            if (prevId !== id) {
-                remakeCopy = true;
-                prevId = id;
-            } // Node reference id has changed. Old copy is invalid.
-            if (!equalKeys(prevChanges, curChanges)) remakeCopy = true;
-            if (remakeCopy) copy = srcNodeMap.getNode(id).copy();
-
-            applyChanges(copy, nodeChanges.get(id));
-            prevChanges = {...curChanges};
-
-            return copy;
+        const srcNode = rSrcNode.value;
+        if (srcNodeChanged) {
+            copy = srcNode.copy();
+            srcNodeChanged = false;
         }
+        return copy;
+        // Only a copy is made on each recomputation. Still quite inexpensive as no deep copies are required.
+        // if (nodeChanges.has(id)) {
+        // const curChanges = nodeChanges.get(id);
+        // let remakeCopy = false;
+        // if (!copy) remakeCopy = true;
+        // if (!equalKeys(prevChanges, curChanges)) remakeCopy = true;
+        // if (remakeCopy) copy = srcNodeMap.getNode(id).copy();
+
+        // applyChanges(copy, nodeChanges.get(id));
+        // prevChanges = {...curChanges};
+
+        // return copy;
+        // }
     });
 
     return {rOverlayNode};

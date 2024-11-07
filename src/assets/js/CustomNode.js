@@ -1,10 +1,20 @@
 import {isValidUUID} from "./Utils.js";
 
-export class CustomNode {
-    constructor(name, weight=0, childrenIds=[]) {
+class CoreNode {
+    constructor(name) {
         this.name = name;
+    }
+}
+
+export class CustomNode extends CoreNode {
+    constructor(name, weight = 0, childrenIds = []) {
+        super(name);
         this.weight = weight;
         this.childrenIds = childrenIds ?? [];
+    }
+
+    get hi() {
+
     }
 
     copy() {
