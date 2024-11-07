@@ -1,5 +1,6 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {isReactive, nextTick, watch} from "vue";
+import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 
 describe('Reactivity checks', () => {
 
@@ -22,6 +23,7 @@ function runWatchTests(description, getTarget, getWatchTriggers, initialValue) {
 
         test('No change', async () => {
             target.name = initialValue;
+            expect(target.name).toBe(initialValue);
             await nextTick();
             Object.values(watchTriggers).forEach(trigger =>
                 expect(trigger).toHaveBeenCalledTimes(0)
@@ -30,6 +32,7 @@ function runWatchTests(description, getTarget, getWatchTriggers, initialValue) {
 
         test('Single change', async () => {
             target.name = "Changed";
+            expect(target.name).toBe("Changed")
             await nextTick();
             Object.values(watchTriggers).forEach(trigger =>
                 expect(trigger).toHaveBeenCalledTimes(1)
@@ -49,7 +52,7 @@ function runWatchTests(description, getTarget, getWatchTriggers, initialValue) {
     });
 }
 
-describe("Watch on source tree", () => {
+describe("Deep watch", () => {
 
     let srcTree, child, initialChildName;
     let rootWatchTrigger, childrenWatchTrigger;
@@ -65,17 +68,39 @@ describe("Watch on source tree", () => {
         watch(srcTree.root, () => rootWatchTrigger());
     })
 
-    runWatchTests(
-        'Root level watch',
-        () => srcTree.root,
-        () => ({rootWatchTrigger}),
-        'Root'
-    );
+    describe('Source tree', () => {
 
-    runWatchTests(
-        'Nested level 1 watch',
-        () => child,
-        () => ({rootWatchTrigger, childrenWatchTrigger}),
-        'Child'
-    );
+        runWatchTests(
+            'Root level watch',
+            () => srcTree.root,
+            () => ({rootWatchTrigger}),
+            'Root'
+        );
+
+        runWatchTests(
+            'Nested level 1 watch',
+            () => child,
+            () => ({rootWatchTrigger, childrenWatchTrigger}),
+            'Child'
+        );
+    });
+
+    xdescribe('Computed tree', () => {
+
+        let compTree, compRootWatchTrigger;
+        beforeEach(() => {
+            const rCount = 0;
+            const computeFn = (root) => undefined;
+            compTree = new ComputedTree(srcTree, computeFn);
+            compRootWatchTrigger = jest.fn();
+            watch(compTree.root, () => compRootWatchTrigger);
+        });
+
+        runWatchTests(
+            'Root level watch',
+            () => compTree.root,
+            () => ({compRootWatchTrigger}),
+            'Root'
+        );
+    })
 })
