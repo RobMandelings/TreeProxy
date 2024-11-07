@@ -9,7 +9,7 @@ const srcTree = new SourceTree().init({name: "Root"});
 let rCount = ref(0);
 let triggered = 0;
 const computeFn = (root) => {
-  console.log(`Triggered ${triggered++} times`);
+  console.log(`Triggered ${++triggered} times`);
   root.weight = rCount.value;
   root.name = `Weight: ${root.weight}`;
 };
