@@ -12,31 +12,25 @@ describe('Reactivity checks', () => {
 
 });
 
-function runWatchTests(description, getTarget, getWatchTriggers, initialValue) {
+function runWatchTests(description, getTarget, watchTriggers, initialValue) {
     describe(description, () => {
-        let target, watchTriggers;
-
+        let target;
         beforeEach(() => {
             target = getTarget();
-            watchTriggers = getWatchTriggers();
         });
 
         test('No change', async () => {
             target.name = initialValue;
             expect(target.name).toBe(initialValue);
             await nextTick();
-            Object.values(watchTriggers).forEach(trigger =>
-                expect(trigger).toHaveBeenCalledTimes(0)
-            );
+            watchTriggers.forEach(t => expect(t).toHaveBeenCalledTimes(0));
         });
 
         test('Single change', async () => {
             target.name = "Changed";
             expect(target.name).toBe("Changed")
             await nextTick();
-            Object.values(watchTriggers).forEach(trigger =>
-                expect(trigger).toHaveBeenCalledTimes(1)
-            );
+            watchTriggers.forEach(t => expect(t).toHaveBeenCalledTimes(1));
         });
 
         test('Many changes', async () => {
@@ -45,42 +39,44 @@ function runWatchTests(description, getTarget, getWatchTriggers, initialValue) {
                 target.name = `${i}`;
                 await nextTick();
             }
-            Object.values(watchTriggers).forEach(trigger =>
-                expect(trigger).toHaveBeenCalledTimes(nrChanges)
-            );
+            watchTriggers.forEach(t => expect(t).toHaveBeenCalledTimes(nrChanges));
         });
     });
 }
 
 describe("Deep watch", () => {
 
-    let srcTree, child, initialChildName;
-    let rootWatchTrigger, childrenWatchTrigger;
+    let srcTree, child, initialName
 
     beforeEach(() => {
-        initialChildName = 'Child';
-        srcTree = new SourceTree().init({name: 'Root', children: [{name: initialChildName}]});
+        initialName = 'Child';
+        srcTree = new SourceTree().init({name: 'Root', children: [{name: initialName}]});
         child = srcTree.root.children[0];
-        rootWatchTrigger = jest.fn();
-        childrenWatchTrigger = jest.fn();
         expect(child).not.toBeFalsy();
-        watch(srcTree.root.children.asArray, () => childrenWatchTrigger());
-        watch(srcTree.root, () => rootWatchTrigger());
     })
 
     describe('Source tree', () => {
 
+        let rootWatchTrigger, childrenWatchTrigger;
+        rootWatchTrigger = jest.fn();
+        childrenWatchTrigger = jest.fn();
+        beforeEach(() => {
+            jest.clearAllMocks();
+            watch(srcTree.root.children.asArray, () => childrenWatchTrigger());
+            watch(srcTree.root, () => rootWatchTrigger());
+        });
+
         runWatchTests(
             'Root level watch',
             () => srcTree.root,
-            () => ({rootWatchTrigger}),
+            [rootWatchTrigger],
             'Root'
         );
 
         runWatchTests(
             'Nested level 1 watch',
             () => child,
-            () => ({rootWatchTrigger, childrenWatchTrigger}),
+            [rootWatchTrigger, childrenWatchTrigger],
             'Child'
         );
     });
