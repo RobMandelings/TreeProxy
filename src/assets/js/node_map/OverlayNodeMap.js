@@ -24,7 +24,6 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     const rOverlayNode = computed(() => {
         const id = rId.value;
         // Only a copy is made on each recomputation. Still quite inexpensive as no deep copies are required.
-        const n = nodeChanges;
         if (nodeChanges.has(id)) {
             const curChanges = nodeChanges.get(id);
             let remakeCopy = false;

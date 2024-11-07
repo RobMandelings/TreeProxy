@@ -111,8 +111,8 @@ describe('ComputedTree', () => {
                 const initWeight = srcTree.root.weight;
                 const nxtWeight = initWeight + 1;
                 expect(compTree.root.weight).toBe(nxtWeight);
-                // srcTree.root.name = change1;
-                // compTree.root.name;
+                srcTree.root.name = change1;
+                compTree.root.name;
                 // expect(compTree.root.name).toBe(change1);
                 // expect(recomputeSpy).toBeCalledTimes(2);
                 // expect(srcTree.root.weight).toBe(initWeight);
