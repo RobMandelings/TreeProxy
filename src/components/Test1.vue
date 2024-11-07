@@ -7,8 +7,9 @@ import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
 const srcTree = new SourceTree().init({name: "Root"});
 
 let rCount = ref(0);
+let triggered = 0;
 const computeFn = (root) => {
-  console.log(`Triggered ${root.weight}`);
+  console.log(`Triggered ${triggered++} times`);
   root.weight += rCount.value;
   root.name = `Weight: ${root.weight}`;
 };
@@ -17,12 +18,7 @@ const compTree = new ComputedTree(srcTree, computeFn);
 
 const change = () => {
   rCount.value++;
-  compTree.root.weight += rCount.value;
 }
-
-// watch(compTree.root, () => {
-//   console.log("Changed!");
-// });
 
 </script>
 

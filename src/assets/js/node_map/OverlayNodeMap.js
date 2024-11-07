@@ -40,7 +40,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     let count = 0;
     let copy, prevChanges = {};
     const getOverlayNodeFn = () => {
-        if (count > 0) console.log(`Overlay node recompute: ${count++}`);
+        console.log(`Overlay node recompute: ${count++}`);
         const id = rId.value;
         const srcNode = rSrcNode.value;
         const curChanges = nodeChanges.get(id);
@@ -52,6 +52,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
         } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
 
         copy = srcNode.copy();
+        console.log(JSON.stringify(changesToApply));
         if (changesToApply) applyChanges(copy, changesToApply);
         prevChanges = curChanges;
         return copy;
