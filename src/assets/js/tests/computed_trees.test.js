@@ -75,17 +75,6 @@ describe('ComputedTree', () => {
             expect(copySpy).toBeCalledTimes(1);
         });
 
-        xtest('Multi-layered change', () => {
-            const compTree2 = new ComputedTree(compTree);
-            compTree.root.name = change1;
-            expect(compTree.root.name).toBe(change1);
-            expect(compTree2.root.name).toBe(change1);
-            compTree2.root.name = change2;
-            expect(compTree2.root.name).toBe(change2);
-            expect(compTree.root.name).toBe(change1);
-            expect(srcTree.root.name).toBe(initial);
-        });
-
         test('Children adjustments', () => {
 
         });
@@ -124,7 +113,7 @@ describe('ComputedTree', () => {
             compTree = new ComputedTree(srcTree);
         });
 
-        xtest('Name change', () => {
+        test('Name change', () => {
 
             const srcNode = getAdjustedNode(srcTree.root);
             const ovNode = getAdjustedNode(compTree.root);
