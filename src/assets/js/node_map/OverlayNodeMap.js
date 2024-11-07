@@ -27,7 +27,6 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
     let srcNodeChanged = false;
     const rSrcNode = computed(() => {
-        console.log(`rSrcNode called`);
         srcNodeChanged = true;
         const srcNode = srcNodeMap.getNode(rId.value);
 
@@ -46,11 +45,9 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
         let changesToApply;
         if (srcNodeChanged) { // In this case we need to create a new copy and apply all changes again
             copy = srcNode.copy();
-            changesToApply = curChanges;
+            changesToApply = curChanges; // It is a fresh copy, so previous changes is irrelevant here
             srcNodeChanged = false;
-        } else {
-            changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
-        }
+        } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
 
         if (changesToApply) applyChanges(copy, changesToApply);
         prevChanges = curChanges;

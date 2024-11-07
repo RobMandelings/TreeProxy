@@ -125,7 +125,6 @@ describe('ComputedTree', () => {
                 expect(compTree.root.weight).toBe(getComputedWeight());
                 srcTree.root.weight += 15;
                 expect(compTree.root.weight).toBe(getComputedWeight());
-                console.log(`The computed weight is: ${compTree.root.weight}`);
             });
         });
     });
