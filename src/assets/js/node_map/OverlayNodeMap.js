@@ -37,8 +37,10 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
         return srcNode;
     });
 
+    let count = 0;
     let copy, prevChanges = {};
-    const rOverlayNode = computed(() => {
+    const getOverlayNodeFn = () => {
+        if (count > 0) console.log(`Overlay node recompute: ${count++}`);
         const id = rId.value;
         const srcNode = rSrcNode.value;
         const curChanges = nodeChanges.get(id);
@@ -49,25 +51,13 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
             srcNodeChanged = false;
         } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
 
+        copy = srcNode.copy();
         if (changesToApply) applyChanges(copy, changesToApply);
         prevChanges = curChanges;
         return copy;
-        // Only a copy is made on each recomputation. Still quite inexpensive as no deep copies are required.
-        // if (nodeChanges.has(id)) {
-        // const curChanges = nodeChanges.get(id);
-        // let remakeCopy = false;
-        // if (!copy) remakeCopy = true;
-        // if (!equalKeys(prevChanges, curChanges)) remakeCopy = true;
-        // if (remakeCopy) copy = srcNodeMap.getNode(id).copy();
+    };
 
-        // applyChanges(copy, nodeChanges.get(id));
-        // prevChanges = {...curChanges};
-
-        // return copy;
-        // }
-    });
-
-    return {rOverlayNode};
+    return {getOverlayNodeFn};
 
 }
 
@@ -101,10 +91,12 @@ export class OverlayNodeMap extends NodeMap {
 
     createRefProxy(initialId) {
         const rId = ref(initialId);
-        const {rOverlayNode} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
+        const {getOverlayNodeFn} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
         const rNode = computed(() => {
-            return rOverlayNode.value
+            const n = getOverlayNodeFn()
                 ?? this.getNode(rId.value)
+            console.log(`rNode recomputed: ${n?.name}`);
+            return n;
         });
         this.overlayNodes.set(rId.value, rNode);
 

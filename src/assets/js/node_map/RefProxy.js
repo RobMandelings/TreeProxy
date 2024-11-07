@@ -1,4 +1,4 @@
-import {computed, reactive} from "vue";
+import {computed, reactive, watch} from "vue";
 import {isVueProperty, wrappedProxyTargetGetter} from "../ProxyUtils.js";
 import {getExcludeProperties} from "../Utils.js";
 

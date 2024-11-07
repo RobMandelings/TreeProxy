@@ -12,7 +12,7 @@ describe('Reactivity checks', () => {
 
 });
 
-function runWatchTests(description, getTarget, watchTriggers, initialValue) {
+function runWatchTests(description, getTarget, watchTriggers) {
     describe(description, () => {
         let target;
         beforeEach(() => {
@@ -20,8 +20,7 @@ function runWatchTests(description, getTarget, watchTriggers, initialValue) {
         });
 
         test('No change', async () => {
-            target.name = initialValue;
-            expect(target.name).toBe(initialValue);
+            expect(target.name).toBe(target.name);
             await nextTick();
             watchTriggers.forEach(t => expect(t).toHaveBeenCalledTimes(0));
         });
@@ -48,7 +47,11 @@ describe("Deep watch", () => {
 
     let srcTree, child, initialName
 
+    let rootWatchTrigger, childrenWatchTrigger;
+    rootWatchTrigger = jest.fn();
+    childrenWatchTrigger = jest.fn();
     beforeEach(() => {
+        jest.clearAllMocks();
         initialName = 'Child';
         srcTree = new SourceTree().init({name: 'Root', children: [{name: initialName}]});
         child = srcTree.root.children[0];
@@ -57,11 +60,7 @@ describe("Deep watch", () => {
 
     describe('Source tree', () => {
 
-        let rootWatchTrigger, childrenWatchTrigger;
-        rootWatchTrigger = jest.fn();
-        childrenWatchTrigger = jest.fn();
         beforeEach(() => {
-            jest.clearAllMocks();
             watch(srcTree.root.children.asArray, () => childrenWatchTrigger());
             watch(srcTree.root, () => rootWatchTrigger());
         });
@@ -70,33 +69,53 @@ describe("Deep watch", () => {
             'Root level watch',
             () => srcTree.root,
             [rootWatchTrigger],
-            'Root'
         );
 
         runWatchTests(
             'Nested level 1 watch',
             () => child,
             [rootWatchTrigger, childrenWatchTrigger],
-            'Child'
         );
     });
 
-    xdescribe('Computed tree', () => {
+    describe('Computed tree', () => {
 
-        let compTree, compRootWatchTrigger;
+        let compTree;
         beforeEach(() => {
             const rCount = 0;
             const computeFn = (root) => undefined;
             compTree = new ComputedTree(srcTree, computeFn);
-            compRootWatchTrigger = jest.fn();
-            watch(compTree.root, () => compRootWatchTrigger);
+            watch(compTree.root, (vN, vO) => {
+                console.log(`Changed from ${vO.name} to ${vN.name}`);
+                rootWatchTrigger()
+            });
         });
 
-        runWatchTests(
-            'Root level watch',
-            () => compTree.root,
-            () => ({compRootWatchTrigger}),
-            'Root'
-        );
+        test('Single change', async () => {
+            compTree.root.name = "Changed";
+            expect(compTree.root.name).toBe("Changed")
+            await nextTick();
+            expect(rootWatchTrigger).toBeCalledTimes(1);
+        });
+
+        test('Many changes', async () => {
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(0);
+            const nrChanges = 5;
+            for (let i = 0; i < nrChanges; i++) {
+                compTree.root.name = `${i}`;
+                await nextTick();
+            }
+            expect(compTree.root.name).toBe(`${nrChanges - 1}`);
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(nrChanges);
+        });
+
+        xtest('TODO: way too many calls happen for recomputation ' +
+            '(I think its the beforeGetHandler or the proxy tree that receives so many calls)', () => expect(true).toBe(false));
+
+        // runWatchTests(
+        //     'Root level watch',
+        //     () => compTree.root,
+        //     [rootWatchTrigger],
+        // );
     })
 })

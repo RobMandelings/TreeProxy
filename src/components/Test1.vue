@@ -16,15 +16,13 @@ const computeFn = (root) => {
 const compTree = new ComputedTree(srcTree, computeFn);
 
 const change = () => {
-  if (rCount.value === 1) rCount.value = 0;
-  else if (rCount.value === 0) rCount.value = 1;
-  console.log(`Count: ${rCount.value}`);
-  console.log(`The name is: ${compTree.root.name};`);
+  rCount.value++;
+  compTree.root.weight += rCount.value;
 }
 
-watch(compTree.root, () => {
-  console.log("Changed!");
-});
+// watch(compTree.root, () => {
+//   console.log("Changed!");
+// });
 
 </script>
 

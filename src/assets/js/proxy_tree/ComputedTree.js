@@ -1,6 +1,6 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {OverlayNodeMap} from "../node_map/OverlayNodeMap.js";
-import {computed, reactive} from "vue";
+import {computed, reactive, watchSyncEffect} from "vue";
 import {createComputedProxyNode, createSrcProxyNode} from "./ProxyNode.js";
 
 export class ComputedTree extends ProxyTree {
@@ -23,7 +23,6 @@ export class ComputedTree extends ProxyTree {
 
             get: (target, prop, receiver) => {
                 if (prop !== 'shouldRecompute' && prop !== 'isRecomputing') {
-                    console.log("Should recompute at computed tree");
                     if (target.shouldRecompute)
                         target.recompute();
                 }
@@ -41,12 +40,12 @@ export class ComputedTree extends ProxyTree {
 
     createReactiveRecomputeFn(customRecomputeFn) {
         if (!customRecomputeFn) customRecomputeFn = (_) => undefined;
+        watchSyncEffect(customRecomputeFn(this.root));
         const rCustomRecomputeFn = computed(() => {
-            console.log("CUstom recomputed executed");
             customRecomputeFn(this.root);
         });
         return () => {
-            console.log("REco")
+            console.log("Recomputing");
             rCustomRecomputeFn.value;
         }
     }
