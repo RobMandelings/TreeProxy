@@ -1,9 +1,17 @@
 import {computed, reactive, ref} from "vue";
 import {getExcludeProperties} from "../Utils.js";
 
+function useDirty(rId, nodeMap) {
+    const rDirty = computed(() => nodeMap.isDirty(rId.value));
+    const isDirtyProp = (prop) => nodeMap.isDirtyProp(rId.value, prop);
+
+    return {rDirty, isDirtyProp};
+}
+
 export function createRefProxy(nodeMap, rId, rNode) {
 
-    const targetObj = reactive({node: rNode, id: rId});
+    const {rDirty, isDirtyProp} = useDirty(rId, nodeMap);
+    const targetObj = reactive({node: rNode, id: rId, dirty: rDirty, isDirtyProp});
 
     const setHandler = (t, prop, value) => {
         nodeMap.set(rId.value, prop, value);

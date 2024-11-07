@@ -25,10 +25,17 @@ export class OverlayNodeMap extends NodeMap {
     }
 
     isDirty(id) {
+        return this.nodeChanges.has(id);
     }
 
     isDirtyProp(id, prop) {
-        super.isDirtyProp(id, prop);
+        if (!this.nodeChanges.has(id)) return false;
+        return this.nodeChanges.get(id)[prop] !== undefined;
+    }
+
+    getPropertyValue(id, prop) {
+        if (!this.isDirtyProp(id, prop)) return this.srcNodeMap.getPropertyValue(id, prop);
+        return this.nodeChanges.get(id)[prop];
     }
 
     createRefProxy(initialId) {
@@ -82,13 +89,27 @@ export class OverlayNodeMap extends NodeMap {
 
     set(nodeId, prop, val) {
 
-        // Sets the property to a value which will be applied to create new nodes
-        if (!this.nodeChanges.has(nodeId)) {
-            if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
-                "Node does not exist in the src node map as well as the computed node map.");
-            this.nodeChanges.set(nodeId, {});
+        // TODO we did not yet check for object equalities (only primitives)
+        const remove = (this.srcNodeMap.getPropertyValue(nodeId, prop) === val);
+        if (remove) {
+            if (this.nodeChanges.has(nodeId)) {
+                const changes = this.nodeChanges.get(nodeId);
+                if (Object.hasOwn(changes, prop)) {
+                    delete this.nodeChanges.get(nodeId)[prop];
+                    if (Utils.isEmpty(changes))
+                        this.nodeChanges.delete(nodeId);
+                }
+            }
+        } else {
+
+            // Sets the property to a value which will be applied to create new nodes
+            if (!this.nodeChanges.has(nodeId)) {
+                if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
+                    "Node does not exist in the src node map as well as the computed node map.");
+                this.nodeChanges.set(nodeId, {});
+            }
+            this.nodeChanges.get(nodeId)[prop] = val;
         }
-        this.nodeChanges.get(nodeId)[prop] = val;
     }
 
     get(nodeId, prop) {

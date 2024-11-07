@@ -17,6 +17,12 @@ export class SourceNodeMap extends NodeMap {
         return false;
     }
 
+    getPropertyValue(id, prop) {
+        if (!this.getNode(id)) return undefined;
+        const n = this.getNode(id);
+        return n[prop];
+    }
+
     createRefProxy(initialId) {
         const rId = ref(initialId);
         const rNode = computed(() => this.getNode(rId.value));

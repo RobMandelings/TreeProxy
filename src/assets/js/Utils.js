@@ -34,3 +34,7 @@ export function equalKeys(obj1, obj2) {
     // Then, check if all keys in obj1 exist in obj2
     return keys1.every(key => obj2.hasOwnProperty(key));
 }
+
+export function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}

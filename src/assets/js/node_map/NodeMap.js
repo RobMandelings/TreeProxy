@@ -20,6 +20,10 @@ export class NodeMap {
         throw new Error('Abstract method');
     }
 
+    getPropertyValue(id, prop) {
+        throw new Error("Abstract method");
+    }
+
     generateId() {
         return crypto.randomUUID();
     }
