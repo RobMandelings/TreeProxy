@@ -51,20 +51,19 @@ describe('ComputedTree', () => {
             });
 
             test('Change to src tree', () => {
-                expect(compTree.shouldRecompute).toBe(false);
                 srcTree.root.name = "Changed1";
                 expect(compTree.shouldRecompute).toBe(true);
                 expect(compTree.isRecomputing).toBe(false);
 
                 // Simply querying for whether the tree should be recomputed should not trigger
                 // Recomputation
-                expect(recomputeSpy).toBeCalledTimes(1); // Initial recomputation always happens
+                expect(recomputeSpy).toBeCalledTimes(0);
                 expect(compTree.root.name).toBe(srcTree.root.name)
                 expect(compTree.shouldRecompute).toBe(false);
                 srcTree.root.name = "Changed2";
                 expect(compTree.shouldRecompute).toBe(true) // Another change is made to the src tree, so the layer above should be re-evaluated
                 expect(compTree.root.name).toBe(srcTree.root.name);
-                expect(recomputeSpy).toBeCalledTimes(3);
+                expect(recomputeSpy).toBeCalledTimes(2);
             });
 
             test('Equivalence to src tree', () => {
@@ -100,24 +99,33 @@ describe('ComputedTree', () => {
 
         describe('Computed tree: adjustments', () => {
 
+            let getComputedWeight = () => srcTree.root.weight + 5;
             beforeEach(() => {
-                const initWeight = srcTree.root.weight;
-                const nxtWeight = initWeight + 1;
-                compTree = new ComputedTree(srcTree, (root) => root.weight = nxtWeight);
+                compTree = new ComputedTree(srcTree, (root) => root.weight = getComputedWeight());
             });
 
-
-            test('Recompute weight', () => {
-                const initWeight = srcTree.root.weight;
-                const nxtWeight = initWeight + 1;
-                const w = compTree.root.weight;
-                // expect(compTree.root.weight).toBe(nxtWeight);
+            test('SRC tree name adjustment', () => {
+                expect(compTree.root.weight).toBe(getComputedWeight());
+                expect(recomputeSpy).toBeCalledTimes(1);
+                expect(copySpy).toBeCalledTimes(1);
                 srcTree.root.name = change1;
-                compTree.root.name;
-                // expect(compTree.root.name).toBe(change1);
+                expect(copySpy).toBeCalledTimes(1);
+                compTree.root.name; // We access the changed node to trigger recomputations
+                expect(recomputeSpy).toBeCalledTimes(2); // Should be recomputed due to access
+                expect(copySpy).toBeCalledTimes(2); // The src node was adjusted, so a new copy was made
+
+                expect(compTree.root.name).toBe(change1); // The name reflects the name from the adjusted src tree
+                expect(compTree.root.weight).toBe(getComputedWeight()); // The weight reflects the computed weight
                 // expect(recomputeSpy).toBeCalledTimes(2);
                 // expect(srcTree.root.weight).toBe(initWeight);
                 // expect(compTree.root.weight).toBe(nxtWeight);
+            });
+
+            test('SRC tree weight adjustment', () => {
+                expect(compTree.root.weight).toBe(getComputedWeight());
+                srcTree.root.weight += 15;
+                expect(compTree.root.weight).toBe(getComputedWeight());
+                console.log(`The computed weight is: ${compTree.root.weight}`);
             });
         });
     });
@@ -135,6 +143,7 @@ describe('ComputedTree', () => {
             const srcNode = getAdjustedNode(srcTree.root);
             const ovNode = getAdjustedNode(compTree.root);
             ovNode.name = change1;
+            copySpy.mockClear();
             expect(srcNode.name).not.toBe(change1);
             expect(ovNode.name).toBe(change1);
             expect(ovNode.parent.id).toBe(srcNode.parent.id);

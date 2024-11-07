@@ -11,9 +11,20 @@ function applyChanges(node, changes) {
     });
 }
 
+function getChangesToApply(prevChanges, curChanges, srcNode) {
+    if (!curChanges) return null;
+    const changesToApply = {...curChanges};
+    for (const key in prevChanges) {
+        if (!(key in curChanges)) {
+            changesToApply[key] = srcNode[key]; // Restore if the change is removed
+        }
+    }
+
+    return changesToApply;
+}
+
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
-    let copy, prevChanges = {};
     let srcNodeChanged = false;
     const rSrcNode = computed(() => {
         console.log(`rSrcNode called`);
@@ -27,13 +38,22 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
         return srcNode;
     });
 
+    let copy, prevChanges = {};
     const rOverlayNode = computed(() => {
         const id = rId.value;
         const srcNode = rSrcNode.value;
-        if (srcNodeChanged) {
+        const curChanges = nodeChanges.get(id);
+        let changesToApply;
+        if (srcNodeChanged) { // In this case we need to create a new copy and apply all changes again
             copy = srcNode.copy();
+            changesToApply = curChanges;
             srcNodeChanged = false;
+        } else {
+            changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
         }
+
+        if (changesToApply) applyChanges(copy, changesToApply);
+        prevChanges = curChanges;
         return copy;
         // Only a copy is made on each recomputation. Still quite inexpensive as no deep copies are required.
         // if (nodeChanges.has(id)) {
