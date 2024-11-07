@@ -1,6 +1,6 @@
 import * as Utils from "../Utils.js";
 import {NodeMap} from "./NodeMap.js";
-import {computed, reactive, ref, watch} from "vue";
+import {computed, reactive, ref, watch, watchSyncEffect} from "vue";
 import * as RefProxy from "./RefProxy.js";
 import {equalKeys} from "../Utils.js";
 
@@ -38,27 +38,27 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     });
 
     let count = 0;
-    let copy, prevChanges = {};
-    const getOverlayNodeFn = () => {
+    let prevChanges = {};
+    const rCopy = ref(null);
+    watchSyncEffect(() => {
+        // TODO too many sync effects are triggered. Try to lower it.
         console.log(`Overlay node recompute: ${count++}`);
+
         const id = rId.value;
         const srcNode = rSrcNode.value;
         const curChanges = nodeChanges.get(id);
         let changesToApply;
         if (srcNodeChanged) { // In this case we need to create a new copy and apply all changes again
-            copy = srcNode.copy();
+            rCopy.value = reactive(srcNode.copy());
             changesToApply = curChanges; // It is a fresh copy, so previous changes is irrelevant here
             srcNodeChanged = false;
         } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
 
-        copy = srcNode.copy();
-        console.log(JSON.stringify(changesToApply));
-        if (changesToApply) applyChanges(copy, changesToApply);
+        if (changesToApply) applyChanges(rCopy.value, changesToApply);
         prevChanges = curChanges;
-        return copy;
-    };
+    });
 
-    return {getOverlayNodeFn};
+    return {rCopy};
 
 }
 
@@ -92,11 +92,14 @@ export class OverlayNodeMap extends NodeMap {
 
     createRefProxy(initialId) {
         const rId = ref(initialId);
-        const {getOverlayNodeFn} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
+        const {rCopy} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
+
+        let count = 0;
         const rNode = computed(() => {
-            const n = getOverlayNodeFn()
+            const n = rCopy.value
                 ?? this.getNode(rId.value)
-            console.log(`rNode recomputed: ${n?.name}`);
+            // TODO reduce the number of recomputations on change
+            console.log(`rNode recomputed ${count++} times`);
             return n;
         });
         this.overlayNodes.set(rId.value, rNode);

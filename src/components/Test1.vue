@@ -10,11 +10,12 @@ let rCount = ref(0);
 let triggered = 0;
 const computeFn = (root) => {
   console.log(`Triggered ${triggered++} times`);
-  root.weight += rCount.value;
+  root.weight = rCount.value;
   root.name = `Weight: ${root.weight}`;
 };
 
 const compTree = new ComputedTree(srcTree, computeFn);
+const compTree2 = new ComputedTree(srcTree, (root) => root.weight = rCount.value * 2);
 
 const change = () => {
   rCount.value++;
@@ -26,6 +27,7 @@ const change = () => {
 
   <div class="card">
     <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>
+    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>
     <button type="button" @click="change">Click me</button>
     <p>
       Edit
