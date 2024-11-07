@@ -42,9 +42,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     let copy;
 
     const rCopy = computed(() => {
-        // TODO too many sync effects are triggered. Try to lower it.
         console.log(`Overlay node recompute: ${count++}`);
-        console.log(copy?.name);
 
         const id = rId.value;
         const srcNode = rSrcNode.value;
@@ -100,11 +98,8 @@ export class OverlayNodeMap extends NodeMap {
 
         let count = 0;
         const rNode = computed(() => {
-            const n = rCopy.value
+            return rCopy.value
                 ?? this.getNode(rId.value)
-            // TODO reduce the number of recomputations on change
-            console.log(`rNode recomputed ${count++} times`);
-            return n;
         });
         this.overlayNodes.set(rId.value, rNode);
 

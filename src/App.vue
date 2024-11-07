@@ -11,7 +11,7 @@ import Test1 from "./components/Test1.vue";
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo"/>
     </a>
   </div>
-  <Test1 msg="Vite + Vue"/>
+  <Test1/>
 </template>
 
 <style scoped>

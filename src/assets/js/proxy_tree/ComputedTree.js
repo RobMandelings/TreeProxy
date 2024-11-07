@@ -17,7 +17,7 @@ export class ComputedTree extends ProxyTree {
         this.initRootId(srcTree.root.id);
         this.flagForRecompute();
 
-        watch(() => this.recompute(true), () => console.log("Hello"), {flush: "sync"});
+        watchSyncEffect(() => this.recompute(true));
 
         // Return a proxied version of this instance
         return new Proxy(this, {

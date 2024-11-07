@@ -8,14 +8,14 @@ const srcTree = new SourceTree().init({name: "Root"});
 
 let rCount = ref(0);
 let triggered = 0;
+let nameCount = 100;
 const computeFn = (root) => {
   console.log(`Triggered ${++triggered} times`);
   root.weight = rCount.value;
-  root.name = `Weight: ${root.weight}`;
+  root.name = `Andere naam: ${nameCount--}`;
 };
 
 const compTree = new ComputedTree(srcTree, computeFn);
-// const compTree2 = new ComputedTree(srcTree, (root) => root.weight = rCount.value * 2);
 
 const change = () => {
   rCount.value++;
