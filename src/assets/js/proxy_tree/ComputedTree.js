@@ -4,6 +4,19 @@ import {computed, reactive, ref, toRaw, watch, watchSyncEffect} from "vue";
 import {createComputedProxyNode, createSrcProxyNode} from "./ProxyNode.js";
 import {isVueProperty} from "../ProxyUtils.js";
 
+function createRootForRecompute(reactiveRoot) {
+
+    const rawRoot = toRaw(reactiveRoot);
+    return new Proxy({}, {
+        get(t, p, receiver) {
+            return Reflect.get(rawRoot, p, receiver);
+        },
+        set(t, p, newValue, receiver) {
+            return Reflect.set(reactiveRoot, p, newValue, receiver);
+        }
+    });
+}
+
 /**
  * The cached recompute version requires a different reactive root
  * In order to break circular dependencies in the computed prop
@@ -72,10 +85,10 @@ export class ComputedTree extends ProxyTree {
 
     createCachedRecompute() {
         // TODO find out why this works
-        const root = reactive(toRaw(this.root)); // Small trick to break circular dependency chain
+        const rootForRecompute = createRootForRecompute(this.root);
         return computed(() => {
             this.rForcedRecomputes.value; // Triggers a recomputation
-            recompute(this, root);
+            recompute(this, rootForRecompute);
         });
     }
 
