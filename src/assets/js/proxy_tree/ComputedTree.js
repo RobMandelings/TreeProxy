@@ -1,6 +1,6 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {OverlayNodeMap} from "../node_map/OverlayNodeMap.js";
-import {computed, reactive, ref, toRaw, watch, watchSyncEffect} from "vue";
+import {computed, effect, reactive, ref, toRaw, triggerRef, watch, watchSyncEffect} from "vue";
 import {createComputedProxyNode, createSrcProxyNode} from "./ProxyNode.js";
 import {isVueProperty} from "../ProxyUtils.js";
 
@@ -54,7 +54,7 @@ export class ComputedTree extends ProxyTree {
             get: (target, prop, receiver) => {
                 if (isVueProperty(prop)) return Reflect.get(target, prop, receiver);
 
-                if (prop !== 'rForcedRecomputes' && prop !== 'isRecomputing') {
+                if (prop !== 'rForcedRecomputes' && prop !== 'isRecomputing' && prop !== "_root") {
                     this.checkForRecompute();
                 }
 
@@ -70,6 +70,7 @@ export class ComputedTree extends ProxyTree {
     }
 
     checkForRecompute() {
+        console.log("Heerlijk");
         if (!this.isRecomputing) this.rRecompute?.value;
         // When recompute is not flagged explicitly, we still access the computed variable to trigger a recompute if any of the
         // Dependencies in recomputeFn have changed
