@@ -3,6 +3,7 @@
 import {SourceTree} from "../assets/js/proxy_tree/SrcTree.js";
 import {computed, customRef, reactive, ref, toRaw, triggerRef, watch} from "vue";
 import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
+import {computed } from "../assets/js/reactivity.js"
 
 const srcTree = new SourceTree().init({name: "Root"});
 
