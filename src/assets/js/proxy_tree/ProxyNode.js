@@ -87,8 +87,6 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
     const excludeProps = getExcludeProperties(target);
 
     const coreGetHandler = (t, prop, receiver) => {
-        if (prop in excludeProps) return Reflect.get(t, prop, receiver);
-        if (isVueProperty(prop)) return Reflect.get(t, prop, receiver);
 
         if (prop === "node") throw new DirectNodeAccessError();
 
@@ -105,6 +103,9 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
 
     const handler = {
         get: (t, prop, receiver) => {
+            if (prop in excludeProps) return Reflect.get(t, prop, receiver);
+            if (isVueProperty(prop)) return Reflect.get(t, prop, receiver);
+
             if (beforeGetFn) beforeGetFn(t, prop, receiver);
             return coreGetHandler(t, prop, receiver);
         },
@@ -124,8 +125,7 @@ export function createSrcProxyNode(srcProxyTree, id, parentId) {
 
 export function createComputedProxyNode(computedProxyTree, id, parentId) {
     const beforeGetFn = (t, prop, receiver) => {
-        if (computedProxyTree.shouldRecompute)
-            computedProxyTree.recompute();
+        // computedProxyTree.checkForRecompute();
     }
 
     return createProxyNode(computedProxyTree, id, parentId, beforeGetFn)
