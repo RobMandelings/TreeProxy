@@ -1,7 +1,24 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {OverlayNodeMap} from "../node_map/OverlayNodeMap.js";
-import {computed, reactive, watch, watchSyncEffect} from "vue";
+import {computed, reactive, toRaw, watch, watchSyncEffect} from "vue";
 import {createComputedProxyNode, createSrcProxyNode} from "./ProxyNode.js";
+
+/**
+ * The cached recompute version requires a different reactive root
+ * In order to break circular dependencies in the computed prop
+ * Force is used for when the computed property re-evaluates
+ */
+function recompute(compTree, root, force = false) {
+    if (compTree.isRecomputing) return;
+    if (!compTree.shouldRecompute && !force) return;
+
+    compTree.isRecomputing = true;
+    compTree.overlayNodeMap.clearAllChanges();
+    compTree.recomputeFn(root);
+    compTree.computedTreeOverlays.forEach(t => t.flagForRecompute());
+    compTree.isRecomputing = false;
+    compTree.shouldRecompute = false;
+}
 
 export class ComputedTree extends ProxyTree {
 
@@ -9,15 +26,16 @@ export class ComputedTree extends ProxyTree {
         let overlayNodeMap = reactive(new OverlayNodeMap(srcTree.nodeMap));
         super(overlayNodeMap);
         this.overlayNodeMap = overlayNodeMap;
+
+        // Initialise flag of recompute to false, because the computed property has not been evaluated yet
+        // Thus it will automatically recompute on first access
         this.shouldRecompute = false;
         this.isRecomputing = false;
+        this.recomputeFn = recomputeFn ?? ((_) => undefined);
         this.srcTree = srcTree;
         this.srcTree.addComputedTreeOverlay(this);
-        this.recomputeFn = recomputeFn ?? ((_) => undefined);
         this.initRootId(srcTree.root.id);
-        this.flagForRecompute();
-
-        watchSyncEffect(() => this.recompute(true));
+        this.rRecompute = this.createCachedRecompute();
 
         // Return a proxied version of this instance
         return new Proxy(this, {
@@ -27,6 +45,9 @@ export class ComputedTree extends ProxyTree {
                 if (prop !== 'shouldRecompute' && prop !== 'isRecomputing') {
                     if (target.shouldRecompute)
                         target.recompute();
+                    else this.rRecompute.value;
+                    // When recompute is not flagged explicitly, we still access the computed variable to trigger a recompute if any of the
+                    // Dependencies in recomputeFn have changed
                 }
 
                 return Reflect.get(target, prop, receiver);
@@ -48,22 +69,14 @@ export class ComputedTree extends ProxyTree {
         return createComputedProxyNode(this, id, parentId);
     }
 
-    /**
-     * Force property is used for e.g. when reactive dependency inside the recomputeFn is called.
-     * Otherwise 'shouldRecompute' simply returns the function and no recomputation is made.
-     * TODO check at a later time whether this is a nice approach.
-     * @param force
-     */
-    recompute(force = false) {
-        if (this.isRecomputing) return;
-        if (!this.shouldRecompute && !force) return;
+    createCachedRecompute() {
+        // TODO find out why this works
+        const root = reactive(toRaw(this.root)); // Small trick to break circular dependency chain
+        return computed(() => recompute(this, root, true));
+    }
 
-        this.isRecomputing = true;
-        this.overlayNodeMap.clearAllChanges();
-        this.recomputeFn(this.root);
-        this.computedTreeOverlays.forEach(t => t.flagForRecompute());
-        this.isRecomputing = false;
-        this.shouldRecompute = false;
+    recompute() {
+        recompute(this, this.root, false);
     }
 
     getOverwrittenNodes() {
