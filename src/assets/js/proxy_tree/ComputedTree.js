@@ -13,7 +13,8 @@ function createStateProxy(state, deps) {
             const res = Reflect.get(target, prop, receiver);
             if (typeof res === 'object') return createStateProxy(res, deps);
             else {
-                // These access properties are tracked, so that they can be put
+                // These access properties are tracked, so that they can be used to re-trigger
+                // Any recomputations that need to happen
                 deps.push({target, prop, receiver});
                 return res;
             }

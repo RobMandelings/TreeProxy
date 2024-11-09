@@ -7,21 +7,31 @@ import {computed, ref} from "vue";
 const srcTree = new SourceTree().init({name: "Root"});
 
 let rCount = ref(0);
+const rText = ref('');
 let triggered = 0;
 let nameCount = 100;
 
 const computeFn = (state, root) => {
+  const textLength = state.text.length;
+  let txt;
+  if (textLength > 10) txt = state.text.length;
+  else txt = state.text;
+  root.name = `${root.name} (c:${state.count}, t:${txt})`
 };
 
-const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
+const compTree = new ComputedTree(srcTree, {count: rCount, text: rText}, computeFn);
 
-const change = () => {
+const changeCount = () => {
   rCount.value++;
 }
 
 let c = 0;
 const changeSrc = () => {
   srcTree.root.name = `SRC Root (${c++})`;
+}
+
+const changeAnother = () => {
+  rText.value += "A";
 }
 
 </script>
@@ -32,7 +42,8 @@ const changeSrc = () => {
     <div>{{ compTree.root.name }}</div>
     <!--    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>-->
     <button type="button" @click="changeSrc">Change src</button>
-    <button type="button" @click="change">Change count</button>
+    <button type="button" @click="changeCount">Change count</button>
+    <button type="button" @click="changeAnother">Change text</button>
     <p>
       Edit
       <code>components/HelloWorld.vue</code> to test HMR
