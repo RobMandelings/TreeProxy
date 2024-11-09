@@ -12,7 +12,7 @@ let nameCount = 100;
 
 const computeFn = (state, root) => {
   console.log("Hallo");
-  root.name = `${root.name} + ${root.name} + ${state.count}`;
+  root.name = `${state.count}`;
 };
 
 const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);

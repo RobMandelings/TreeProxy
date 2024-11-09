@@ -52,7 +52,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
             changesToApply = curChanges; // It is a fresh copy, so previous changes is irrelevant here
             srcNodeChanged = false;
         } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
-
+        
         if (Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
         prevChanges = curChanges;
 
