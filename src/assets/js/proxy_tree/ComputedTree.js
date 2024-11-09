@@ -36,7 +36,8 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     recomputeFn = recomputeFn ?? ((_) => undefined);
 
     const rIsRecomputing = ref(false);
-    let dirty = true;
+    let dirty = {value: true};
+    let reactiveDirty = reactive(dirty);
     let rCheckDependencies;
     let recomputeWatcher;
 
@@ -47,7 +48,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
         rCheckDependencies = computed(() => {
             dependencies.forEach(d => checkDep(d));
             if (initial) initial = false;
-            else dirty = true;
+            else dirty.value = true;
         });
 
         rCheckDependencies.value;
@@ -86,14 +87,20 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
         if (rIsRecomputing.value) return;
 
         checkDirtyDependencies();
-        if (dirty) recompute();
+        if (dirty.value) recompute();
     }
 
-    const resetDirty = () => dirty = false;
+    const resetDirty = () => dirty.value = false;
     const markDirty = () => {
-        console.log("MarkDirty check");
-        dirty = true;
+        reactiveDirty.value = true;
     }
+
+    // If dirty was marked explicitly, this watch should take care of updates
+    // If the recompute did not happen
+    watch(reactiveDirty, (dirty) => {
+        if (!dirty.value) return;
+        recomputeIfDirty()
+    });
 
     initCheckDependencies(); // Initial dependency tracking enabled
 

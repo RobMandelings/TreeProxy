@@ -11,7 +11,7 @@ let triggered = 0;
 let nameCount = 100;
 
 const computeFn = (state, root) => {
-  root.name = `${root.name} + 5`;
+  root.name = `(${state.count})`;
 };
 
 const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
@@ -23,7 +23,6 @@ const change = () => {
 let c = 0;
 const changeSrc = () => {
   srcTree.root.name = `SRC Root (${c++})`;
-  // compTree.root.name;
 }
 
 </script>
@@ -31,7 +30,7 @@ const changeSrc = () => {
 <template>
 
   <div class="card">
-    <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>
+    <div>{{ compTree.root.name }}</div>
     <!--    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>-->
     <button type="button" @click="changeSrc">Change src</button>
     <button type="button" @click="change">Change count</button>
