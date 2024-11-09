@@ -90,7 +90,10 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     }
 
     const resetDirty = () => dirty = false;
-    const markDirty = () => dirty = true;
+    const markDirty = () => {
+        console.log("MarkDirty check");
+        dirty = true;
+    }
 
     initCheckDependencies(); // Initial dependency tracking enabled
 

@@ -11,7 +11,7 @@ let triggered = 0;
 let nameCount = 100;
 
 const computeFn = (state, root) => {
-  root.name = `${root.name} B (${state.count})`;
+  root.name = `${root.name} + 5`;
 };
 
 const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
@@ -23,6 +23,7 @@ const change = () => {
 let c = 0;
 const changeSrc = () => {
   srcTree.root.name = `SRC Root (${c++})`;
+  // compTree.root.name;
 }
 
 </script>

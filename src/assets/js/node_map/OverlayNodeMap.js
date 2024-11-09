@@ -2,7 +2,7 @@ import * as Utils from "../Utils.js";
 import {NodeMap} from "./NodeMap.js";
 import {computed, reactive, ref, toRaw, watch, watchSyncEffect} from "vue";
 import * as RefProxy from "./RefProxy.js";
-import {equalKeys} from "../Utils.js";
+import {equalKeys, isEmpty} from "../Utils.js";
 
 function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
@@ -48,21 +48,22 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     const rNodeChanges = computed(() => nodeChanges.get(rId.value) ?? {});
 
     const rCopy = computed(() => {
-        console.log(`Overlay node recompute: ${count++}`);
 
         const srcNode = rSrcNode.value;
         const curChanges = rNodeChanges.value;
-        let changesToApply;
-        if (srcNodeChanged) { // In this case we need to create a new copy and apply all changes again
+        let changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
+        console.log(isEmpty(changesToApply));
+        if (srcNodeChanged && !isEmpty(changesToApply)) { // In this case we need to create a new copy and apply all changes again
             copy = reactive(srcNode.copy());
-            changesToApply = curChanges; // It is a fresh copy, so previous changes is irrelevant here
             srcNodeChanged = false;
-        } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
-
-        console.log(`Changes to apply: ${JSON.stringify(prevChanges)} ${JSON.stringify(curChanges)} ${JSON.stringify(changesToApply)}`);
+        }
 
         // The copy is reactive, and we don't want to trigger unnecessary recomputations here (or circular dependencies)
-        if (Object.keys(changesToApply).length) applyChanges(copy, changesToApply)
+        if (Object.keys(changesToApply).length) {
+            console.log(`Changes to apply: ${JSON.stringify(prevChanges)} ${JSON.stringify(curChanges)} ${JSON.stringify(changesToApply)}`);
+            console.log(`Overlay node recompute: ${count++}`);
+            applyChanges(copy, changesToApply);
+        }
         prevChanges = curChanges;
 
         return copy;
