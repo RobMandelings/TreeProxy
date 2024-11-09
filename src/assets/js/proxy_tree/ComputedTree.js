@@ -12,7 +12,7 @@ function createStateProxy(state, deps) {
 
             const res = Reflect.get(target, prop, receiver);
             if (typeof res === 'object') return createStateProxy(res, deps);
-            else if (isRef(res)) {
+            else {
                 // These access properties are tracked, so that they can be put
                 deps.push({target, prop, receiver});
                 return res;
@@ -38,7 +38,8 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     const rIsRecomputing = ref(false);
     let dirty = true;
     let rCheckDependencies;
-    const resetDirty = () => {
+
+    const initCheckDependencies = () => {
         let initial = true;
         rCheckDependencies = computed(() => {
             dependencies.forEach(s => Reflect.get(s.target, s.prop, s.receiver));
@@ -46,11 +47,12 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
             else dirty = true;
         });
         rCheckDependencies.value;
-        dirty = false;
     }
 
+    const resetDirty = () => dirty = false;
+
     const checkDirtyDependencies = () => {
-        if (!rCheckDependencies.value)
+        if (!rCheckDependencies)
             throw new Error("Can't check for dirty dependencies: not initialised.")
         rCheckDependencies.value;
     }
@@ -61,6 +63,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
         clearDependencies();
         recomputeFn(stateProxy, root);
         resetDirty();
+        initCheckDependencies();
         rIsRecomputing.value = false;
 
         markOverlaysDirtyFn(); // Computed trees that depend on this tree need to recompute
@@ -74,6 +77,8 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     }
 
     const markDirty = () => dirty = true;
+
+    initCheckDependencies(); // Initial dependency tracking enabled
 
     return {
         recomputeIfDirty,

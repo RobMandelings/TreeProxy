@@ -10,33 +10,21 @@ let rCount = ref(0);
 let triggered = 0;
 let nameCount = 100;
 
-const computeFn = (root) => {
+const computeFn = (state, root) => {
+  console.log(state.count);
   // root.name = "Hello";
   // root.weight = rCount.value;
 };
 
-let c = 0;
-// const rDirty = ref(false);
-let dirty = {value: false};
-const computedC = computed(() => {
-  console.log("Computed is triggered");
-  dirty.value = true;
-});
 
-
-// const compTree = new ComputedTree(srcTree, computeFn);
-
-const change = () => {
-  dirty.value = false;
-  computedC.value;
-}
+const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
 
 </script>
 
 <template>
 
   <div class="card">
-    <!--    <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>-->
+    <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>
     <!--    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>-->
     <button type="button" @click="change">Click me</button>
     <p>
