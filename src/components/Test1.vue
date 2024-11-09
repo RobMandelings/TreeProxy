@@ -18,7 +18,6 @@ const computeFn = (state, root) => {
 const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
 
 const change = () => {
-  compTree.root.name = "Changed";
   rCount.value++;
 }
 

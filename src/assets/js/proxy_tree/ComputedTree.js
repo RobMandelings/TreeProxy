@@ -1,6 +1,6 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {OverlayNodeMap} from "../node_map/OverlayNodeMap.js";
-import {computed, isRef, reactive, ref, toRaw} from "vue";
+import {computed, isRef, reactive, ref, toRaw, watch} from "vue";
 import {createComputedProxyNode} from "./ProxyNode.js";
 import {useShouldExcludeProperty} from "../ProxyUtils.js";
 
@@ -38,15 +38,29 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     const rIsRecomputing = ref(false);
     let dirty = true;
     let rCheckDependencies;
+    let recomputeWatcher;
+
+    const checkDep = (d) => Reflect.get(d.target, d.prop, d.receiver)
 
     const initCheckDependencies = () => {
         let initial = true;
         rCheckDependencies = computed(() => {
-            dependencies.forEach(s => Reflect.get(s.target, s.prop, s.receiver));
+            dependencies.forEach(d => checkDep(d));
             if (initial) initial = false;
             else dirty = true;
         });
+
         rCheckDependencies.value;
+    }
+
+    /**
+     * If dependency changes but there is no explicit call to one of the nodes, recomputeIfDirty is not called
+     * This watcher will perform a single call if any of the dependencies have changed to see whether a
+     * recomputation should happen
+     */
+    const initRecomputeWatcher = () => {
+        if (recomputeWatcher) recomputeWatcher();
+        recomputeWatcher = watch(dependencies.map(d => () => checkDep(d)), () => recomputeIfDirty());
     }
 
     const resetDirty = () => dirty = false;
@@ -64,6 +78,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
         recomputeFn(stateProxy, root);
         resetDirty();
         initCheckDependencies();
+        initRecomputeWatcher();
         rIsRecomputing.value = false;
 
         markOverlaysDirtyFn(); // Computed trees that depend on this tree need to recompute
