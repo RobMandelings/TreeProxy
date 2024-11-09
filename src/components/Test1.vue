@@ -12,7 +12,6 @@ let nameCount = 100;
 
 const computeFn = (state, root) => {
   root.name = `${root.name} B (${state.count})`;
-  // root.name = `(${state.count})`;
 };
 
 const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
