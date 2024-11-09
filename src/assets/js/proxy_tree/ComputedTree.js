@@ -1,32 +1,79 @@
 import {ProxyTree} from "./ProxyTree.js";
 import {OverlayNodeMap} from "../node_map/OverlayNodeMap.js";
-import {computed, effect, reactive, ref, toRaw, triggerRef, watch, watchSyncEffect} from "vue";
-import {createComputedProxyNode, createSrcProxyNode} from "./ProxyNode.js";
-import {isVueProperty} from "../ProxyUtils.js";
+import {computed, isRef, reactive, ref, toRaw} from "vue";
+import {createComputedProxyNode} from "./ProxyNode.js";
+import {useShouldExcludeProperty} from "../ProxyUtils.js";
 
-let propertyAccess = [];
-
-function createStateProxy(state) {
-    state = reactive(state); // Need to make reactive for computed prop to work
-
+function createStateProxy(state, stateAccess) {
+    const excludePropFn = useShouldExcludeProperty(state);
     return new Proxy(state, {
-        get(t, p, _) {
-            // What to do with vue props? Get function?
+        get(target, prop, receiver) {
+            if (excludePropFn(prop)) return Reflect.get(target, prop, receiver);
+
+            const res = Reflect.get(target, prop, receiver);
+            if (typeof res === 'object') return createStateProxy(res, stateAccess);
+            else if (isRef(res)) {
+                // These access properties are tracked, so that they can be put
+                stateAccess.push({target, prop, receiver});
+                return res;
+            }
         },
     });
 }
 
-function createRootForRecompute(reactiveRoot) {
+function useStateTracker(state) {
+    state = reactive(state); // Need to make reactive for computed prop to work
+    let stateAccess = [];
+    const stateProxy = createStateProxy(state, stateAccess);
+    const clearState = () => stateAccess.length = 0;
+    return {stateProxy, stateAccess, clearState};
 
-    const rawRoot = toRaw(reactiveRoot);
-    return new Proxy({}, {
-        get(t, p, receiver) {
-            return Reflect.get(rawRoot, p, receiver);
-        },
-        set(t, p, newValue, receiver) {
-            return Reflect.set(reactiveRoot, p, newValue, receiver);
-        }
-    });
+}
+
+function useRecompute(state, root, recomputeFn, flagOverlaysForRecomputeFn, resetRootFn) {
+
+    const {stateProxy, stateAccess, clearState} = useStateTracker(state);
+
+    const rIsRecomputing = ref(false);
+    let dirty = true;
+    let rSetDirty;
+    const resetDirty = () => {
+        let initial = true;
+        rSetDirty = computed(() => {
+            stateAccess.forEach(s => Reflect.get(s.target, s.prop, s.receiver));
+            if (initial) initial = false;
+            else dirty = true;
+        });
+        rSetDirty.value;
+        dirty = false;
+    }
+
+    const setDirtyFlag = () => rSetDirty.value;
+
+    const recompute = () => {
+        rIsRecomputing.value = true;
+        resetRootFn();
+        clearState();
+        recomputeFn(stateProxy, root);
+        resetDirty();
+        rIsRecomputing.value = false;
+
+        flagOverlaysForRecomputeFn(); // Computed trees that depend on this tree need to recompute
+    }
+
+    const recomputeIfDirty = () => {
+
+        if (rIsRecomputing.value) return;
+
+        setDirtyFlag();
+        if (dirty) recompute();
+    }
+
+    return {
+        forceRecompute: recompute,
+        recomputeIfDirty,
+        rIsRecomputing
+    }
 }
 
 /**
@@ -58,13 +105,13 @@ export class ComputedTree extends ProxyTree {
         this.initRootId(srcTree.root.id);
 
         this.rForcedRecomputes = ref(0);
-        this.rRecompute = this.createCachedRecompute();
 
+        const excludePropFn = useShouldExcludeProperty(this);
         // Return a proxied version of this instance
         return new Proxy(this, {
 
             get: (target, prop, receiver) => {
-                if (isVueProperty(prop)) return Reflect.get(target, prop, receiver);
+                excludePropFn(prop);
 
                 if (prop !== 'rForcedRecomputes' && prop !== 'isRecomputing' && prop !== "_root") {
                     this.checkForRecompute();
@@ -94,15 +141,6 @@ export class ComputedTree extends ProxyTree {
 
     createProxyNodeFn(id, parentId) {
         return createComputedProxyNode(this, id, parentId);
-    }
-
-    createCachedRecompute() {
-        // TODO find out why this works
-        const rootForRecompute = createRootForRecompute(this.root);
-        return computed(() => {
-            this.rForcedRecomputes.value; // Triggers a recomputation
-            recompute(this, rootForRecompute);
-        });
     }
 
     getOverwrittenNodes() {
