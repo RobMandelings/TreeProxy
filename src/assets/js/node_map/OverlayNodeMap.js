@@ -60,7 +60,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
         // The copy is reactive, and we don't want to trigger unnecessary recomputations here (or circular dependencies)
         if (Object.keys(changesToApply).length) {
             console.log(`Overlay node recompute: ${count++}`);
-            // console.log(`Changes to apply: ${JSON.stringify(prevChanges)} ${JSON.stringify(curChanges)} ${JSON.stringify(changesToApply)}`);
+            console.log(`Changes to apply: ${JSON.stringify(prevChanges)} ${JSON.stringify(curChanges)} ${JSON.stringify(changesToApply)}`);
             applyChanges(copy, changesToApply);
         }
         prevChanges = {...curChanges};
