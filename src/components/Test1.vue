@@ -2,7 +2,7 @@
 
 import {SourceTree} from "../assets/js/proxy_tree/SrcTree.js";
 import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 
 const srcTree = new SourceTree().init({name: "Root"});
 
@@ -15,10 +15,20 @@ const computeFn = (root) => {
   // root.weight = rCount.value;
 };
 
-const compTree = new ComputedTree(srcTree, computeFn);
+let c = 0;
+// const rDirty = ref(false);
+let dirty = {value: false};
+const computedC = computed(() => {
+  console.log("Computed is triggered");
+  dirty.value = true;
+});
+
+
+// const compTree = new ComputedTree(srcTree, computeFn);
 
 const change = () => {
-  rCount.value++;
+  dirty.value = false;
+  computedC.value;
 }
 
 </script>
@@ -26,7 +36,7 @@ const change = () => {
 <template>
 
   <div class="card">
-    <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>
+    <!--    <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>-->
     <!--    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>-->
     <button type="button" @click="change">Click me</button>
     <p>

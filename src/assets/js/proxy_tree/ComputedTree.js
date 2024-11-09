@@ -4,92 +4,79 @@ import {computed, isRef, reactive, ref, toRaw} from "vue";
 import {createComputedProxyNode} from "./ProxyNode.js";
 import {useShouldExcludeProperty} from "../ProxyUtils.js";
 
-function createStateProxy(state, stateAccess) {
+function createStateProxy(state, deps) {
     const excludePropFn = useShouldExcludeProperty(state);
     return new Proxy(state, {
         get(target, prop, receiver) {
             if (excludePropFn(prop)) return Reflect.get(target, prop, receiver);
 
             const res = Reflect.get(target, prop, receiver);
-            if (typeof res === 'object') return createStateProxy(res, stateAccess);
+            if (typeof res === 'object') return createStateProxy(res, deps);
             else if (isRef(res)) {
                 // These access properties are tracked, so that they can be put
-                stateAccess.push({target, prop, receiver});
+                deps.push({target, prop, receiver});
                 return res;
             }
         },
     });
 }
 
-function useStateTracker(state) {
+function useDependencyTracker(state) {
     state = reactive(state); // Need to make reactive for computed prop to work
-    let stateAccess = [];
-    const stateProxy = createStateProxy(state, stateAccess);
-    const clearState = () => stateAccess.length = 0;
-    return {stateProxy, stateAccess, clearState};
+    let dependencies = [];
+    const stateProxy = createStateProxy(state, dependencies);
+    const clearDependencies = () => dependencies.length = 0;
+    return {stateProxy, dependencies, clearDependencies};
 
 }
 
-function useRecompute(state, root, recomputeFn, flagOverlaysForRecomputeFn, resetRootFn) {
+function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn) {
 
-    const {stateProxy, stateAccess, clearState} = useStateTracker(state);
+    const {stateProxy, dependencies, clearDependencies} = useDependencyTracker(state);
+    recomputeFn = recomputeFn ?? ((_) => undefined);
 
     const rIsRecomputing = ref(false);
     let dirty = true;
-    let rSetDirty;
+    let rCheckDependencies;
     const resetDirty = () => {
         let initial = true;
-        rSetDirty = computed(() => {
-            stateAccess.forEach(s => Reflect.get(s.target, s.prop, s.receiver));
+        rCheckDependencies = computed(() => {
+            dependencies.forEach(s => Reflect.get(s.target, s.prop, s.receiver));
             if (initial) initial = false;
             else dirty = true;
         });
-        rSetDirty.value;
+        rCheckDependencies.value;
         dirty = false;
     }
 
-    const setDirtyFlag = () => rSetDirty.value;
+    const checkDirtyDependencies = () => rCheckDependencies.value;
 
     const recompute = () => {
         rIsRecomputing.value = true;
         resetRootFn();
-        clearState();
+        clearDependencies();
         recomputeFn(stateProxy, root);
         resetDirty();
         rIsRecomputing.value = false;
 
-        flagOverlaysForRecomputeFn(); // Computed trees that depend on this tree need to recompute
+        markOverlaysDirtyFn(); // Computed trees that depend on this tree need to recompute
     }
 
     const recomputeIfDirty = () => {
 
         if (rIsRecomputing.value) return;
 
-        setDirtyFlag();
+        checkDirtyDependencies();
         if (dirty) recompute();
     }
 
+    const markDirty = () => dirty = true;
+
     return {
-        forceRecompute: recompute,
         recomputeIfDirty,
+        markDirty,
         rIsRecomputing
     }
-}
-
-/**
- * The cached recompute version requires a different reactive root
- * In order to break circular dependencies in the computed prop
- * Force is used for when the computed property re-evaluates
- */
-function recompute(compTree, root) {
-    if (compTree.isRecomputing) return;
-
-    compTree.isRecomputing = true;
-    compTree.overlayNodeMap.clearAllChanges();
-    compTree.recomputeFn(root);
-    compTree.computedTreeOverlays.forEach(t => t.flagForRecompute());
-    compTree.isRecomputing = false;
-    console.log("Set it to false");
 }
 
 export class ComputedTree extends ProxyTree {
@@ -99,12 +86,22 @@ export class ComputedTree extends ProxyTree {
         super(overlayNodeMap);
         this.overlayNodeMap = overlayNodeMap;
         this.isRecomputing = false;
-        this.recomputeFn = recomputeFn ?? ((_) => undefined);
         this.srcTree = srcTree;
         this.srcTree.addComputedTreeOverlay(this);
         this.initRootId(srcTree.root.id);
 
-        this.rForcedRecomputes = ref(0);
+        const {recomputeIfDirty, rIsRecomputing, markDirty} =
+            useRecompute(
+                state,
+                this.root,
+                recomputeFn,
+                () => this.flagOverlaysForRecompute(),
+                () => this.overlayNodeMap.clearAllChanges()
+            );
+
+        this.recomputeIfDirty = recomputeIfDirty;
+        this.rIsRecomputing = rIsRecomputing;
+        this.markDirty = markDirty;
 
         const excludePropFn = useShouldExcludeProperty(this);
         // Return a proxied version of this instance
@@ -113,30 +110,19 @@ export class ComputedTree extends ProxyTree {
             get: (target, prop, receiver) => {
                 excludePropFn(prop);
 
-                if (prop !== 'rForcedRecomputes' && prop !== 'isRecomputing' && prop !== "_root") {
-                    this.checkForRecompute();
+                if (prop !== 'isRecomputing' && prop !== "_root") {
+                    this.recomputeIfDirty();
                 }
 
                 return Reflect.get(target, prop, receiver);
             },
             set: (target, prop, value, receiver) => {
                 const result = Reflect.set(target, prop, value, receiver);
-                if (prop !== 'rForcedRecomputes' && prop !== 'isRecomputing')
-                    target.flagForRecompute();
+                if (prop !== 'isRecomputing')
+                    this.markDirty();
                 return result;
             }
         });
-    }
-
-    checkForRecompute() {
-        console.log("Heerlijk");
-        if (!this.isRecomputing) this.rRecompute?.value;
-        // When recompute is not flagged explicitly, we still access the computed variable to trigger a recompute if any of the
-        // Dependencies in recomputeFn have changed
-    }
-
-    flagForRecompute() {
-        this.rForcedRecomputes.value++;
     }
 
     createProxyNodeFn(id, parentId) {
