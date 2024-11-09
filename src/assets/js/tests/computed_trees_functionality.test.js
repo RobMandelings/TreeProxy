@@ -14,5 +14,6 @@ test('Computed tree clearance', () => {
 
     compTree.root.name = "Changed"; // Manually change a value
     rCount.value++; // This should trigger recompute and clear the adjustments
-    expect(compTree.root.name).toBe("Changed");
+    expect(compTree.root.name).not.toBe("Changed");
 })
+xtest('Find out why the recomputeOverlay is computed multiple times', () => false);

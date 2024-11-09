@@ -63,8 +63,6 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
         recomputeWatcher = watch(dependencies.map(d => () => checkDep(d)), () => recomputeIfDirty());
     }
 
-    const resetDirty = () => dirty = false;
-
     const checkDirtyDependencies = () => {
         if (!rCheckDependencies)
             throw new Error("Can't check for dirty dependencies: not initialised.")
@@ -91,6 +89,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
         if (dirty) recompute();
     }
 
+    const resetDirty = () => dirty = false;
     const markDirty = () => dirty = true;
 
     initCheckDependencies(); // Initial dependency tracking enabled

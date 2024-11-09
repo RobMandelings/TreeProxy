@@ -112,7 +112,7 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
         },
         set: (t, prop, value, receiver) => {
             const success = Reflect.set(t.refProxy, prop, value, receiver);
-            // if (success) proxyTree.flagOverlaysForRecompute();
+            if (success) proxyTree.markOverlaysDirty();
             return success;
         }
     }

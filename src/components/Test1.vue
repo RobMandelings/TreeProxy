@@ -11,14 +11,19 @@ let triggered = 0;
 let nameCount = 100;
 
 const computeFn = (state, root) => {
-  console.log("Hallo");
-  root.name = `${state.count}`;
+  root.name = `${root.name} B (${state.count})`;
+  // root.name = `(${state.count})`;
 };
 
 const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
 
 const change = () => {
   rCount.value++;
+}
+
+let c = 0;
+const changeSrc = () => {
+  srcTree.root.name = `SRC Root (${c++})`;
 }
 
 </script>
@@ -28,7 +33,8 @@ const change = () => {
   <div class="card">
     <div>{{ compTree.root.name }} and {{ compTree.root.weight }}</div>
     <!--    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>-->
-    <button type="button" @click="change">Click me</button>
+    <button type="button" @click="changeSrc">Change src</button>
+    <button type="button" @click="change">Change count</button>
     <p>
       Edit
       <code>components/HelloWorld.vue</code> to test HMR

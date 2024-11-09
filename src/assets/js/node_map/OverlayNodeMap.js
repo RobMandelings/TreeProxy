@@ -1,6 +1,6 @@
 import * as Utils from "../Utils.js";
 import {NodeMap} from "./NodeMap.js";
-import {computed, reactive, ref, watch, watchSyncEffect} from "vue";
+import {computed, reactive, ref, toRaw, watch, watchSyncEffect} from "vue";
 import * as RefProxy from "./RefProxy.js";
 import {equalKeys} from "../Utils.js";
 
@@ -40,19 +40,26 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     let prevChanges = {};
     let copy;
 
+    const rNodeChanges = computed(() => {
+        return nodeChanges.get(rId.value) ?? {};
+    })
+
     const rCopy = computed(() => {
         console.log(`Overlay node recompute: ${count++}`);
 
         const id = rId.value;
         const srcNode = rSrcNode.value;
-        const curChanges = nodeChanges.get(id) ?? {};
+        const curChanges = rNodeChanges.value;
         let changesToApply;
         if (srcNodeChanged) { // In this case we need to create a new copy and apply all changes again
             copy = reactive(srcNode.copy());
             changesToApply = curChanges; // It is a fresh copy, so previous changes is irrelevant here
             srcNodeChanged = false;
         } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
-        
+
+        console.log(`Changes to apply: ${JSON.stringify(prevChanges)} ${JSON.stringify(curChanges)}`);
+
+        // The copy is reactive, and we don't want to trigger unnecessary recomputations here (or circular dependencies)
         if (Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
         prevChanges = curChanges;
 
