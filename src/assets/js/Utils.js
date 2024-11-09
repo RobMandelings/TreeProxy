@@ -13,17 +13,6 @@ export function isValidUUID(uuid) {
     return uuidRegex.test(uuid);
 }
 
-export function getExcludeProperties(obj) {
-    const properties = new Set();
-    let currentObj = Object.getPrototypeOf(obj);
-    do {
-        Object.getOwnPropertyNames(currentObj).forEach(name => properties.add(name));
-        Object.getOwnPropertySymbols(currentObj).forEach(symbol => properties.add(symbol));
-    } while ((currentObj = Object.getPrototypeOf(currentObj)));
-
-    return Array.from(properties);
-}
-
 export function equalKeys(obj1, obj2) {
     const keys1 = Object.keys(obj1);
     const keys2 = Object.keys(obj2);

@@ -1,7 +1,9 @@
 import {computed, reactive, ref} from "vue";
 import {DirectNodeAccessError, StaleProxyError} from "./ProxyNodeErrors.js";
-import {isVueProperty, wrappedProxyTargetGetter} from "../ProxyUtils.js";
-import {getExcludeProperties} from "../Utils.js";
+import {
+    useShouldExcludeProperty,
+    wrappedProxyTargetGetter
+} from "../ProxyUtils.js";
 import {useChildren} from "./proxy_node/useChildren.js";
 import {useAncestors} from "./proxy_node/useAncestors.js";
 import {useDescendants} from "./proxy_node/useDescendants.js";
@@ -84,8 +86,6 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
         }
     });
 
-    const excludeProps = getExcludeProperties(target);
-
     const coreGetHandler = (t, prop, receiver) => {
 
         if (prop === "node") throw new DirectNodeAccessError();
@@ -101,10 +101,11 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
         return wrappedProxyTargetGetter(t, t.refProxy, prop, receiver);
     }
 
+    const excludePropFn = useShouldExcludeProperty(target);
+
     const handler = {
         get: (t, prop, receiver) => {
-            if (prop in excludeProps) return Reflect.get(t, prop, receiver);
-            if (isVueProperty(prop)) return Reflect.get(t, prop, receiver);
+            if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
 
             if (beforeGetFn) beforeGetFn(t, prop, receiver);
             return coreGetHandler(t, prop, receiver);

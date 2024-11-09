@@ -4,6 +4,18 @@ import {computed, effect, reactive, ref, toRaw, triggerRef, watch, watchSyncEffe
 import {createComputedProxyNode, createSrcProxyNode} from "./ProxyNode.js";
 import {isVueProperty} from "../ProxyUtils.js";
 
+let propertyAccess = [];
+
+function createStateProxy(state) {
+    state = reactive(state); // Need to make reactive for computed prop to work
+
+    return new Proxy(state, {
+        get(t, p, _) {
+            // What to do with vue props? Get function?
+        },
+    });
+}
+
 function createRootForRecompute(reactiveRoot) {
 
     const rawRoot = toRaw(reactiveRoot);
