@@ -12,7 +12,6 @@ function applyChanges(node, changes) {
 }
 
 function getChangesToApply(prevChanges, curChanges, srcNode) {
-    if (!curChanges) return null;
     const changesToApply = {...curChanges};
     for (const key in prevChanges) {
         if (!(key in curChanges)) {
@@ -46,7 +45,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
         const id = rId.value;
         const srcNode = rSrcNode.value;
-        const curChanges = nodeChanges.get(id);
+        const curChanges = nodeChanges.get(id) ?? {};
         let changesToApply;
         if (srcNodeChanged) { // In this case we need to create a new copy and apply all changes again
             copy = reactive(srcNode.copy());
@@ -54,7 +53,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
             srcNodeChanged = false;
         } else changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
 
-        if (changesToApply) applyChanges(copy, changesToApply);
+        if (Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
         prevChanges = curChanges;
 
         return copy;

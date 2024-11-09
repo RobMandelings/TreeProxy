@@ -11,13 +11,16 @@ let triggered = 0;
 let nameCount = 100;
 
 const computeFn = (state, root) => {
-  console.log(state.count);
-  // root.name = "Hello";
-  // root.weight = rCount.value;
+  // console.log(`${state.count} en ${root.name}`);
+  root.name = `${root.name} + ${state.count}`;
 };
 
-
 const compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
+
+const change = () => {
+  compTree.root.name = "Changed";
+  rCount.value++;
+}
 
 </script>
 
