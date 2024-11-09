@@ -13,8 +13,8 @@ export class ProxyTree extends NodeMap {
         this._root = null;
     }
 
-    flagOverlaysForRecompute() {
-        this.computedTreeOverlays.forEach(t => t.flagForRecompute());
+    markOverlaysDirty() {
+        this.computedTreeOverlays.forEach(t => t.markDirty());
     }
 
     addComputedTreeOverlay(tree) {

@@ -49,7 +49,11 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
         dirty = false;
     }
 
-    const checkDirtyDependencies = () => rCheckDependencies.value;
+    const checkDirtyDependencies = () => {
+        if (!rCheckDependencies.value)
+            throw new Error("Can't check for dirty dependencies: not initialised.")
+        rCheckDependencies.value;
+    }
 
     const recompute = () => {
         rIsRecomputing.value = true;
@@ -63,7 +67,6 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     }
 
     const recomputeIfDirty = () => {
-
         if (rIsRecomputing.value) return;
 
         checkDirtyDependencies();
@@ -81,7 +84,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
 
 export class ComputedTree extends ProxyTree {
 
-    constructor(srcTree, recomputeFn) {
+    constructor(srcTree, state, recomputeFn) {
         let overlayNodeMap = reactive(new OverlayNodeMap(srcTree.nodeMap));
         super(overlayNodeMap);
         this.overlayNodeMap = overlayNodeMap;
@@ -95,7 +98,7 @@ export class ComputedTree extends ProxyTree {
                 state,
                 this.root,
                 recomputeFn,
-                () => this.flagOverlaysForRecompute(),
+                () => this.markOverlaysDirty(),
                 () => this.overlayNodeMap.clearAllChanges()
             );
 
