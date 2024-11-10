@@ -12,12 +12,12 @@ let triggered = 0;
 let nameCount = 100;
 
 const computeFn = (state, root) => {
-  const textLength = state.text.length;
-  let txt;
-  if (textLength >= 20) txt = state.text.replaceAll('A', 'B');
-  else if (textLength >= 10) txt = state.text.length;
-  else txt = state.text;
-  root.name = `${root.name} (c:${state.count}, t:${txt})`
+  // const textLength = state.text.length;
+  // let txt;
+  // if (textLength >= 20) txt = state.text.replaceAll('A', 'B');
+  // else if (textLength >= 10) txt = state.text.length;
+  // else txt = state.text;
+  // root.name = `${root.name} (c:${state.count}, t:${txt})`
 };
 
 const compTree = new ComputedTree(srcTree, {count: rCount, text: rText}, computeFn);
