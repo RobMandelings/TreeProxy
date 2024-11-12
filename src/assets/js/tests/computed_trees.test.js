@@ -171,7 +171,7 @@ describe('Computed tree behaviour on src change', () => {
 
         srcTree.root.name = "Changed";
         expect(compTree.root.name).toBe("Changed");
-        expect(computeFn).toBeCalledTimes(1);
+        expect(computeFn).toBeCalledTimes(2);
         expect(copySpy).toBeCalledTimes(0);
     });
 });

@@ -95,17 +95,19 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
         dirty.value = false;
     }
     const markDirty = () => {
-        dirty.value = true;
+        reactiveDirty.value = true;
     }
 
     // If dirty was marked explicitly, this watch should take care of updates
     // Recomputation also happens on access, but in case that didn't happen we still want the recompute to happen.
+    // E.g. srcTree.root.name = "Changed", then if
     watch(reactiveDirty, (dirty) => {
         if (!dirty.value) return;
         recomputeIfDirty()
     });
 
     initCheckDependencies(); // Initial dependency tracking enabled
+    recomputeIfDirty();
 
     return {
         recomputeIfDirty,

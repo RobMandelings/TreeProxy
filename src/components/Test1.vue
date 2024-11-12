@@ -40,7 +40,7 @@ const changeAnother = () => {
 <template>
 
   <div class="card">
-    <div>{{ srcTree.root.name }}</div>
+    <!--    <div>{{ srcTree.root.name }}</div>-->
     <div>{{ compTree.root.name }}</div>
     <!--    <div>{{ compTree2.root.name }} and {{ compTree2.root.weight }}</div>-->
     <button type="button" @click="changeSrc">Change src</button>
