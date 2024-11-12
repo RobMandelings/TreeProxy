@@ -10,7 +10,12 @@ const createEmptyCompTree = (srcTree) => {
     return {compTree, computeFn};
 }
 
-const createSimpleSourceTree = () => new SourceTree().init({name: "Root"});
+
+const createSuffixCompTree = (srcTree, concat) => {
+    return new ComputedTree(srcTree, {}, (_, root) => root.name += concat);
+}
+
+const createSimpleSourceTree = (rootName = "Root") => new SourceTree().init({name: rootName});
 
 let copySpy = jest.spyOn(CustomNode.prototype, 'copy');
 beforeEach(() => {
@@ -198,6 +203,18 @@ describe('Computed tree behaviour on src change', () => {
         expect(copySpy).toBeCalledTimes(0); // A name change in src should not trigger a copy, as the computed tree does not alter it.
     });
 
+    test('', () => {
+        const srcTree = createSimpleSourceTree();
+
+
+        const computeFn = (_, root) => root.name += " (changed)";
+        const compTree = new ComputedTree(srcTree, {}, computeFn);
+        expect(compTree.root.name).toBe(srcTree.root.name + " (changed)");
+        expect(copySpy).toBeCalledTimes(1);
+        srcTree.root.name
+
+    });
+
     /*
     This is required because vue might not reflect the changes in the computed tree. The computed tree
     immediately gets marked as dirty, but if srcTree.root.name isn't accessed explicitly afterwards, then it will not be re-evaluated.
@@ -214,3 +231,34 @@ describe('Computed tree behaviour on src change', () => {
         expect(computeFn).toBeCalledTimes(2);
     });
 });
+
+test('Shorthand name concatenation using src root', () => {
+
+    const concatString = " (changed)";
+    const srcTree = createSimpleSourceTree();
+    const compTree = new ComputedTree(srcTree, {}, (_, root) => root.name += concatString);
+    expect(compTree.root.name).toBe(srcTree.root.name + concatString);
+
+})
+
+test('Layers: previous layer remains unchanged', () => {
+
+    const getLayerName = (root, layer) => `layer${layer}-${root.name}`;
+    const layer0 = createSimpleSourceTree("layer0");
+    const layer1 = new ComputedTree(layer0, {}, (_, root) => root.name = getLayerName(root, 1));
+    const layer2 = new ComputedTree(layer1, {}, (_, root) => {
+        root.name = getLayerName(root, 2)
+    });
+    const layer3 = new ComputedTree(layer2, {}, (_, root) => root.name = getLayerName(root, 3));
+
+    const checkLayerNameConsistency = () => {
+        expect(layer3.root.name).toBe(getLayerName(layer2.root, 3));
+        expect(layer2.root.name).toBe(getLayerName(layer1.root, 2));
+        expect(layer1.root.name).toBe(getLayerName(layer0.root, 1));
+    }
+
+    checkLayerNameConsistency();
+    layer0.root.name = "Changed";
+    checkLayerNameConsistency(); // Layer 0 has changed, all other layers should be recomputed.
+});
+

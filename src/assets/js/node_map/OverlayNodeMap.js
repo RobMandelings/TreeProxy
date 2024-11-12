@@ -79,7 +79,8 @@ export class OverlayNodeMap extends NodeMap {
 
         // Tracks the changes of the nodes on previous layer by keeping an object with the new property values
         this.nodeChanges = new Map();
-        this.overlayNodes = new Map();
+        // To treat the values as reactive objects, we make overlayNodes reactive.
+        this.overlayNodes = reactive({}); // We will add computed properties to this object.
 
         this.addedNodes = new Map();
         this.deletedNodeIds = new Set(); // Node ids which are deleted from the src map
@@ -103,12 +104,12 @@ export class OverlayNodeMap extends NodeMap {
         const rId = ref(initialId);
         const {rCopy} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
 
-        let count = 0;
         const rNode = computed(() => {
             return rCopy.value
                 ?? this.getNode(rId.value)
         });
-        this.overlayNodes.set(rId.value, rNode);
+
+        this.overlayNodes[rId.value] = rNode;
 
         return RefProxy.createRefProxy(this, rId, rNode);
     }
@@ -206,6 +207,7 @@ export class OverlayNodeMap extends NodeMap {
         if (this.isDeleted(id)) return null;
 
         return this.getAddedNode(id)
+            ?? this.overlayNodes[id]
             ?? this.srcNodeMap.getNode(id);
     }
 }
