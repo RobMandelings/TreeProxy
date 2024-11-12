@@ -5,7 +5,7 @@ import {createComputedProxyNode} from "./ProxyNode.js";
 import {useShouldExcludeProperty} from "../ProxyUtils.js";
 import {useRecompute} from "./Recompute.js";
 
-const excludedPropsCompTree = new Set(["_root", "isRecomputing", "markDirty", "recomputeIfDirty"]);
+const excludedPropsCompTree = new Set(["_root", "isRecomputing", "_isRecomputingObj", "markDirty", "recomputeIfDirty", "markedForRecompute", "_isDirtyObj"]);
 const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);
 
 export class ComputedTree extends ProxyTree {
@@ -18,7 +18,7 @@ export class ComputedTree extends ProxyTree {
         this.srcTree.addComputedTreeOverlay(this);
         this.initRootId(srcTree.root.id);
 
-        const {recomputeIfDirty, isRecomputingObj, markDirty} =
+        const {recomputeIfDirty, isRecomputingObj, isDirtyObj, markDirty} =
             useRecompute(
                 state,
                 this.root,
@@ -29,6 +29,7 @@ export class ComputedTree extends ProxyTree {
 
         this.recomputeIfDirty = recomputeIfDirty;
         this._isRecomputingObj = isRecomputingObj;
+        this._isDirtyObj = isDirtyObj;
         this.markDirty = markDirty;
 
         const excludePropFn = useShouldExcludeProperty(this);
@@ -46,6 +47,10 @@ export class ComputedTree extends ProxyTree {
                 return result;
             }
         });
+    }
+
+    get markedForRecompute() {
+        return this._isDirtyObj.value;
     }
 
     isRecomputing() {

@@ -69,7 +69,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     }
 
     const recompute = () => {
-        console.log("Recompute")
+
         isRecomputing.value = true;
         resetRootFn();
         clearDependencies();
@@ -92,9 +92,14 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
         }
     }
 
-    const resetDirty = () => dirty.value = false;
+    const resetDirty = () => {
+        console.log("Resetting dirty");
+        dirty.value = false;
+    }
     const markDirty = () => {
-        reactiveDirty.value = true;
+
+        console.log("Hallo");
+        dirty.value = true;
     }
 
     // If dirty was marked explicitly, this watch should take care of updates
@@ -105,10 +110,12 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     });
 
     initCheckDependencies(); // Initial dependency tracking enabled
+    recomputeIfDirty();
 
     return {
         recomputeIfDirty,
         markDirty,
+        isDirtyObj: dirty,
         isRecomputingObj: isRecomputing
     }
 }

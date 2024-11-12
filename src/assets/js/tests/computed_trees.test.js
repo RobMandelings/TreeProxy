@@ -4,31 +4,6 @@ import {CustomNode} from "../CustomNode.js";
 import {createTree} from "./TreeUtil.js";
 import {nextTick, ref} from "vue";
 
-jest.mock("../proxy_tree/Recompute.js", () => ({
-    useRecompute: jest.fn((...args) => {
-        const original = jest.requireActual('../proxy_tree/Recompute.js').useRecompute;
-        const res = original(...args);
-        const recomputeIfDirty = jest.fn(res.recomputeIfDirty);
-        return {
-            ...res,
-            recomputeIfDirty
-        }
-    })
-}))
-
-function createRecomputeSpy(instance) {
-    const originalMethod = instance.recomputeIfDirty;
-
-    let recomputeSpy = jest.fn();
-    jest.spyOn(instance, 'recomputeIfDirty').mockImplementation(function (...args) {
-        const res = originalMethod();
-        if (res) recomputeSpy();
-        return res;
-    });
-
-    return recomputeSpy;
-}
-
 
 describe('ComputedTree', () => {
     let srcTree, compTree;
@@ -54,39 +29,34 @@ describe('ComputedTree', () => {
             let rCount;
             const initialCount = 0;
             const resetCount = () => rCount.value = initialCount;
+            let recomputeFn = jest.fn((state, __) => state.count);
 
             beforeEach(() => {
                 rCount = ref(initialCount);
-                compTree = new ComputedTree(srcTree, {count: rCount}, (state, __) => state.count);
+                compTree = new ComputedTree(srcTree, {count: rCount}, recomputeFn);
                 expect(srcTree.computedTreeOverlays.length).not.toBeFalsy();
+                expect(recomputeFn).toBeCalledTimes(1);
             });
 
             afterEach(() => resetCount());
 
-            test("Hello", async () => {
-                expect(compTree.recomputeIfDirty).toBeCalledTimes(0);
-                rCount.value++; // Make the recompute dirty
-                await nextTick();
-                expect(compTree.recomputeIfDirty).toBeCalledTimes(1);
+            test('Recompute on access', () => {
+                rCount.value++;
+                expect(recomputeFn).toBeCalledTimes(1);
+                compTree.root;
+                expect(recomputeFn).toBeCalledTimes(2);
             });
 
-            const testRecomputeBehavior = (description, action) => {
-
-            };
-
-            testRecomputeBehavior(
-                'should recompute on accessing root',
-                () => Promise.resolve(compTree.root)
-            );
-
-            // testRecomputeBehavior(
-            //     'should recompute after nextTick',
-            //     () => nextTick()
-            // );
+            test('Recompute automatically', async () => {
+                rCount.value++;
+                expect(recomputeFn).toBeCalledTimes(1);
+                await nextTick();
+                expect(recomputeFn).toBeCalledTimes(2);
+            });
 
             test('Change to src tree', () => {
                 srcTree.root.name = "Changed1";
-                expect(compTree.shouldRecompute).toBe(true);
+                expect(compTree.markedForRecompute).toBe(true);
                 expect(compTree.isRecomputing).toBe(false);
 
                 // Simply querying for whether the tree should be recomputed should not trigger
