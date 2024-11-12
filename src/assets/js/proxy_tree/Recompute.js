@@ -28,7 +28,7 @@ function useDependencyTracker(state) {
 
 }
 
-export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn) {
+export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn, recomputeSrcFn) {
 
     const {stateProxy, dependencies, clearDependencies} = useDependencyTracker(state);
     recomputeFn = recomputeFn ?? ((_) => undefined);
@@ -77,6 +77,8 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
 
     const recompute = () => {
 
+        if (recomputeSrcFn) recomputeSrcFn(); // First recompute the layer on which this layer depends
+
         isRecomputing.value = true;
         resetRootFn();
         clearDependencies();
@@ -104,6 +106,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     }
     const markDirty = () => {
         reactiveDirty.value = true;
+        markOverlaysDirtyFn(); // All overlays should become dirty as well
     }
 
     // If dirty was marked explicitly, this watch should take care of updates

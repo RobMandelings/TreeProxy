@@ -24,7 +24,8 @@ export class ComputedTree extends ProxyTree {
                 this.root,
                 recomputeFn,
                 () => this.markOverlaysDirty(),
-                () => this.overlayNodeMap.clearAllChanges()
+                () => this.overlayNodeMap.clearAllChanges(),
+                () => srcTree.recomputeIfDirty ? srcTree.recomputeIfDirty() : undefined
             );
 
         this.recomputeIfDirty = recomputeIfDirty;

@@ -246,9 +246,7 @@ test('Layers: previous layer remains unchanged', () => {
     const getLayerName = (root, layer) => `layer${layer}-${root.name}`;
     const layer0 = createSimpleSourceTree("layer0");
     const layer1 = new ComputedTree(layer0, {}, (_, root) => root.name = getLayerName(root, 1));
-    const layer2 = new ComputedTree(layer1, {}, (_, root) => {
-        root.name = getLayerName(root, 2)
-    });
+    const layer2 = new ComputedTree(layer1, {}, (_, root) => root.name = getLayerName(root, 2));
     const layer3 = new ComputedTree(layer2, {}, (_, root) => root.name = getLayerName(root, 3));
 
     const checkLayerNameConsistency = () => {
@@ -259,6 +257,15 @@ test('Layers: previous layer remains unchanged', () => {
 
     checkLayerNameConsistency();
     layer0.root.name = "Changed";
+    expect(layer1.markedForRecompute).toBe(true);
+    expect(layer2.markedForRecompute).toBe(true);
+    expect(layer3.markedForRecompute).toBe(true);
     checkLayerNameConsistency(); // Layer 0 has changed, all other layers should be recomputed.
-});
+    expect(layer1.markedForRecompute).toBe(false);
+    expect(layer2.markedForRecompute).toBe(false);
+    expect(layer3.markedForRecompute).toBe(false);
 
+    layer0.root.weight = 15;
+    expect(layer3.root.weight).toBe(layer0.root.weight); // The update propagates through all layers
+
+});
