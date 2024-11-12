@@ -95,7 +95,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
         dirty.value = false;
     }
     const markDirty = () => {
-        reactiveDirty.value = true;
+        dirty.value = true;
     }
 
     // If dirty was marked explicitly, this watch should take care of updates
@@ -106,7 +106,6 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     });
 
     initCheckDependencies(); // Initial dependency tracking enabled
-    recomputeIfDirty(); // Initial recompute. Also sets up the watchers that track any changes to the dependencies
 
     return {
         recomputeIfDirty,

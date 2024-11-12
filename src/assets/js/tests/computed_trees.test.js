@@ -10,6 +10,8 @@ const createEmptyCompTree = (srcTree) => {
     return {compTree, computeFn};
 }
 
+const createSimpleSourceTree = () => new SourceTree().init({name: "Root"});
+
 let copySpy = jest.spyOn(CustomNode.prototype, 'copy');
 beforeEach(() => {
     jest.clearAllMocks();
@@ -163,15 +165,13 @@ describe('ComputedTree', () => {
 
 describe('Computed tree behaviour on src change', () => {
 
-    let srcTree, compTree, computeFn;
-    beforeEach(() => {
-        srcTree = new SourceTree().init({name: "Root"});
-        ({compTree, computeFn} = createEmptyCompTree(srcTree));
-    });
-
     test('Source tree update should not trigger a new copy', () => {
+        const srcTree = createSimpleSourceTree();
+        const {compTree, computeFn} = createEmptyCompTree(srcTree);
+
         srcTree.root.name = "Changed";
         expect(compTree.root.name).toBe("Changed");
+        expect(computeFn).toBeCalledTimes(1);
         expect(copySpy).toBeCalledTimes(0);
     });
-})
+});
