@@ -24,7 +24,7 @@ describe('ComputedTree', () => {
     const change1 = "Changed";
     const change2 = "Changed2";
 
-    let recomputeFn;
+    let computeFn;
 
     describe('Simple tree', () => {
         beforeEach(() => {
@@ -38,21 +38,20 @@ describe('ComputedTree', () => {
             const resetCount = () => rCount.value = initialCount;
 
             beforeEach(() => {
-                recomputeFn = jest.fn((state, __) => state.count);
+                computeFn = jest.fn((state, __) => state.count);
                 rCount = ref(initialCount);
-                compTree = new ComputedTree(srcTree, {count: rCount}, recomputeFn);
+                compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
                 expect(srcTree.computedTreeOverlays.length).not.toBeFalsy();
-                expect(recomputeFn).toBeCalledTimes(1);
-                recomputeFn.mockClear();
+                expect(computeFn).toBeCalledTimes(1);
             });
 
             afterEach(() => resetCount());
 
             test('Recompute on access', () => {
                 rCount.value++;
-                expect(recomputeFn).toBeCalledTimes(0);
+                expect(computeFn).toBeCalledTimes(1);
                 compTree.root;
-                expect(recomputeFn).toBeCalledTimes(1);
+                expect(computeFn).toBeCalledTimes(2);
             });
 
             /*
@@ -63,11 +62,11 @@ describe('ComputedTree', () => {
              */
             test('Recompute on next tick', async () => {
 
-                expect(recomputeFn).toBeCalledTimes(0)
+                expect(computeFn).toBeCalledTimes(1)
                 rCount.value++;
-                expect(recomputeFn).toBeCalledTimes(0);
+                expect(computeFn).toBeCalledTimes(1);
                 await nextTick();
-                expect(recomputeFn).toBeCalledTimes(1);
+                expect(computeFn).toBeCalledTimes(2);
             });
 
             test('Change to src tree', () => {
@@ -77,13 +76,13 @@ describe('ComputedTree', () => {
 
                 // Simply querying for whether the tree should be recomputed should not trigger
                 // Recomputation
-                expect(recomputeFn).toBeCalledTimes(0);
+                expect(computeFn).toBeCalledTimes(1);
                 expect(compTree.root.name).toBe(srcTree.root.name)
                 expect(compTree.markedForRecompute).toBe(false);
                 srcTree.root.name = "Changed2";
                 expect(compTree.markedForRecompute).toBe(true) // Another change is made to the src tree, so the layer above should be re-evaluated
                 expect(compTree.root.name).toBe(srcTree.root.name);
-                expect(recomputeFn).toBeCalledTimes(2);
+                expect(computeFn).toBeCalledTimes(3);
             });
 
             test('Equivalence to src tree', () => {
@@ -122,18 +121,18 @@ describe('ComputedTree', () => {
             const getCompWeight = () => srcTree.root.weight + 5;
 
             beforeEach(() => {
-                recomputeFn = jest.fn((state, root) => root.weight = getCompWeight());
-                compTree = new ComputedTree(srcTree, {}, recomputeFn);
+                computeFn = jest.fn((state, root) => root.weight = getCompWeight());
+                compTree = new ComputedTree(srcTree, {}, computeFn);
             });
 
             test('SRC tree name adjustment', async () => {
                 expect(compTree.root.weight).toBe(getCompWeight());
-                expect(recomputeFn).toBeCalledTimes(1);
+                expect(computeFn).toBeCalledTimes(1);
                 expect(copySpy).toBeCalledTimes(1);
                 srcTree.root.name = change1;
                 expect(copySpy).toBeCalledTimes(1); // No recomputation has happened yet
                 compTree.root.name; // We access the changed node to trigger recomputations
-                expect(recomputeFn).toBeCalledTimes(2); // Should be recomputed due to access
+                expect(computeFn).toBeCalledTimes(2); // Should be recomputed due to access
                 expect(copySpy).toBeCalledTimes(2); // The src node was adjusted, so a new copy was made
 
                 expect(compTree.root.name).toBe(change1); // The name reflects the name from the adjusted src tree
@@ -199,6 +198,13 @@ describe('Computed tree behaviour on src change', () => {
         expect(copySpy).toBeCalledTimes(0); // A name change in src should not trigger a copy, as the computed tree does not alter it.
     });
 
+    /*
+    This is required because vue might not reflect the changes in the computed tree. The computed tree
+    immediately gets marked as dirty, but if srcTree.root.name isn't accessed explicitly afterwards, then it will not be re-evaluated.
+    This leads to the computed version of the node to also not be re-evaluated.
+
+    See what happens when markDirty is called in Recompute.js
+     */
     test('Source tree name change. nextTick should trigger recompute', async () => {
         const srcTree = createSimpleSourceTree();
         const {compTree, computeFn} = createEmptyCompTree(srcTree);
@@ -206,13 +212,5 @@ describe('Computed tree behaviour on src change', () => {
         expect(computeFn).toBeCalledTimes(1);
         await nextTick();
         expect(computeFn).toBeCalledTimes(2);
-
-        /*
-        This is required because vue might not reflect the changes in the computed tree. The computed tree
-        immediately gets marked as dirty, but if srcTree.root.name isn't accessed explicitly afterwards, then it will not be re-evaluated.
-        This leads to the computed version of the node to also not be re-evaluated.
-
-        See what happens when markDirty is called in Recompute.js
-         */
     });
 });

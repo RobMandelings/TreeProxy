@@ -48,7 +48,6 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     const rNodeChanges = computed(() => nodeChanges.get(rId.value) ?? {});
 
     const rCopy = computed(() => {
-        console.log("Hallo");
 
         const srcNode = rSrcNode.value;
         const curChanges = rNodeChanges.value;
