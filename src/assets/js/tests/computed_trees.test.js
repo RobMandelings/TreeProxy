@@ -2,15 +2,15 @@ import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 import {CustomNode} from "../CustomNode.js";
 import {createTree} from "./TreeUtil.js";
-import {nextTick} from "vue";
 
-function createRecomputeSpy() {
-    const originalMethod = ComputedTree.prototype.recompute;
+function createRecomputeSpy(instance) {
+    const originalMethod = instance.recomputeIfDirty;
 
     let recomputeSpy = jest.fn();
-    jest.spyOn(ComputedTree.prototype, 'recompute').mockImplementation(function (...args) {
-        if (!this.isRecomputing) recomputeSpy();
-        originalMethod.apply(this, args);
+    jest.spyOn(instance, 'recomputeIfDirty').mockImplementation(function (...args) {
+        const res = originalMethod();
+        if (res) recomputeSpy();
+        return res;
     });
 
     return recomputeSpy;
@@ -24,12 +24,10 @@ describe('ComputedTree', () => {
     const change2 = "Changed2";
 
     let copySpy;
-    let recomputeSpy;
     beforeEach(() => {
         jest.clearAllMocks();
         jest.restoreAllMocks();
         copySpy = jest.spyOn(CustomNode.prototype, 'copy');
-        recomputeSpy = createRecomputeSpy();
     })
 
     describe('Simple tree', () => {
@@ -39,8 +37,10 @@ describe('ComputedTree', () => {
 
         describe('ComputedTree core: no adjustments', () => {
 
+            let recomputeSpy;
             beforeEach(() => {
-                compTree = new ComputedTree(srcTree, (_) => undefined);
+                compTree = new ComputedTree(srcTree, (_, __) => undefined);
+                recomputeSpy = createRecomputeSpy(compTree);
                 expect(srcTree.computedTreeOverlays.length).not.toBeFalsy();
             });
 

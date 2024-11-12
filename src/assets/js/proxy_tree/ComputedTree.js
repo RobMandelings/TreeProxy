@@ -36,7 +36,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     const {stateProxy, dependencies, clearDependencies} = useDependencyTracker(state);
     recomputeFn = recomputeFn ?? ((_) => undefined);
 
-    const rIsRecomputing = ref(false);
+    let isRecomputing = {value: false};
     let dirty = {value: true};
     let reactiveDirty = reactive(dirty);
     let rCheckDependencies;
@@ -72,23 +72,26 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     }
 
     const recompute = () => {
-        rIsRecomputing.value = true;
+        isRecomputing.value = true;
         resetRootFn();
         clearDependencies();
         recomputeFn(stateProxy, root);
         resetDirty();
         initCheckDependencies();
         initRecomputeWatcher();
-        rIsRecomputing.value = false;
+        isRecomputing.value = false;
 
         markOverlaysDirtyFn(); // Computed trees that depend on this tree need to recompute
     }
 
     const recomputeIfDirty = () => {
-        if (rIsRecomputing.value) return;
+        if (isRecomputing.value) return false;
 
         checkDirtyDependencies();
-        if (dirty.value) recompute();
+        if (dirty.value) {
+            recompute();
+            return true;
+        }
     }
 
     const resetDirty = () => dirty.value = false;
@@ -108,7 +111,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     return {
         recomputeIfDirty,
         markDirty,
-        rIsRecomputing
+        isRecomputingObj: isRecomputing
     }
 }
 
@@ -118,12 +121,11 @@ export class ComputedTree extends ProxyTree {
         let overlayNodeMap = reactive(new OverlayNodeMap(srcTree.nodeMap));
         super(overlayNodeMap);
         this.overlayNodeMap = overlayNodeMap;
-        this.isRecomputing = false;
         this.srcTree = srcTree;
         this.srcTree.addComputedTreeOverlay(this);
         this.initRootId(srcTree.root.id);
 
-        const {recomputeIfDirty, rIsRecomputing, markDirty} =
+        const {recomputeIfDirty, isRecomputingObj, markDirty} =
             useRecompute(
                 state,
                 this.root,
@@ -133,7 +135,7 @@ export class ComputedTree extends ProxyTree {
             );
 
         this.recomputeIfDirty = recomputeIfDirty;
-        this.rIsRecomputing = rIsRecomputing;
+        this._isRecomputingObj = isRecomputingObj;
         this.markDirty = markDirty;
 
         const excludePropFn = useShouldExcludeProperty(this);
@@ -151,11 +153,14 @@ export class ComputedTree extends ProxyTree {
             },
             set: (target, prop, value, receiver) => {
                 const result = Reflect.set(target, prop, value, receiver);
-                if (prop !== 'isRecomputing')
-                    this.markDirty();
+                if (result) this.markDirty();
                 return result;
             }
         });
+    }
+
+    isRecomputing() {
+        return this._isRecomputingObj.value;
     }
 
     createProxyNodeFn(id, parentId) {
