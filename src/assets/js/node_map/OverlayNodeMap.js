@@ -47,6 +47,9 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     let copy;
     const rNodeChanges = computed(() => nodeChanges.get(rId.value) ?? {});
 
+    // TODO future optimisation: when the srcNode originates from another computed layer,
+    // instead of copying the entire node again we can simply get the changes from the previous layer and apply them recursively.
+    // E.g. via function getTotalChanges() or something. Then we only have to copy once and then use that copy
     const rCopy = computed(() => {
 
         const srcNode = rSrcNode.value;
