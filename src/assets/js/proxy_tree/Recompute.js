@@ -36,20 +36,25 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     let isRecomputing = {value: false};
     let dirty = {value: true};
     let reactiveDirty = reactive(dirty);
-    let rCheckDependencies;
+    let checkDependenciesForDirty;
     let recomputeWatcher;
 
     const checkDep = (d) => Reflect.get(d.target, d.prop, d.receiver)
 
     const initCheckDependencies = () => {
-        let initial = true;
-        rCheckDependencies = computed(() => {
-            dependencies.forEach(d => checkDep(d));
-            if (initial) initial = false;
-            else dirty.value = true;
-        });
 
-        rCheckDependencies.value;
+        if (dependencies.length) {
+            let initial = true;
+            let rCheckDependencies = computed(() => {
+                dependencies.forEach(d => checkDep(d));
+                if (initial) initial = false;
+                else dirty.value = true;
+            });
+
+            rCheckDependencies.value;
+
+            checkDependenciesForDirty = () => rCheckDependencies.value;
+        } else checkDependenciesForDirty = () => undefined; // There are no dependencies to check, so we don't create a computed prop
     }
 
     /**
@@ -60,12 +65,6 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     const initRecomputeWatcher = () => {
         if (recomputeWatcher) recomputeWatcher();
         recomputeWatcher = watch(dependencies.map(d => () => checkDep(d)), () => recomputeIfDirty());
-    }
-
-    const checkDirtyDependencies = () => {
-        if (!rCheckDependencies)
-            throw new Error("Can't check for dirty dependencies: not initialised.")
-        rCheckDependencies.value;
     }
 
     const recompute = () => {
@@ -85,7 +84,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     const recomputeIfDirty = () => {
         if (isRecomputing.value) return false;
 
-        checkDirtyDependencies();
+        checkDependenciesForDirty();
         if (dirty.value) {
             recompute();
             return true;
