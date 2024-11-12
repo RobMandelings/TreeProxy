@@ -177,18 +177,25 @@ describe('ComputedTree', () => {
 
 describe('Computed tree state changes', () => {
 
-    let srcTree, compTree;
-    beforeEach(() => {
-        srcTree = createSimpleSourceTree();
-    });
-
     test('state.count change', () => {
 
         const srcTree = createSimpleSourceTree();
         const rCount = ref(0);
-        const compTree = new ComputedTree(srcTree, {count: rCount}, (state, root) => state.count);
+        const compTree = new ComputedTree(srcTree, {count: rCount}, (state, root) => root.weight = state.count);
+        rCount.value++;
+        expect(compTree.root.weight).toBe(rCount.value);
 
     });
+
+    test('Deep state change', () => {
+        const srcTree = createSimpleSourceTree();
+        const rCount = ref(0);
+        const stateObj = {nested1: {nested2: {count: rCount}}};
+        const compTree = new ComputedTree(srcTree, stateObj, (state, root) => root.weight = state.nested1.nested2.count);
+        rCount.value++;
+        expect(compTree.root.weight).toBe(rCount.value);
+
+    })
 })
 
 describe('Computed tree behaviour on src change', () => {

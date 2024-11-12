@@ -18,7 +18,6 @@ export class CustomNode extends CoreNode {
     }
 
     copy() {
-        console.log("Copy constructor");
         return new CustomNode(this.name, this.weight, this.childrenIds);
     }
 
