@@ -93,24 +93,21 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     }
 
     const resetDirty = () => {
-        console.log("Resetting dirty");
         dirty.value = false;
     }
     const markDirty = () => {
-
-        console.log("Hallo");
-        dirty.value = true;
+        reactiveDirty.value = true;
     }
 
     // If dirty was marked explicitly, this watch should take care of updates
-    // If the recompute did not happen via access.
+    // Recomputation also happens on access, but in case that didn't happen we still want the recompute to happen.
     watch(reactiveDirty, (dirty) => {
         if (!dirty.value) return;
         recomputeIfDirty()
     });
 
     initCheckDependencies(); // Initial dependency tracking enabled
-    recomputeIfDirty();
+    recomputeIfDirty(); // Initial recompute. Also sets up the watchers that track any changes to the dependencies
 
     return {
         recomputeIfDirty,

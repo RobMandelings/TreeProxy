@@ -29,9 +29,12 @@ function getChangesToApply(prevChanges, curChanges, srcNode) {
 
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
+    let prevChanges = {};
     let srcNodeChanged = false;
+    let initial = true;
     const rSrcNode = computed(() => {
-        srcNodeChanged = true;
+        if (initial) initial = false;
+        else srcNodeChanged = true;
         const srcNode = srcNodeMap.getNode(rId.value);
 
         // This one is essential to make the computed prop reactive on deep changes
@@ -41,24 +44,24 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
         return srcNode;
     });
 
-    let count = 0;
     let copy;
-
-    let prevChanges = {};
     const rNodeChanges = computed(() => nodeChanges.get(rId.value) ?? {});
 
     const rCopy = computed(() => {
 
         const srcNode = rSrcNode.value;
         const curChanges = rNodeChanges.value;
-        let changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
-        if (srcNodeChanged && !isEmpty(changesToApply)) { // In this case we need to create a new copy and apply all changes again
+        let changesToApply;
+        if (srcNodeChanged || (!copy && Object.keys(curChanges).length)) { // In this case we need to create a new copy and apply all changes again
             copy = reactive(srcNode.copy());
+            changesToApply = curChanges; // Don't use prevChanges as it is a new copy
             srcNodeChanged = false;
+        } else {
+            // Compute the changes that should be applied based on current and prev changes.
+            changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
         }
 
-        // The copy is reactive, and we don't want to trigger unnecessary recomputations here (or circular dependencies)
-        if (Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
+        if (copy && Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
         prevChanges = {...curChanges};
 
         return copy;
@@ -165,6 +168,7 @@ export class OverlayNodeMap extends NodeMap {
     }
 
     clearAllChanges() {
+
         this.nodeChanges.clear();
         this.addedNodes.clear();
         this.deletedNodeIds.clear();

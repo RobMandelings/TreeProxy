@@ -53,7 +53,7 @@ export class ComputedTree extends ProxyTree {
         return this._isDirtyObj.value;
     }
 
-    isRecomputing() {
+    get isRecomputing() {
         return this._isRecomputingObj.value;
     }
 
