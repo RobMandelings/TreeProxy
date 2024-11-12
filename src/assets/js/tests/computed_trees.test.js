@@ -273,12 +273,40 @@ test('Layers: previous layer remains unchanged', () => {
     expect(layer3.markedForRecompute).toBe(true);
     expect(recomputeFnAll).toBeCalledTimes(3); // Not recomputed yet
     checkLayerNameConsistency(); // Layer 0 has changed, all other layers should be recomputed.
-    expect(recomputeFnAll).toBeCalledTimes(6); // All layers have been accessed
+    expect(recomputeFnAll).toBeCalledTimes(6); // All layers have been accessed and therefore recomputed
     expect(layer1.markedForRecompute).toBe(false);
     expect(layer2.markedForRecompute).toBe(false);
     expect(layer3.markedForRecompute).toBe(false);
 
     layer0.root.weight = 15;
     expect(layer3.root.weight).toBe(layer0.root.weight); // The update propagates through all layers
+
+});
+
+test('Branching layers', () => {
+
+    const recomputeFnAll = jest.fn();
+    const layer0 = createSimpleSourceTree("layer0");
+    layer0.root.weight = 0;
+
+    const createRecompute = (recomputeFn) => {
+        return (state, root) => {
+            recomputeFn(state, root)
+            recomputeFnAll();
+        }
+    }
+
+    const add10 = createRecompute((_, root) => root.weight += 10);
+    const double = createRecompute((_, root) => root.weight *= 2);
+
+    const layer1 = new ComputedTree(layer0, {}, add10);
+    const layer2_0 = new ComputedTree(layer1, {}, double);
+    const layer_2_1 = new ComputedTree(layer1, {}, add10);
+    const layer_3_1 = new ComputedTree(layer_2_1, {}, double);
+
+    expect(layer1.root.weight).toBe(10);
+    expect(layer2_0.root.weight).toBe(20);
+    expect(layer_2_1.root.weight).toBe(20);
+    expect(layer_3_1.root.weight).toBe(40);
 
 });
