@@ -187,14 +187,42 @@ describe('Computed tree state changes', () => {
 
     });
 
-    test('Deep state change', () => {
-        const srcTree = createSimpleSourceTree();
-        const rCount = ref(0);
-        const stateObj = {nested1: {nested2: {count: rCount}}};
-        const compTree = new ComputedTree(srcTree, stateObj, (state, root) => root.weight = state.nested1.nested2.count);
-        rCount.value++;
-        expect(compTree.root.weight).toBe(rCount.value);
+    describe('Deep state changes', () => {
+        test('Deep count change', () => {
+            const srcTree = createSimpleSourceTree();
+            const rCount = ref(0);
+            const stateObj = {nested1: {nested2: {count: rCount}}};
+            const compTree = new ComputedTree(srcTree, stateObj, (state, root) => root.weight = state.nested1.nested2.count);
+            rCount.value++;
+            expect(compTree.root.weight).toBe(rCount.value);
+        });
+    })
 
+    test('Conditional', () => {
+
+        const rCount = ref(0);
+        const rSyncWeight = ref(false);
+        const stateObj = {count: rCount, syncWeight: rSyncWeight};
+
+        const srcTree = createSimpleSourceTree();
+        const recomputeSpy = jest.fn();
+        const compTree = new ComputedTree(srcTree, stateObj, (state, root) => {
+            if (state.syncWeight) root.name = `${state.count}`;
+            recomputeSpy();
+        });
+        expect(compTree.root.name).toBe(srcTree.root.name);
+        recomputeSpy.mockClear();
+        rCount.value++;
+        expect(compTree.root.name).toBe(srcTree.root.name);
+        expect(recomputeSpy).toBeCalledTimes(0); // Since syncWeight is false, state.count was not accessed during recomputed
+        rSyncWeight.value = true;
+        expect(compTree.root.name).not.toBe(srcTree.root.name);
+        expect(compTree.root.name).toBe(`${rCount.value}`);
+        expect(recomputeSpy).toBeCalledTimes(1);
+        recomputeSpy.mockClear();
+        rCount.value++;
+        expect(compTree.root.name).toBe(`${rCount.value}`);
+        expect(recomputeSpy).toBeCalledTimes(1);
     })
 })
 
