@@ -165,13 +165,28 @@ describe('ComputedTree', () => {
 
 describe('Computed tree behaviour on src change', () => {
 
-    test('Source tree update should not trigger a new copy', () => {
+    test('Source tree name change', () => {
         const srcTree = createSimpleSourceTree();
         const {compTree, computeFn} = createEmptyCompTree(srcTree);
 
         srcTree.root.name = "Changed";
         expect(compTree.root.name).toBe("Changed");
         expect(computeFn).toBeCalledTimes(2);
-        expect(copySpy).toBeCalledTimes(0);
+        expect(copySpy).toBeCalledTimes(0); // A name change in src should not trigger a copy, as the computed tree does not alter it.
     });
+
+    test('Source tree name change. nextTick should trigger recompute', async () => {
+        const srcTree = createSimpleSourceTree();
+        const {compTree, computeFn} = createEmptyCompTree(srcTree);
+        srcTree.root.name = "Changed";
+        expect(computeFn).toBeCalledTimes(1);
+        await nextTick();
+        expect(computeFn).toBeCalledTimes(2);
+
+        /*
+        This is required because vue might not reflect the changes in the computed tree. The computed tree
+        immediately gets marked as dirty, but if srcTree.root.name isn't accessed explicitly afterwards, then it will not be re-evaluated.
+        This leads to the computed version of the node to also not be re-evaluated.
+         */
+    })
 });
