@@ -2,6 +2,7 @@ import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 import {CustomNode} from "../CustomNode.js";
 import {createTree} from "./TreeUtil.js";
+import {nextTick, ref} from "vue";
 
 function createRecomputeSpy(instance) {
     const originalMethod = instance.recomputeIfDirty;
@@ -15,6 +16,7 @@ function createRecomputeSpy(instance) {
 
     return recomputeSpy;
 }
+
 
 describe('ComputedTree', () => {
     let srcTree, compTree;
@@ -37,18 +39,41 @@ describe('ComputedTree', () => {
 
         describe('ComputedTree core: no adjustments', () => {
 
+            let rCount;
             let recomputeSpy;
+            const initialCount = 0;
+            const resetCount = () => rCount.value = initialCount;
+
             beforeEach(() => {
-                compTree = new ComputedTree(srcTree, (_, __) => undefined);
+                rCount = ref(initialCount);
+                compTree = new ComputedTree(srcTree, {count: rCount}, (state, __) => state.count);
                 recomputeSpy = createRecomputeSpy(compTree);
                 expect(srcTree.computedTreeOverlays.length).not.toBeFalsy();
             });
 
-            test('First access', () => {
+            afterEach(() => resetCount());
+
+            test("Hello", async () => {
                 expect(recomputeSpy).toBeCalledTimes(0);
-                const r = compTree.root;
+                rCount.value++; // Make the recompute dirty
+                compTree.root;
+                // await nextTick();
                 expect(recomputeSpy).toBeCalledTimes(1);
             });
+
+            const testRecomputeBehavior = (description, action) => {
+
+            };
+
+            testRecomputeBehavior(
+                'should recompute on accessing root',
+                () => Promise.resolve(compTree.root)
+            );
+
+            // testRecomputeBehavior(
+            //     'should recompute after nextTick',
+            //     () => nextTick()
+            // );
 
             test('Change to src tree', () => {
                 srcTree.root.name = "Changed1";

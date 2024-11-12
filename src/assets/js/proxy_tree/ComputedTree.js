@@ -72,6 +72,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     }
 
     const recompute = () => {
+        console.log("Recompute")
         isRecomputing.value = true;
         resetRootFn();
         clearDependencies();
@@ -115,6 +116,9 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     }
 }
 
+const excludedPropsCompTree = new Set(["_root", "isRecomputing", "markDirty", "recomputeIfDirty"]);
+const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);
+
 export class ComputedTree extends ProxyTree {
 
     constructor(srcTree, state, recomputeFn) {
@@ -145,15 +149,16 @@ export class ComputedTree extends ProxyTree {
             get: (target, prop, receiver) => {
                 excludePropFn(prop);
 
-                if (prop !== 'isRecomputing' && prop !== "_root") {
-                    this.recomputeIfDirty();
+                if (checkDirtyForProp(prop)) {
+                    if (prop !== 'isRecomputing' && prop !== "_root" && prop !== 'recomputeIfDirty') {
+                        this.recomputeIfDirty();
+                    }
                 }
-
                 return Reflect.get(target, prop, receiver);
             },
             set: (target, prop, value, receiver) => {
                 const result = Reflect.set(target, prop, value, receiver);
-                if (result) this.markDirty();
+                if (checkDirtyForProp(prop) && result) this.markDirty();
                 return result;
             }
         });
