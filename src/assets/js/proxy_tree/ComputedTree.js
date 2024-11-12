@@ -97,7 +97,7 @@ function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn
     }
 
     // If dirty was marked explicitly, this watch should take care of updates
-    // If the recompute did not happen
+    // If the recompute did not happen via access.
     watch(reactiveDirty, (dirty) => {
         if (!dirty.value) return;
         recomputeIfDirty()
