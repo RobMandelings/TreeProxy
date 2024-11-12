@@ -83,37 +83,29 @@ describe("Deep watch", () => {
         let compTree;
         const rCount = ref(0);
         beforeEach(() => {
-            // const computeFn = (state, root) => {
-            //     root.name = `${state.count}`;
-            // };
-            // compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
-            // watch(compTree.root, (vN, vO) => rootWatchTrigger());
+            const computeFn = (state, root) => {
+
+            };
+            compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
+            watch(compTree.root, (vN, vO) => rootWatchTrigger());
         });
 
         test('Single change', async () => {
-
-            const computeFn = (state, root) => {
-                // root.name = `${state.count}`;
-            };
-            compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
             compTree.root.name = "Changed";
             expect(compTree.root.name).toBe("Changed")
             await nextTick();
             // expect(rootWatchTrigger).toBeCalledTimes(1);
         });
 
-        // test('Many changes', async () => {
-        //     expect(rootWatchTrigger).toHaveBeenCalledTimes(0);
-        //     const nrChanges = 5;
-        //     for (let i = 0; i < nrChanges; i++) {
-        //         compTree.root.name = `${i}`;
-        //         await nextTick();
-        //     }
-        //     expect(compTree.root.name).toBe(`${nrChanges - 1}`);
-        //     expect(rootWatchTrigger).toHaveBeenCalledTimes(nrChanges);
-        // });
-
-        xtest('TODO: way too many calls happen for recomputation ' +
-            '(I think its the beforeGetHandler or the proxy tree that receives so many calls)', () => expect(true).toBe(false));
+        test('Many changes', async () => {
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(0);
+            const nrChanges = 5;
+            for (let i = 0; i < nrChanges; i++) {
+                compTree.root.name = `${i}`;
+                await nextTick();
+            }
+            expect(compTree.root.name).toBe(`${nrChanges - 1}`);
+            expect(rootWatchTrigger).toHaveBeenCalledTimes(nrChanges);
+        });
     })
 })
