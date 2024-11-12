@@ -4,6 +4,16 @@ import {CustomNode} from "../CustomNode.js";
 import {createTree} from "./TreeUtil.js";
 import {nextTick, ref} from "vue";
 
+const createEmptyCompTree = (srcTree) => {
+    const computeFn = jest.fn((_, __) => undefined);
+    const compTree = new ComputedTree(srcTree, {}, computeFn);
+    return {compTree, computeFn};
+}
+
+let copySpy = jest.spyOn(CustomNode.prototype, 'copy');
+beforeEach(() => {
+    jest.clearAllMocks();
+})
 
 describe('ComputedTree', () => {
     let srcTree, compTree;
@@ -12,13 +22,7 @@ describe('ComputedTree', () => {
     const change1 = "Changed";
     const change2 = "Changed2";
 
-    let copySpy;
     let recomputeFn;
-    beforeEach(() => {
-        jest.clearAllMocks();
-        jest.restoreAllMocks();
-        copySpy = jest.spyOn(CustomNode.prototype, 'copy');
-    })
 
     describe('Simple tree', () => {
         beforeEach(() => {
@@ -154,5 +158,20 @@ describe('ComputedTree', () => {
             expect(ovNode.parent.id).toBe(srcNode.parent.id);
             expect(copySpy).toBeCalledTimes(1);
         });
+    });
+})
+
+describe('Computed tree behaviour on src change', () => {
+
+    let srcTree, compTree, computeFn;
+    beforeEach(() => {
+        srcTree = new SourceTree().init({name: "Root"});
+        ({compTree, computeFn} = createEmptyCompTree(srcTree));
+    });
+
+    test('Source tree update should not trigger a new copy', () => {
+        srcTree.root.name = "Changed";
+        expect(compTree.root.name).toBe("Changed");
+        expect(copySpy).toBeCalledTimes(0);
     });
 })
