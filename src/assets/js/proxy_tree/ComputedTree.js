@@ -148,12 +148,7 @@ export class ComputedTree extends ProxyTree {
 
             get: (target, prop, receiver) => {
                 excludePropFn(prop);
-
-                if (checkDirtyForProp(prop)) {
-                    if (prop !== 'isRecomputing' && prop !== "_root" && prop !== 'recomputeIfDirty') {
-                        this.recomputeIfDirty();
-                    }
-                }
+                if (checkDirtyForProp(prop)) this.recomputeIfDirty();
                 return Reflect.get(target, prop, receiver);
             },
             set: (target, prop, value, receiver) => {
