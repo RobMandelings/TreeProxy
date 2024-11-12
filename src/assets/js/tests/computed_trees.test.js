@@ -4,6 +4,18 @@ import {CustomNode} from "../CustomNode.js";
 import {createTree} from "./TreeUtil.js";
 import {nextTick, ref} from "vue";
 
+jest.mock("../proxy_tree/Recompute.js", () => ({
+    useRecompute: jest.fn((...args) => {
+        const original = jest.requireActual('../proxy_tree/Recompute.js').useRecompute;
+        const res = original(...args);
+        const recomputeIfDirty = jest.fn(res.recomputeIfDirty);
+        return {
+            ...res,
+            recomputeIfDirty
+        }
+    })
+}))
+
 function createRecomputeSpy(instance) {
     const originalMethod = instance.recomputeIfDirty;
 
@@ -40,25 +52,22 @@ describe('ComputedTree', () => {
         describe('ComputedTree core: no adjustments', () => {
 
             let rCount;
-            let recomputeSpy;
             const initialCount = 0;
             const resetCount = () => rCount.value = initialCount;
 
             beforeEach(() => {
                 rCount = ref(initialCount);
                 compTree = new ComputedTree(srcTree, {count: rCount}, (state, __) => state.count);
-                recomputeSpy = createRecomputeSpy(compTree);
                 expect(srcTree.computedTreeOverlays.length).not.toBeFalsy();
             });
 
             afterEach(() => resetCount());
 
             test("Hello", async () => {
-                expect(recomputeSpy).toBeCalledTimes(0);
+                expect(compTree.recomputeIfDirty).toBeCalledTimes(0);
                 rCount.value++; // Make the recompute dirty
-                compTree.root;
-                // await nextTick();
-                expect(recomputeSpy).toBeCalledTimes(1);
+                await nextTick();
+                expect(compTree.recomputeIfDirty).toBeCalledTimes(1);
             });
 
             const testRecomputeBehavior = (description, action) => {
