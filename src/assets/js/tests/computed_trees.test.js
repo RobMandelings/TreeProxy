@@ -55,7 +55,15 @@ describe('ComputedTree', () => {
                 expect(recomputeFn).toBeCalledTimes(1);
             });
 
-            test('Recompute automatically', async () => {
+            /*
+            To make sure that even without explicit access on the node that triggers recomputation,
+            the recomputation is will always be performed at the nextTick.
+            This is because reactivity is handled slightly differently in computed trees, and vue does not know what
+            properties are
+             */
+            test('Recompute on next tick', async () => {
+
+                expect(recomputeFn).toBeCalledTimes(0)
                 rCount.value++;
                 expect(recomputeFn).toBeCalledTimes(0);
                 await nextTick();
@@ -163,6 +171,22 @@ describe('ComputedTree', () => {
     });
 })
 
+describe('Computed tree state changes', () => {
+
+    let srcTree, compTree;
+    beforeEach(() => {
+        srcTree = createSimpleSourceTree();
+    });
+
+    test('state.count change', () => {
+
+        const srcTree = createSimpleSourceTree();
+        const rCount = ref(0);
+        const compTree = new ComputedTree(srcTree, {count: rCount}, (state, root) => state.count);
+
+    });
+})
+
 describe('Computed tree behaviour on src change', () => {
 
     test('Source tree name change', () => {
@@ -187,6 +211,8 @@ describe('Computed tree behaviour on src change', () => {
         This is required because vue might not reflect the changes in the computed tree. The computed tree
         immediately gets marked as dirty, but if srcTree.root.name isn't accessed explicitly afterwards, then it will not be re-evaluated.
         This leads to the computed version of the node to also not be re-evaluated.
+
+        See what happens when markDirty is called in Recompute.js
          */
-    })
+    });
 });

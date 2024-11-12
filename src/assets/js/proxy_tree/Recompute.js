@@ -58,9 +58,17 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     }
 
     /**
-     * If dependency changes but there is no explicit call to one of the nodes, recomputeIfDirty is not called
-     * This watcher will perform a single call if any of the dependencies have changed to see whether a
-     * recomputation should happen
+     * If dependency changes but there is no explicit call to one of the nodes, recomputeIfDirty is not called.
+     * This is because reactivity works differently in the recomputed tree. Suppose compTree.root.name is shown
+     * on the page. Then having a changed dependency will make sure that checkDependenciesForDirty() will re-evaluate
+     * and set the dirty flag. However, vue has no way of knowing that compTree.root.name depends on it, so it will not refresh.
+     * Therefore recomputeIfDirty will not be called.
+     *
+     * Making an explicit call e.g. compTree.root.name will trigger recomputeIfDirty earlier, because we always want the tree
+     * to reflect the latest update. In this case we don't need the watcher to recompute the tree.
+     *
+     * This watcher will perform a single call if any of the dependencies have changed to recompute the tree.
+     *
      */
     const initRecomputeWatcher = () => {
         if (recomputeWatcher) recomputeWatcher();
@@ -107,7 +115,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     });
 
     initCheckDependencies(); // Initial dependency tracking enabled
-    recomputeIfDirty();
+    recomputeIfDirty(); // Initial computation. Helps with tracking updates as well.
 
     return {
         recomputeIfDirty,
