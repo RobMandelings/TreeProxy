@@ -244,10 +244,20 @@ test('Shorthand name concatenation using src root', () => {
 test('Layers: previous layer remains unchanged', () => {
 
     const getLayerName = (root, layer) => `layer${layer}-${root.name}`;
+    const recomputeFnAll = jest.fn();
     const layer0 = createSimpleSourceTree("layer0");
-    const layer1 = new ComputedTree(layer0, {}, (_, root) => root.name = getLayerName(root, 1));
-    const layer2 = new ComputedTree(layer1, {}, (_, root) => root.name = getLayerName(root, 2));
-    const layer3 = new ComputedTree(layer2, {}, (_, root) => root.name = getLayerName(root, 3));
+    const layer1 = new ComputedTree(layer0, {}, (_, root) => {
+        root.name = getLayerName(root, 1);
+        recomputeFnAll();
+    });
+    const layer2 = new ComputedTree(layer1, {}, (_, root) => {
+        root.name = getLayerName(root, 2)
+        recomputeFnAll();
+    });
+    const layer3 = new ComputedTree(layer2, {}, (_, root) => {
+        root.name = getLayerName(root, 3)
+        recomputeFnAll();
+    });
 
     const checkLayerNameConsistency = () => {
         expect(layer3.root.name).toBe(getLayerName(layer2.root, 3));
@@ -256,11 +266,14 @@ test('Layers: previous layer remains unchanged', () => {
     }
 
     checkLayerNameConsistency();
+    expect(recomputeFnAll).toBeCalledTimes(3);
     layer0.root.name = "Changed";
     expect(layer1.markedForRecompute).toBe(true);
     expect(layer2.markedForRecompute).toBe(true);
     expect(layer3.markedForRecompute).toBe(true);
+    expect(recomputeFnAll).toBeCalledTimes(3); // Not recomputed yet
     checkLayerNameConsistency(); // Layer 0 has changed, all other layers should be recomputed.
+    expect(recomputeFnAll).toBeCalledTimes(6); // All layers have been accessed
     expect(layer1.markedForRecompute).toBe(false);
     expect(layer2.markedForRecompute).toBe(false);
     expect(layer3.markedForRecompute).toBe(false);
