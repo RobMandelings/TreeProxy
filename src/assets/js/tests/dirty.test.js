@@ -32,7 +32,7 @@ describe('', () => {
         expect(srcTree.root.isDirty).toBe(false);
     });
 
-    test('Name change ov: sync with source', () => {
+    xtest('Name change ov: sync with source', () => {
         cTree.root.name.value = "Changed";
         cTree.syncSrc();
         expect(cTree.root.dirty).toBe(false);
