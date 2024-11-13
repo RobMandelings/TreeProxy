@@ -13,6 +13,18 @@ export class ProxyTree extends NodeMap {
         this._root = null;
     }
 
+    getPreviousValue(id, prop) {
+        return this.nodeMap.getPreviousValue(id, prop);
+    }
+
+    isDirty(id) {
+        return this.nodeMap.isDirty(id);
+    }
+
+    isPropDirty(id, prop) {
+        return this.nodeMap.isPropDirty(id, prop);
+    }
+
     markOverlaysDirty() {
         this.computedTreeOverlays.forEach(t => t.markDirty());
     }

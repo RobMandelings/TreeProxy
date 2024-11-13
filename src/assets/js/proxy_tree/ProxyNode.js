@@ -37,6 +37,44 @@ function useHeight(children) {
     return {rHeight};
 }
 
+function useDirty(proxyTree, rId) {
+
+    const isDirty = () => proxyTree.isDirty(rId.value);
+    const isPropDirty = (propName) => proxyTree.isPropDirty(rId.value, propName);
+    const changedParent = () => undefined;
+
+    const dirtyPropProxy = new Proxy({}, {
+        get(target, p, receiver) {
+            return isPropDirty(p);
+        },
+        set(target, p, newValue, receiver) {
+            throw new Error("Can't set value");
+        }
+    });
+
+    return {
+        rIsDirty: computed(() => isDirty()),
+        dirtyPropProxy: dirtyPropProxy,
+    }
+}
+
+function usePreviousValue(proxyTree, rId) {
+    const getPrevValue = (prop) => proxyTree.getPreviousValue(rId.value, prop);
+
+    const prevProxy = new Proxy({}, {
+        get(target, p, receiver) {
+            return getPrevValue(p);
+        },
+        set(target, p, newValue, receiver) {
+            throw new Error("Cannot use the set operation on prev");
+        }
+    });
+
+    return {
+        prevProxy: prevProxy,
+    }
+}
+
 function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
     const refProxy = proxyTree.nodeMap.createRefProxy(id);
 
@@ -61,6 +99,8 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
     const {replaceFn} = useReplace(rId, proxyTree);
     const rDepth = computed(() => ancestors.size);
     const {rHeight} = useHeight(children);
+    const {rIsDirty, dirtyPropProxy} = useDirty(proxyTree, rId);
+    const {prevProxy} = usePreviousValue(proxyTree, rId);
 
     const target = reactive({
         refProxy,
@@ -76,6 +116,9 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
         delete: deleteFn,
         depth: rDepth,
         height: rHeight,
+        isDirty: rIsDirty,
+        dirty: dirtyPropProxy,
+        prev: prevProxy,
         toJSON: () => {
             let obj = {
                 id: rId.value,

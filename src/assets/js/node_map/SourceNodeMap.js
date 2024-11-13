@@ -13,7 +13,7 @@ export class SourceNodeMap extends NodeMap {
         return false;
     }
 
-    isDirtyProp(id, prop) {
+    isPropDirty(id, prop) {
         return false;
     }
 
@@ -21,6 +21,12 @@ export class SourceNodeMap extends NodeMap {
         if (!this.getNode(id)) return undefined;
         const n = this.getNode(id);
         return n[prop];
+    }
+
+    getPreviousValue(id, prop) {
+        // Simply return the current value, as the source node map does not have notion of dirtyness.
+        // To encapsulate the complexity we still provide a result, the previous value is in this case just always in sync
+        return this.getPropertyValue(id, prop);
     }
 
     createRefProxy(initialId) {

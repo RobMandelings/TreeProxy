@@ -1,17 +1,8 @@
 import {computed, reactive, watch} from "vue";
 import {useShouldExcludeProperty, wrappedProxyTargetGetter} from "../ProxyUtils.js";
 
-function useDirty(rId, nodeMap) {
-    const rDirty = computed(() => nodeMap.isDirty(rId.value));
-    const isDirtyProp = (prop) => nodeMap.isDirtyProp(rId.value, prop);
-
-    return {rDirty, isDirtyProp};
-}
-
 export function createRefProxy(nodeMap, rId, rNode) {
-
-    const {rDirty, isDirtyProp} = useDirty(rId, nodeMap);
-    const targetObj = reactive({node: rNode, id: rId, dirty: rDirty, isDirtyProp});
+    const targetObj = reactive({node: rNode, id: rId});
 
     const setHandler = (t, prop, value) => {
         nodeMap.set(rId.value, prop, value);

@@ -93,14 +93,18 @@ export class OverlayNodeMap extends NodeMap {
         return this.nodeChanges.has(id);
     }
 
-    isDirtyProp(id, prop) {
+    isPropDirty(id, prop) {
         if (!this.nodeChanges.has(id)) return false;
         return this.nodeChanges.get(id)[prop] !== undefined;
     }
 
     getPropertyValue(id, prop) {
-        if (!this.isDirtyProp(id, prop)) return this.srcNodeMap.getPropertyValue(id, prop);
+        if (!this.isPropDirty(id, prop)) return this.srcNodeMap.getPropertyValue(id, prop);
         return this.nodeChanges.get(id)[prop];
+    }
+
+    getPreviousValue(id, prop) {
+        return this.srcNodeMap.getPropertyValue(id, prop);
     }
 
     createRefProxy(initialId) {
