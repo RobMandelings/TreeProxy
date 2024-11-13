@@ -12,6 +12,10 @@ export class NodeMap {
     constructor() {
     }
 
+    getOverlayType(id) {
+        throw new Error("Abstract method");
+    }
+
     isDirty(id) {
         throw new Error('Abstract method');
     }

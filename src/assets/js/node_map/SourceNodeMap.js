@@ -1,12 +1,17 @@
 import {NodeMap} from "./NodeMap.js";
 import {computed, ref} from "vue";
 import * as RefProxy from "./RefProxy.js"
+import {OverlayType} from "../proxy_tree/OverlayType.js";
 
 export class SourceNodeMap extends NodeMap {
 
     constructor() {
         super();
         this.nodes = new Map();
+    }
+
+    getOverlayType(id) {
+        return OverlayType.SRC;
     }
 
     isDirty(id) {

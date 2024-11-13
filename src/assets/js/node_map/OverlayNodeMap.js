@@ -3,6 +3,7 @@ import {NodeMap} from "./NodeMap.js";
 import {computed, reactive, ref, toRaw, watch, watchSyncEffect} from "vue";
 import * as RefProxy from "./RefProxy.js";
 import {equalKeys, isEmpty} from "../Utils.js";
+import {OverlayType} from "../proxy_tree/OverlayType.js";
 
 function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
@@ -87,6 +88,12 @@ export class OverlayNodeMap extends NodeMap {
 
         this.addedNodes = new Map();
         this.deletedNodeIds = new Set(); // Node ids which are deleted from the src map
+    }
+
+    getOverlayType(id) {
+        if (this.addedNodes.has(id)) return OverlayType.ADDED;
+        else if (id in this.overlayNodes) return OverlayType.OVERWRITTEN;
+        else return OverlayType.SRC;
     }
 
     isDirty(id) {
