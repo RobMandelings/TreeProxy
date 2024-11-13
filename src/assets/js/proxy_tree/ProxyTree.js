@@ -13,6 +13,10 @@ export class ProxyTree extends NodeMap {
         this._root = null;
     }
 
+    getOverlayType(id) {
+        return this.nodeMap.getOverlayType(id);
+    }
+
     getSrcNode(id) {
         throw new Error("Abstract method");
     }
