@@ -37,15 +37,15 @@ function useHeight(children) {
     return {rHeight};
 }
 
-function useDirty(proxyTree, rId) {
+function useDirty(proxyTree, rProxyNode, prevProxy) {
 
-    const isDirty = () => proxyTree.isDirty(rId.value);
-    const isPropDirty = (propName) => proxyTree.isPropDirty(rId.value, propName);
-    const changedParent = () => undefined;
+    const changedParent = () => rProxyNode.value.parent?.id !== prevProxy.parent?.id;
+    const rIsDirty = computed(() => changedParent() || proxyTree.isDirty(rProxyNode.value.id));
 
     const dirtyPropProxy = new Proxy({}, {
         get(target, p, receiver) {
-            return isPropDirty(p);
+            if (p === "parent") return changedParent();
+            return proxyTree.isPropDirty(rProxyNode.value.id, p);
         },
         set(target, p, newValue, receiver) {
             throw new Error("Can't set value");
@@ -53,13 +53,15 @@ function useDirty(proxyTree, rId) {
     });
 
     return {
-        rIsDirty: computed(() => isDirty()),
+        rIsDirty,
         dirtyPropProxy: dirtyPropProxy,
     }
 }
 
 function usePreviousValue(proxyTree, rId) {
 
+    // TODO perhaps we can set the source node as the proxy target as this might help with reactivity.
+    // TODO don't know if this is still efficient thought
     const prevProxy = new Proxy({}, {
         get(target, p, receiver) {
             return proxyTree.getSrcNode(rId.value)[p];
@@ -98,8 +100,8 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
     const {replaceFn} = useReplace(rId, proxyTree);
     const rDepth = computed(() => ancestors.size);
     const {rHeight} = useHeight(children);
-    const {rIsDirty, dirtyPropProxy} = useDirty(proxyTree, rId);
     const {prevProxy} = usePreviousValue(proxyTree, rId);
+    const {rIsDirty, dirtyPropProxy} = useDirty(proxyTree, rProxyNode, prevProxy);
 
     const target = reactive({
         refProxy,
