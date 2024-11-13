@@ -3,12 +3,7 @@ import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 import {CustomNode} from "../CustomNode.js";
 import {createTree} from "./TreeUtil.js";
 import {nextTick, ref} from "vue";
-
-const createEmptyCompTree = (srcTree) => {
-    const computeFn = jest.fn((_, __) => undefined);
-    const compTree = new ComputedTree(srcTree, {}, computeFn);
-    return {compTree, computeFn};
-}
+import {createEmptyCompTree} from "./trees.js";
 
 
 const createSuffixCompTree = (srcTree, concat) => {

@@ -1,6 +1,8 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 import {createTree} from "./TreeUtil.js";
+import {createEmptyCompTree} from "./trees.js";
+import {CustomNode} from "../CustomNode.js";
 
 
 describe('', () => {
@@ -66,4 +68,22 @@ test('Overlay tree: move child', () => {
     expect(cChild2.prev.children.has(cSubChild.id)).toBe(false);
 
     console.log("Testing more stuff");
-})
+});
+
+describe('Add children', () => {
+
+    test('Add single node to root', () => {
+
+        const srcTree = new SourceTree().init(createTree(0));
+        const cTree = createEmptyCompTree(srcTree).compTree;
+        const cRoot = cTree.root;
+        const id = cRoot.children.addNode(new CustomNode("Child", 1), 0);
+        // TODO add to the end by default
+        // TODO add entire tree structure and add an array of nodes / tree structures
+        //  (might be able to reuse some tree creation logic)
+
+        expect(cRoot.children.has(id)).toBe(true);
+        expect(cRoot.prev.children.has(id)).toBe(false);
+    })
+
+});

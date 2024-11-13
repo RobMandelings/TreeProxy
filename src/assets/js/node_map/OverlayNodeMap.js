@@ -103,16 +103,24 @@ export class OverlayNodeMap extends NodeMap {
         return this.nodeChanges.get(id)[prop];
     }
 
-    createRefProxy(initialId) {
-        const rId = ref(initialId);
-        const {rCopy} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
+    createRefProxy(id) {
+        const rId = ref(id);
 
-        const rNode = computed(() => {
-            return rCopy.value
-                ?? this.getNode(rId.value)
-        });
+        let rNode;
 
-        this.overlayNodes[rId.value] = rNode;
+        // We don't need to a copy of the previous layer as the node was added on this layer.
+        // Any adjustments directly apply to the node on this layer
+        if (this.addedNodes.has(id)) rNode = computed(() => this.addedNodes.get(id));
+        else {
+            const {rCopy} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
+
+            rNode = computed(() => {
+                return rCopy.value
+                    ?? this.getNode(rId.value)
+            });
+
+            this.overlayNodes[rId.value] = rNode;
+        }
 
         return RefProxy.createRefProxy(this, rId, rNode);
     }
@@ -138,24 +146,29 @@ export class OverlayNodeMap extends NodeMap {
 
         // TODO we did not yet check for object equalities (only primitives)
         const remove = (this.srcNodeMap.getPropertyValue(nodeId, prop) === val);
-        if (remove) {
-            if (this.nodeChanges.has(nodeId)) {
-                const changes = this.nodeChanges.get(nodeId);
-                if (Object.hasOwn(changes, prop)) {
-                    delete this.nodeChanges.get(nodeId)[prop];
-                    if (Utils.isEmpty(changes))
-                        this.nodeChanges.delete(nodeId);
-                }
-            }
-        } else {
 
-            // Sets the property to a value which will be applied to create new nodes
-            if (!this.nodeChanges.has(nodeId)) {
-                if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
-                    "Node does not exist in the src node map as well as the computed node map.");
-                this.nodeChanges.set(nodeId, {});
+        // If the node was added on this layer, any adjustments to this node simply apply to the node itself
+        if (this.addedNodes.has(nodeId)) this.addedNodes.get(nodeId)[prop] = val;
+        else {
+            if (remove) {
+                if (this.nodeChanges.has(nodeId)) {
+                    const changes = this.nodeChanges.get(nodeId);
+                    if (Object.hasOwn(changes, prop)) {
+                        delete this.nodeChanges.get(nodeId)[prop];
+                        if (Utils.isEmpty(changes))
+                            this.nodeChanges.delete(nodeId);
+                    }
+                }
+            } else {
+
+                // Sets the property to a value which will be applied to create new nodes
+                if (!this.nodeChanges.has(nodeId)) {
+                    if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
+                        "Node does not exist in the src node map as well as the computed node map.");
+                    this.nodeChanges.set(nodeId, {});
+                }
+                this.nodeChanges.get(nodeId)[prop] = val;
             }
-            this.nodeChanges.get(nodeId)[prop] = val;
         }
     }
 
