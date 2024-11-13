@@ -76,6 +76,10 @@ function usePreviousValue(proxyTree, rId) {
     }
 }
 
+function useOverlayType(proxyTree, rId) {
+    return computed(() => proxyTree.getOverlayType(rId.value));
+}
+
 function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
     const refProxy = proxyTree.nodeMap.createRefProxy(id);
 
@@ -102,9 +106,11 @@ function createProxyNode(proxyTree, id, parentId, beforeGetFn) {
     const {rHeight} = useHeight(children);
     const {prevProxy} = usePreviousValue(proxyTree, rId);
     const {rIsDirty, dirtyPropProxy} = useDirty(proxyTree, rProxyNode, prevProxy);
+    const rOverlayType = useOverlayType(proxyTree, rId);
 
     const target = reactive({
         refProxy,
+        overlayType: rOverlayType,
         children,
         ancestors,
         descendants,
