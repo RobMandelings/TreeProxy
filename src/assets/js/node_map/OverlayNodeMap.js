@@ -103,10 +103,6 @@ export class OverlayNodeMap extends NodeMap {
         return this.nodeChanges.get(id)[prop];
     }
 
-    getPreviousValue(id, prop) {
-        return this.srcNodeMap.getPropertyValue(id, prop);
-    }
-
     createRefProxy(initialId) {
         const rId = ref(initialId);
         const {rCopy} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);

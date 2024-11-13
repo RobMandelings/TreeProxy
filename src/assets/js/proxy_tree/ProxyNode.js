@@ -59,11 +59,10 @@ function useDirty(proxyTree, rId) {
 }
 
 function usePreviousValue(proxyTree, rId) {
-    const getPrevValue = (prop) => proxyTree.getPreviousValue(rId.value, prop);
 
     const prevProxy = new Proxy({}, {
         get(target, p, receiver) {
-            return getPrevValue(p);
+            return proxyTree.getSrcNode(rId.value)[p];
         },
         set(target, p, newValue, receiver) {
             throw new Error("Cannot use the set operation on prev");

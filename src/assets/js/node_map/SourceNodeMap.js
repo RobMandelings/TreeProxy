@@ -23,12 +23,6 @@ export class SourceNodeMap extends NodeMap {
         return n[prop];
     }
 
-    getPreviousValue(id, prop) {
-        // Simply return the current value, as the source node map does not have notion of dirtyness.
-        // To encapsulate the complexity we still provide a result, the previous value is in this case just always in sync
-        return this.getPropertyValue(id, prop);
-    }
-
     createRefProxy(initialId) {
         const rId = ref(initialId);
         const rNode = computed(() => this.getNode(rId.value));

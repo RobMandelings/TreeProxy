@@ -24,10 +24,6 @@ export class NodeMap {
         throw new Error("Abstract method");
     }
 
-    getPreviousValue(id, prop) {
-        throw new Error("Abstract method")
-    }
-
     generateId() {
         return crypto.randomUUID();
     }

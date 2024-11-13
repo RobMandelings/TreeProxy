@@ -9,6 +9,10 @@ export class SourceTree extends ProxyTree {
         super(reactive(new SourceNodeMap()));
     }
 
+    getSrcNode(id) {
+        return this.getNode(id) // Simply return the same node as with getNode. This is already the source node, unlike with Computed tree for example.
+    }
+
     createProxyNodeFn(id, parentId) {
         return createSrcProxyNode(this, id, parentId)
     }

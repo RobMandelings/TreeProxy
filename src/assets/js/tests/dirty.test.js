@@ -39,4 +39,8 @@ describe('', () => {
         expect(cTree.root.name.dirty).toBe(false);
         expect(srcTree.root.name.value).toBe("Changed");
     });
+});
+
+test('Dirty parent', () => {
+
 })

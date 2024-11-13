@@ -13,8 +13,8 @@ export class ProxyTree extends NodeMap {
         this._root = null;
     }
 
-    getPreviousValue(id, prop) {
-        return this.nodeMap.getPreviousValue(id, prop);
+    getSrcNode(id) {
+        throw new Error("Abstract method");
     }
 
     isDirty(id) {

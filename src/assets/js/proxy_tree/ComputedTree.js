@@ -50,6 +50,10 @@ export class ComputedTree extends ProxyTree {
         });
     }
 
+    getSrcNode(id) {
+        return this.srcTree.getNode(id);
+    }
+
     get markedForRecompute() {
         return this._isDirtyObj.value;
     }
