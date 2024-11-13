@@ -1,4 +1,5 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
+import {createTree} from "./TreeUtil.js";
 
 describe("Parent relation test", () => {
 
@@ -39,3 +40,20 @@ describe("Parent relation test", () => {
         expect(child2.children.size).toBe(1);
     });
 })
+
+test('Move parent 2', () => {
+
+    const srcTree = new SourceTree().init(createTree([2, 0]));
+    const child1 = srcTree.root.children[0];
+    const child2 = srcTree.root.children[1];
+    const subChild1 = child1.children[0];
+
+    expect(child1.children.size).toBe(2);
+    expect(child2.children.size).toBe(0);
+    expect(child1.children.has(subChild1.id)).toBe(true);
+    subChild1.setParent(child2.id);
+    expect(child1.children.size).toBe(1);
+    expect(child2.children.size).toBe(1);
+    expect(child1.children.has(subChild1.id)).toBe(false);
+    expect(child2.children.has(subChild1.id)).toBe(true);
+});
