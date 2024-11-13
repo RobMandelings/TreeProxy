@@ -41,7 +41,7 @@ describe('Delayed child computation', () => {
             name: "Root",
             children: [{name: "Child1"}, {name: "Child2", children: [{name: "Subchild1"}]}, {name: "Child3"}]
         });
-        expect(spy).toHaveBeenCalledTimes(0);
+        spy.mockClear();
     });
 
     afterEach(() => {
@@ -53,7 +53,6 @@ describe('Delayed child computation', () => {
         watch(srcTree.root, () => undefined);
         const callCount = spy.mock.calls.length;
         spy.mockRestore();
-        // expect(callCount).toBe();
     });
 })
 

@@ -37,7 +37,18 @@ export class ProxyTree extends NodeMap {
         if (this._root) this._root.delete();
         const rootId = this.addTree(tree);
         this.initRootId(rootId);
+        this.initProxyNodes();
         return this;
+    }
+
+    /**
+     * Initialises the map of proxy nodes such that they are loaded eagerly
+     * Takes up more memory usage and increases initial loading times, but better for reactivity.
+     * TODO test performance on large tree structures.
+     */
+    initProxyNodes() {
+        // All proxy nodes will be initialised by simply retrieving the descendants of the root
+        this.root.descendants.asArray;
     }
 
     initRootId(rootId) {
@@ -133,8 +144,9 @@ export class ProxyTree extends NodeMap {
         if (!node) throw new Error("Can't move node to parent: node does not exist");
         if (!parent) throw new Error("Can't move node to parent: parent does not exist");
 
-        node.parent.childrenIds = parent.childrenIds.filter(cId => cId !== node.id);
-        parent.childrenIds.push(nodeId);
-
+        node.parent.childrenIds = node.parent.childrenIds.filter(cId => cId !== node.id);
+        parent.childrenIds = [...parent.childrenIds, nodeId];
+        // TODO make childrenIds only accessible internally (proxy tree)
+        // TODO don't allow methods to be executed upon childrenIds, these do not work well with computed trees.
     }
 }

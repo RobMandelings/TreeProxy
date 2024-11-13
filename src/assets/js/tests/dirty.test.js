@@ -41,6 +41,29 @@ describe('', () => {
     });
 });
 
-test('Dirty parent', () => {
+test('Overlay tree: move child', () => {
 
+    const srcTree = new SourceTree().init(createTree([1, 0]));
+    const compTree = new ComputedTree(srcTree, {}, (_, __) => undefined);
+    const srcRoot = srcTree.root;
+    const compRoot = compTree.root;
+
+    const cChild1 = compRoot.children[0];
+    const cChild2 = compRoot.children[1];
+    const cSubChild = cChild1.children[0];
+
+    expect(cSubChild.parent.id).toBe(cChild1.id);
+    cSubChild.setParent(cChild2.id);
+
+    expect(cSubChild.parent.id).toBe(cChild2.id);
+    expect(cSubChild.prev.parent.id).toBe(cChild1.id);
+    expect(cSubChild.dirty.parent).toBe(true);
+    expect(cChild1.dirty.childrenIds).toBe(true);
+    expect(cChild2.dirty.childrenIds).toBe(true);
+    expect(cChild1.children.has(cSubChild.id)).toBe(false);
+    expect(cChild1.prev.children.has(cSubChild.id)).toBe(true);
+    expect(cChild2.children.has(cSubChild.id)).toBe(true);
+    expect(cChild2.prev.children.has(cSubChild.id)).toBe(false);
+
+    console.log("Testing more stuff");
 })
