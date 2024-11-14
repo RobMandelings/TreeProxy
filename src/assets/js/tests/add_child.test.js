@@ -4,8 +4,8 @@
 
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {createTree} from "./TreeUtil.js";
-import {CustomNode} from "@pt/CustomNode.js";
 import {createSourceTree} from "../BasicSrcTree.js";
+import {CustomNode} from "@/CustomNode.js";
 
 test('No children', () => {
     const srcTree = createSourceTree(createTree(0));

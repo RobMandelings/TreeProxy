@@ -1,24 +1,12 @@
-import {isValidUUID} from "./proxy_utils/Utils.js";
+import {isValidUUID} from "@pt/proxy_utils/Utils.js";
 
-class CoreNode {
-    constructor(name) {
-        this.name = name;
-    }
-}
-
-export class CustomNode extends CoreNode {
-    constructor(name, weight = 0, childrenIds = []) {
-        super(name);
-        this.weight = weight;
+export class CoreNode {
+    constructor(childrenIds = []) {
         this.childrenIds = childrenIds ?? [];
     }
 
-    get hi() {
-
-    }
-
     copy() {
-        return new CustomNode(this.name, this.weight, this.childrenIds);
+        throw new Error("Abstract method");
     }
 
     static isValidID(id) {
