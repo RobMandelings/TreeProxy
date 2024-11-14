@@ -1,7 +1,6 @@
-import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {isReactive, nextTick, ref, watch} from "vue";
-import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 import {createSourceTree} from "../BasicSrcTree.js";
+import {ComputedTree} from "@pt/ComputedTree.js";
 
 describe('Reactivity checks', () => {
 

@@ -1,7 +1,6 @@
 import {ProxyTree} from "@pt/ProxyTree.js";
 import {OverlayNodeMap} from "@pt/node_map/OverlayNodeMap.js";
 import {reactive} from "vue";
-import {createComputedProxyNode} from "@pt/ProxyNode.js";
 import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
 import {useRecompute} from "@pt/Recompute.js";
 
@@ -10,9 +9,9 @@ const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);
 
 export class ComputedTree extends ProxyTree {
 
-    constructor(srcTree, state, recomputeFn) {
+    constructor(srcTree, state, recomputeFn, proxyNodeFactory = null) {
         let overlayNodeMap = reactive(new OverlayNodeMap(srcTree.nodeMap));
-        super(overlayNodeMap);
+        super(overlayNodeMap, proxyNodeFactory);
         this.overlayNodeMap = overlayNodeMap;
         this.srcTree = srcTree;
         this.srcTree.addComputedTreeOverlay(this);
@@ -63,7 +62,7 @@ export class ComputedTree extends ProxyTree {
     }
 
     createProxyNodeFn(id, parentId) {
-        return createComputedProxyNode(this, id, parentId);
+        return this.proxyNodeFactory.createComputedProxyNode(this, id, parentId);
     }
 
     getOverwrittenNodes() {

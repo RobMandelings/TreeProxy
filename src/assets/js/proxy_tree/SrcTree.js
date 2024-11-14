@@ -1,12 +1,11 @@
 import {ProxyTree} from "@pt/ProxyTree.js";
 import {reactive} from "vue";
 import {SourceNodeMap} from "@pt/node_map/SourceNodeMap.js";
-import {createSrcProxyNode} from "@pt/ProxyNode.js";
 
 export class SourceTree extends ProxyTree {
 
-    constructor() {
-        super(reactive(new SourceNodeMap()));
+    constructor(proxyNodeFactory) {
+        super(reactive(new SourceNodeMap()), proxyNodeFactory);
     }
 
     getSrcNode(id) {
@@ -14,6 +13,6 @@ export class SourceTree extends ProxyTree {
     }
 
     createProxyNodeFn(id, parentId) {
-        return createSrcProxyNode(this, id, parentId)
+        return this.proxyNodeFactory.createSrcProxyNode(this, id, parentId)
     }
 }
