@@ -96,7 +96,12 @@ export class ProxyTree extends NodeMap {
         // Apparently splice with -1 index
         // does not insert at the last position, we have to use array.length.
         if (index === -1) index = parent.childrenIds.length;
-        parent.childrenIds.splice(index, 0, id);
+        // Create a new array using assignment instead of splice
+        parent.childrenIds = [
+            ...parent.childrenIds.slice(0, index),
+            id,
+            ...parent.childrenIds.slice(index)
+        ];
         return id;
     }
 
