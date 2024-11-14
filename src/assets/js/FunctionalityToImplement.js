@@ -158,9 +158,35 @@ class Vakonderdeel {
         return this.hasNonInvisibleParent();
     }
 
+    sortTests() {
+        // this.children.forEach(test => console.assert(!!test.date || test.isTemporary()));
+        super.children = this.children.sort((child1, child2) => {
+
+            let startDate1, startDate2, endDate1, endDate2;
+            if (child1 instanceof TestAggregationCount) {
+                startDate1 = child1.startDate;
+                endDate1 = child1.endDate;
+            } else startDate1 = endDate1 = child1.date;
+
+            if (child2 instanceof TestAggregationCount) {
+                startDate2 = child2.startDate;
+                endDate2 = child2.endDate;
+            } else startDate2 = endDate2 = child2.date;
+
+            if (startDate2 > endDate1) return -1;
+            else if (startDate1 > endDate2) return 1;
+            else return 0;
+        });
+    }
+
 }
 
 class Lesgroep {
+
+    hasCells() {
+        return Object.values(this.users).length > 0;
+    }
+
     checkUsersConstraints(users) {
         console.assert(users instanceof Object);
     }

@@ -176,7 +176,7 @@ export function createSrcProxyNode(srcProxyTree, id, parentId) {
 
 export function createComputedProxyNode(computedProxyTree, id, parentId) {
     const beforeGetFn = (t, prop, receiver) => {
-        // computedProxyTree.checkForRecompute();
+        if (computedProxyTree.recomputeIfDirty) computedProxyTree.recomputeIfDirty();
     }
 
     return createProxyNode(computedProxyTree, id, parentId, beforeGetFn)
