@@ -1,5 +1,6 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {createTree} from "./TreeUtil.js";
+import {createSourceTree} from "../BasicSrcTree.js";
 
 describe('Relatives', () => {
 
@@ -7,7 +8,7 @@ describe('Relatives', () => {
 
         let srcTree, child, root;
         beforeEach(() => {
-            srcTree = new SourceTree().init(createTree(5));
+            srcTree = createSourceTree(createTree(5));
             root = srcTree.root;
             child = srcTree.root.children[0];
         });
@@ -62,7 +63,7 @@ describe('Relatives', () => {
 
         let srcTree, root, childLvl1, childLvl2;
         beforeEach(() => {
-            srcTree = new SourceTree().init(createTree([1, 2, [3, 4]]));
+            srcTree = createSourceTree(createTree([1, 2, [3, 4]]));
             root = srcTree.root;
             childLvl1 = srcTree.root.children[2];
             childLvl2 = srcTree.root.descendants["2, 0"];

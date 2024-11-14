@@ -37,9 +37,8 @@ export class ProxyTree extends NodeMap {
         this.computedTreeOverlays.push(tree);
     }
 
-    init(tree) {
+    init(rootId) {
         if (this._root) this._root.delete();
-        const rootId = this.addTree(tree);
         this.initRootId(rootId);
         this.initProxyNodes();
         return this;

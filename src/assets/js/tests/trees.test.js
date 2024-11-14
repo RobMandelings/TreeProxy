@@ -2,18 +2,18 @@ import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js"
 import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"
 import {watch} from "vue";
+import {addBasicTree, createSourceTree} from "../BasicSrcTree.js";
 
 test('Root not initialised', () => {
     const srcTree = new SourceTree();
+    const rootId = addBasicTree(srcTree, {name: "Root"});
     expect(() => srcTree.root).toThrow(ProxyTreeErrors.RootNotSetError);
-    srcTree.init({name: "Root"})
+    srcTree.init(rootId);
     expect(() => srcTree.root).not.toBeNull();
 })
 
 test('Direct proxy node access', () => {
-    const srcTree = new SourceTree();
-    const rootId = srcTree.init({name: "Root", children: [{name: "Child 1"}]});
-
+    const srcTree = createSourceTree({name: "Root", children: [{name: "Child 1"}]});
     expect(() => srcTree.root.node).toThrow(ProxyNodeErrors.DirectNodeAccessError);
 });
 
@@ -37,7 +37,7 @@ describe('Delayed child computation', () => {
             // Return the original result
             return result;
         });
-        srcTree = new SourceTree().init({
+        srcTree = createSourceTree({
             name: "Root",
             children: [{name: "Child1"}, {name: "Child2", children: [{name: "Subchild1"}]}, {name: "Child3"}]
         });
@@ -62,7 +62,7 @@ describe('Children', () => {
     let first;
     describe('Single child', () => {
         beforeAll(() => {
-            srcTree.init({name: "Root", children: [{name: "Child"}]})
+            srcTree = createSourceTree({name: "Root", children: [{name: "Child"}]})
             first = srcTree.root.children[0];
         });
         test('First', () => expect(first).not.toBeUndefined());
@@ -75,7 +75,7 @@ describe('Children', () => {
     });
 
     describe('No child', () => {
-        beforeAll(() => srcTree.init({name: "Root"}));
+        beforeAll(() => srcTree = createSourceTree({name: "Root"}));
         test('Size', () => expect(srcTree.root.children.size).toBe(0))
         test('Array', () => expect(srcTree.root.children.asArray).toBeInstanceOf(Array));
         test('Set', () => expect(srcTree.root.children.asSet).toBeInstanceOf(Set));
@@ -87,7 +87,7 @@ describe('Children', () => {
 
     describe('Proxy reuse on multiple access', () => {
         test('Single child', () => {
-            const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
+            const srcTree = createSourceTree({name: "Root", children: [{name: "Child"}]});
             expect(srcTree.root.children.asArray).toBe(srcTree.root.children.asArray);
             expect(srcTree.root.children[0]).toBe(srcTree.root.children[0]);
 
@@ -97,8 +97,7 @@ describe('Children', () => {
 
 
 describe('Parent and Child relation', () => {
-    const srcTree = new SourceTree();
-    srcTree.init({name: "Root", children: [{name: "Child"}]});
+    const srcTree = createSourceTree({name: "Root", children: [{name: "Child"}]});
     const child = srcTree.root.children[0];
     test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
     test('Child instance via parent equal to child instance', () => expect(child.parent.children[0]).toBe(child));

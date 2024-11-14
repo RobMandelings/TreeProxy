@@ -4,13 +4,14 @@ import {createTree} from "./TreeUtil.js";
 import {createEmptyCompTree} from "./trees.js";
 import {CustomNode} from "../CustomNode.js";
 import {OverlayType} from "../proxy_tree/OverlayType.js";
+import {createSourceTree} from "../BasicSrcTree.js";
 
 
 describe('', () => {
 
     let srcTree, cTree;
     beforeEach(() => {
-        srcTree = new SourceTree().init(createTree(0));
+        srcTree = createSourceTree(createTree(0));
         cTree = new ComputedTree(srcTree, {}, (_, __) => undefined);
         expect(srcTree.root.isDirty).toBe(false);
         expect(cTree.root.isDirty).toBe(false);
@@ -29,7 +30,6 @@ describe('', () => {
         expect(cTree.root.dirty.name).toBe(true);
         expect(cTree.root.name).toBe("Changed");
         expect(srcTree.root.name).not.toBe("Changed");
-        console.log(srcTree.root.name);
         expect(cTree.root.prev.name).toBe(srcTree.root.name);
         expect(srcTree.root.dirty.name).toBe(false);
         expect(srcTree.root.isDirty).toBe(false);
@@ -46,7 +46,7 @@ describe('', () => {
 
 test('Overlay tree: move child', () => {
 
-    const srcTree = new SourceTree().init(createTree([1, 0]));
+    const srcTree = createSourceTree(createTree([1, 0]));
     const compTree = new ComputedTree(srcTree, {}, (_, __) => undefined);
     const srcRoot = srcTree.root;
     const compRoot = compTree.root;
@@ -67,15 +67,13 @@ test('Overlay tree: move child', () => {
     expect(cChild1.prev.children.has(cSubChild.id)).toBe(true);
     expect(cChild2.children.has(cSubChild.id)).toBe(true);
     expect(cChild2.prev.children.has(cSubChild.id)).toBe(false);
-
-    console.log("Testing more stuff");
 });
 
 describe('Add children', () => {
 
     test('Add single node to root', () => {
 
-        const srcTree = new SourceTree().init(createTree(0));
+        const srcTree = createSourceTree(createTree(0));
         const cTree = createEmptyCompTree(srcTree).compTree;
         const cRoot = cTree.root;
         const id = cRoot.children.addNode(new CustomNode("Child", 1), 0);
@@ -91,7 +89,7 @@ describe('Add children', () => {
 
 test('Delete subtree', () => {
 
-    const srcTree = new SourceTree().init(createTree([5])); // Root has 1 child that has 5 children
+    const srcTree = createSourceTree(createTree([5])); // Root has 1 child that has 5 children
     const cTree = createEmptyCompTree(srcTree).compTree;
     expect(srcTree.root.descendants.size).toBe(6);
     const srcChild = srcTree.root.children[0];

@@ -1,6 +1,4 @@
 import {CustomNode} from "../../CustomNode.js";
-import {createRefProxy} from "./RefProxy.js";
-import {computed, ref} from "vue";
 
 class NodeNotExistsError extends Error {
     constructor(id) {
@@ -52,11 +50,6 @@ export class NodeMap {
 
     replaceNode(id, node) {
         throw new Error("Abstract method");
-    }
-
-    addTree(tree) {
-        let childrenIds = (tree.children?.length) ? tree.children.map(c => this.addTree(c)) : [];
-        return this.addNode(new CustomNode(tree.name, tree.weight, childrenIds));
     }
 
     deleteNode(id) {

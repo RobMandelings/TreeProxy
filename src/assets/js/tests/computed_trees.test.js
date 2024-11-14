@@ -4,13 +4,14 @@ import {CustomNode} from "../CustomNode.js";
 import {createTree} from "./TreeUtil.js";
 import {nextTick, ref} from "vue";
 import {createEmptyCompTree} from "./trees.js";
+import {createSourceTree} from "../BasicSrcTree.js";
 
 
 const createSuffixCompTree = (srcTree, concat) => {
     return new ComputedTree(srcTree, {}, (_, root) => root.name += concat);
 }
 
-const createSimpleSourceTree = (rootName = "Root") => new SourceTree().init({name: rootName});
+const createSimpleSourceTree = (rootName = "Root") => createSourceTree({name: rootName});
 
 let copySpy = jest.spyOn(CustomNode.prototype, 'copy');
 beforeEach(() => {
@@ -28,7 +29,7 @@ describe('ComputedTree', () => {
 
     describe('Simple tree', () => {
         beforeEach(() => {
-            srcTree = new SourceTree().init({name: initial});
+            srcTree = createSourceTree({name: initial});
         });
 
         describe('ComputedTree core: no computed values', () => {
@@ -152,7 +153,7 @@ describe('ComputedTree', () => {
         const getAdjustedNode = (tree) => tree.children[0].children[0];
 
         beforeEach(() => {
-            srcTree = new SourceTree().init(createTree([[0, 0], 0, 0]));
+            srcTree = createSourceTree(createTree([[0, 0], 0, 0]));
             compTree = new ComputedTree(srcTree, {}, (_, __) => undefined);
         });
 

@@ -1,13 +1,14 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js";
 import {createTree} from "./TreeUtil.js";
+import {createSourceTree} from "../BasicSrcTree.js";
 
 
 describe('Deletion', () => {
 
     let srcTree;
     beforeEach(() => {
-        srcTree = new SourceTree().init({name: "Root", children: [{name: "Child 1"}]});
+        srcTree = createSourceTree({name: "Root", children: [{name: "Child 1"}]});
         expect(srcTree.root.stale).toBe(false);
     });
 
@@ -35,7 +36,7 @@ describe('Deletion', () => {
 });
 
 test('Delete many at once check', () => {
-    const srcTree = new SourceTree().init(createTree([0, 3, 0]));
+    const srcTree = createSourceTree(createTree([0, 3, 0]));
     const nrDescendants1 = srcTree.root.descendants.size;
     const nrDeleted = srcTree.root.children[1].delete();
     expect(nrDeleted).toBe(4);

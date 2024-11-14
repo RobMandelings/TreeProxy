@@ -1,10 +1,11 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {isReactive, nextTick, ref, watch} from "vue";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
+import {createSourceTree} from "../BasicSrcTree.js";
 
 describe('Reactivity checks', () => {
 
-    const srcTree = new SourceTree().init({name: "Root", children: [{name: "Child"}]});
+    const srcTree = createSourceTree({name: "Root", children: [{name: "Child"}]});
 
     expect(isReactive(srcTree.root)).toBe(true);
     expect(isReactive(srcTree.root.children)).toBe(true);
@@ -53,7 +54,7 @@ describe("Deep watch", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         initialName = 'Child';
-        srcTree = new SourceTree().init({name: 'Root', children: [{name: initialName}]});
+        srcTree = createSourceTree({name: 'Root', children: [{name: initialName}]});
         child = srcTree.root.children[0];
         expect(child).not.toBeFalsy();
     })

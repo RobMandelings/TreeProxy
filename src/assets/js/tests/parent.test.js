@@ -1,11 +1,12 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {createTree} from "./TreeUtil.js";
+import {createSourceTree} from "../BasicSrcTree.js";
 
 describe("Parent relation test", () => {
 
     let srcTree, child1, child2, subchild1;
     beforeEach(() => {
-        srcTree = new SourceTree().init({
+        srcTree = createSourceTree({
             name: "Root",
             children: [{name: "Child1", children: [{name: "Subchild1"}]}, {name: "Child2"}]
         });
@@ -43,7 +44,7 @@ describe("Parent relation test", () => {
 
 test('Move parent 2', () => {
 
-    const srcTree = new SourceTree().init(createTree([2, 0]));
+    const srcTree = createSourceTree(createTree([2, 0]));
     const child1 = srcTree.root.children[0];
     const child2 = srcTree.root.children[1];
     const subChild1 = child1.children[0];
