@@ -1,4 +1,4 @@
-import {CustomNode} from "@/CustomNode.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 export function findById(t, prop) {
     if (typeof prop === 'string' && CustomNode.isValidID(prop)) {

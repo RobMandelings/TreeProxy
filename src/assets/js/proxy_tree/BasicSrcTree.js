@@ -1,5 +1,5 @@
-import {SourceTree} from "./proxy_tree/SrcTree.js";
-import {CustomNode} from "@/CustomNode.js";
+import {SourceTree} from "./SrcTree.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 export function addBasicTree(nodeMap, tree) {
     let childrenIds = (tree.children?.length) ? tree.children.map(c => addBasicTree(nodeMap, c)) : [];

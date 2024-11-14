@@ -1,5 +1,5 @@
 import {isReactive, nextTick, ref, watch} from "vue";
-import {createSourceTree} from "../BasicSrcTree.js";
+import {createSourceTree} from "@pt/BasicSrcTree.js";
 import {ComputedTree} from "@pt/ComputedTree.js";
 
 describe('Reactivity checks', () => {

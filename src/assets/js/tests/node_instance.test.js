@@ -1,5 +1,5 @@
-import {createSourceTree} from "@/BasicSrcTree.js";
-import {CustomNode} from "@/CustomNode.js";
+import {createSourceTree} from "@pt/BasicSrcTree.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 test('Check node instance', () => {
     const tree = createSourceTree({name: "Hello"});

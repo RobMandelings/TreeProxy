@@ -75,6 +75,12 @@ function useOverlayType(proxyTree, rId) {
     return computed(() => proxyTree.getOverlayType(rId.value));
 }
 
+function usePos(rParent) {
+
+    // const rPos = computed(() => )
+
+}
+
 export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const nodeRef = proxyTree.nodeMap.createRefProxy(id);
 
@@ -82,6 +88,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const rStale = computed(() => !(nodeRef.node && proxyTree.getNode(id)));
 
     const {rParent, setParent} = useParent(rId, proxyTree, parentId)
+
     const children = useChildren(rId, computed(() => nodeRef.childrenIds), proxyTree);
     const ancestors = useAncestors(rParent);
     const descendants = useDescendants(proxyTree, children, rId);

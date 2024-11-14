@@ -1,7 +1,7 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js";
-import {createTree} from "./TreeUtil.js";
-import {createSourceTree} from "../BasicSrcTree.js";
+import {createTree} from "@pt/TreeUtil.js";
+import {createSourceTree} from "@pt/BasicSrcTree.js";
 
 
 describe('Deletion', () => {

@@ -1,6 +1,6 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
-import {createTree} from "./TreeUtil.js";
-import {createSourceTree} from "../BasicSrcTree.js";
+import {createTree} from "@pt/TreeUtil.js";
+import {createSourceTree} from "@pt/BasicSrcTree.js";
 
 describe("Parent relation test", () => {
 

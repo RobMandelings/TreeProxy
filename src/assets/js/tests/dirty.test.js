@@ -1,10 +1,10 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
-import {createTree} from "./TreeUtil.js";
+import {createTree} from "@pt/TreeUtil.js";
 import {createEmptyCompTree} from "./trees.js";
 import {OverlayType} from "../proxy_tree/OverlayType.js";
-import {createSourceTree} from "../BasicSrcTree.js";
-import {CustomNode} from "@/CustomNode.js";
+import {createSourceTree} from "@pt/BasicSrcTree.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 
 describe('', () => {

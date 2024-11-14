@@ -3,7 +3,7 @@
 import {SourceTree} from "../assets/js/proxy_tree/SrcTree.js";
 import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
 import {computed, ref} from "vue";
-import {createSourceTree} from "../assets/js/BasicSrcTree.js";
+import {createSourceTree} from "@pt/BasicSrcTree.js";
 
 const srcTree = createSourceTree({name: "Root"});
 

@@ -1,4 +1,4 @@
-import {CustomNode} from "@/CustomNode.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 class NodeNotExistsError extends Error {
     constructor(id) {

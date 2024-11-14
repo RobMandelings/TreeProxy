@@ -3,9 +3,9 @@
 // Add when there are multiple children
 
 import {SourceTree} from "../proxy_tree/SrcTree.js";
-import {createTree} from "./TreeUtil.js";
-import {createSourceTree} from "../BasicSrcTree.js";
-import {CustomNode} from "@/CustomNode.js";
+import {createTree} from "@pt/TreeUtil.js";
+import {createSourceTree} from "@pt/BasicSrcTree.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 test('No children', () => {
     const srcTree = createSourceTree(createTree(0));
