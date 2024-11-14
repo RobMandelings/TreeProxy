@@ -51,7 +51,6 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     // instead of copying the entire node again we can simply get the changes from the previous layer and apply them recursively.
     // E.g. via function getTotalChanges() or something. Then we only have to copy once and then use that copy
     const rCopy = computed(() => {
-
         const srcNode = rSrcNode.value;
         const curChanges = rNodeChanges.value;
         let changesToApply;
@@ -67,7 +66,8 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
         if (copy && Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
         prevChanges = {...curChanges};
 
-        return copy;
+        if (copy && Object.keys(curChanges).length) return copy; // For consistency we only return the overwritten node if it actually has to be overwritten
+        else return null; // If the copy is identical to the src node or if there is no copy
     });
 
     return {rCopy};
@@ -91,7 +91,7 @@ export class OverlayNodeMap extends NodeMap {
 
     getOverlayType(id) {
         if (this.addedNodes.has(id)) return OverlayType.ADDED;
-        else if (id in this.overlayNodes) return OverlayType.OVERWRITTEN;
+        else if (this.isOverwritten(id)) return OverlayType.OVERWRITTEN;
         else return OverlayType.SRC;
     }
 
@@ -119,16 +119,15 @@ export class OverlayNodeMap extends NodeMap {
         if (this.addedNodes.has(id)) rNode = computed(() => this.addedNodes.get(id));
         else {
             const {rCopy} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
-
-            rNode = computed(() => {
-                return rCopy.value
-                    ?? this.getNode(rId.value)
-            });
-
-            this.overlayNodes[rId.value] = rNode;
+            rNode = computed(() => this.getNode(rId.value));
+            this.overlayNodes[rId.value] = rCopy;
         }
 
         return RefProxy.createRefProxy(this, rId, rNode);
+    }
+
+    isOverwritten(id) {
+        return this.overlayNodes[id] != null;
     }
 
     syncSrc() {

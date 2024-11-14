@@ -94,7 +94,7 @@ describe("Deep watch", () => {
             compTree.root.name = "Changed";
             expect(compTree.root.name).toBe("Changed")
             await nextTick();
-            // expect(rootWatchTrigger).toBeCalledTimes(1);
+            expect(rootWatchTrigger).toBeCalledTimes(1);
         });
 
         test('Many changes', async () => {
