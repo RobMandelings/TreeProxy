@@ -76,20 +76,20 @@ function useOverlayType(proxyTree, rId) {
 }
 
 export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
-    const refProxy = proxyTree.nodeMap.createRefProxy(id);
+    const nodeRef = proxyTree.nodeMap.createRefProxy(id);
 
     const rProxyTarget = reactive({
         value: null,
     });
-    const rId = computed(() => rProxyTarget.value?.refProxy.id);
+    const rId = computed(() => rProxyTarget.value?.nodeRef.id);
 
     const rStale = computed(() => {
         if (!rProxyTarget.value) return false; // Still initialising
-        return !(refProxy.node && proxyTree.getNode(id));
+        return !(nodeRef.node && proxyTree.getNode(id));
     });
 
     const {rParent, setParent} = useParent(rId, proxyTree, parentId)
-    const children = useChildren(rId, computed(() => refProxy.childrenIds), proxyTree);
+    const children = useChildren(rId, computed(() => nodeRef.childrenIds), proxyTree);
     const ancestors = useAncestors(rProxyTarget);
     const descendants = useDescendants(rProxyTarget, proxyTree);
     const isDescendantOf = (id) => !!ancestors.has(id);
@@ -104,7 +104,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const rOverlayType = useOverlayType(proxyTree, rId);
 
     rProxyTarget.value = {
-        refProxy,
+        nodeRef,
         overlayType: rOverlayType,
         children,
         ancestors,
@@ -124,7 +124,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
         toJSON: () => {
             let obj = {
                 id: rId.value,
-                name: refProxy.name,
+                name: nodeRef.name,
             }
             if (children.size) obj.children = children.asArray.map(c => c.toJSON());
             return obj;

@@ -5,7 +5,7 @@ import {createBaseProxyNodeTarget} from "@pt/BaseProxyNode.js";
 const coreGetHandler = (t, prop, receiver) => {
     if (prop === "node") throw new DirectNodeAccessError();
 
-    if (prop in t || prop in t.refProxy) {
+    if (prop in t || prop in t.nodeRef) {
         if (prop === "stale") return t.stale;
         else if (t.stale) {
             if (prop === "toJSON") return {msg: "This proxy is stale"};
@@ -13,7 +13,7 @@ const coreGetHandler = (t, prop, receiver) => {
         }
     }
 
-    return wrappedProxyTargetGetter(t, t.refProxy, prop, receiver);
+    return wrappedProxyTargetGetter(t, t.nodeRef, prop, receiver);
 }
 
 /**
@@ -37,7 +37,7 @@ class ProxyNodeFactory {
                 return coreGetHandler(t, prop, receiver);
             },
             set: (t, prop, value, receiver) => {
-                const success = Reflect.set(t.refProxy, prop, value, receiver);
+                const success = Reflect.set(t.nodeRef, prop, value, receiver);
                 if (success) proxyTree.markOverlaysDirty();
                 return success;
             }
