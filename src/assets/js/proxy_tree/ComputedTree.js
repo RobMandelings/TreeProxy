@@ -3,7 +3,7 @@ import {OverlayNodeMap} from "./node_map/OverlayNodeMap.js";
 import {computed, isRef, reactive, ref, toRaw, watch} from "vue";
 import {createComputedProxyNode} from "./ProxyNode.js";
 import {useShouldExcludeProperty} from "../ProxyUtils.js";
-import {useRecompute} from "./recompute.js";
+import {useRecompute} from "./Recompute.js";
 
 const excludedPropsCompTree = new Set(["_root", "isRecomputing", "_isRecomputingObj", "markDirty", "recomputeIfDirty", "markedForRecompute", "_isDirtyObj"]);
 const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);
