@@ -20,7 +20,7 @@ function useParent(rId, proxyTree, initialParentId) {
     return {rParent: rParentProxy, setParent};
 }
 
-function useReplace(rId, proxyTree) {
+function useReplace(proxyTree, rId) {
 
     const replaceFn = (node) => proxyTree.replaceNode(rId.value, node);
     return {replaceFn};
@@ -78,32 +78,25 @@ function useOverlayType(proxyTree, rId) {
 export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const nodeRef = proxyTree.nodeMap.createRefProxy(id);
 
-    const rProxyTarget = reactive({
-        value: null,
-    });
-    const rId = computed(() => rProxyTarget.value?.nodeRef.id);
-
-    const rStale = computed(() => {
-        if (!rProxyTarget.value) return false; // Still initialising
-        return !(nodeRef.node && proxyTree.getNode(id));
-    });
+    const rId = computed(() => nodeRef.id);
+    const rStale = computed(() => !(nodeRef.node && proxyTree.getNode(id)));
 
     const {rParent, setParent} = useParent(rId, proxyTree, parentId)
     const children = useChildren(rId, computed(() => nodeRef.childrenIds), proxyTree);
-    const ancestors = useAncestors(rProxyTarget);
-    const descendants = useDescendants(rProxyTarget, proxyTree);
+    const ancestors = useAncestors(rParent);
+    const descendants = useDescendants(proxyTree, children, rId);
     const isDescendantOf = (id) => !!ancestors.has(id);
     const isAncestorOf = (id) => !!descendants.has(id);
 
     const {deleteFn} = useDelete(proxyTree, rId);
-    const {replaceFn} = useReplace(rId, proxyTree);
+    const {replaceFn} = useReplace(proxyTree, rId);
     const rDepth = computed(() => ancestors.size);
     const {rHeight} = useHeight(children);
     const {prevProxy} = usePreviousValue(proxyTree, rId);
     const {rIsDirty, dirtyPropProxy} = useDirty(proxyTree, rParent, rId, prevProxy);
     const rOverlayType = useOverlayType(proxyTree, rId);
 
-    rProxyTarget.value = {
+    const target = reactive({
         nodeRef,
         overlayType: rOverlayType,
         children,
@@ -129,7 +122,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
             if (children.size) obj.children = children.asArray.map(c => c.toJSON());
             return obj;
         }
-    }
+    })
 
-    return rProxyTarget.value;
+    return target;
 }

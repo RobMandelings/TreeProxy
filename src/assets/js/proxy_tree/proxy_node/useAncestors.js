@@ -1,13 +1,12 @@
 import {decorateNodeRelatives, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
 
-export function useAncestors(rProxyNode) {
+export function useAncestors(rParent) {
 
     const getAncestorsAsArrayFn = () => {
-        const proxyNode = rProxyNode.value;
-        if (!proxyNode) return [];
+        const parent = rParent.value;
+        if (!parent) return [];
 
-        if (!proxyNode.parent) return [];
-        return [proxyNode.parent, ...proxyNode.parent.ancestors.asArray];
+        return [parent, ...parent.ancestors.asArray];
     }
 
     const decorateAncestors = (ancestors) => {
