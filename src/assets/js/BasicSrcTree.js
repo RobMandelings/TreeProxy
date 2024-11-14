@@ -1,4 +1,4 @@
-import {CustomNode} from "./CustomNode.js";
+import {CustomNode} from "@pt/CustomNode.js";
 import {SourceTree} from "./proxy_tree/SrcTree.js";
 
 export function addBasicTree(nodeMap, tree) {

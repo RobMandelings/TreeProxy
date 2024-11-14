@@ -1,6 +1,6 @@
 import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
-import {CustomNode} from "../CustomNode.js";
+import {CustomNode} from "@pt/CustomNode.js";
 import {createTree} from "./TreeUtil.js";
 import {nextTick, ref} from "vue";
 import {createEmptyCompTree} from "./trees.js";

@@ -1,4 +1,4 @@
-import {CustomNode} from "../../CustomNode.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 class NodeNotExistsError extends Error {
     constructor(id) {
@@ -42,6 +42,7 @@ export class NodeMap {
     }
 
     addNode(node) {
+        console.assert(node instanceof CustomNode);
         if (node == null) throw new Error("Node is null");
         const id = this._addNode(node);
         console.assert(this.getNode(id));

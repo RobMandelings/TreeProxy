@@ -1,8 +1,8 @@
-import * as Utils from "../proxy_utils/Utils.js";
-import {NodeMap} from "./NodeMap.js";
-import {computed, reactive, ref, toRaw, watch, watchSyncEffect} from "vue";
-import * as RefProxy from "./RefProxy.js";
-import {OverlayType} from "../OverlayType.js";
+import * as Utils from "@pt/proxy_utils/Utils.js";
+import {NodeMap} from "@pt/node_map/NodeMap.js";
+import {computed, reactive, ref} from "vue";
+import * as RefProxy from "@pt/node_map/RefProxy.js";
+import {OverlayType} from "@pt/OverlayType.js";
 
 function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {

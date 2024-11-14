@@ -1,4 +1,4 @@
-import {decorateNodeRelatives, findById, useNodeRelatives} from "./nodeRelatives.js";
+import {decorateNodeRelatives, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
 
 export function useDescendants(rProxyNode, proxyTree) {
 

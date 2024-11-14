@@ -1,9 +1,9 @@
-import {ProxyTree} from "./ProxyTree.js";
-import {OverlayNodeMap} from "./node_map/OverlayNodeMap.js";
-import {computed, isRef, reactive, ref, toRaw, watch} from "vue";
-import {createComputedProxyNode} from "./ProxyNode.js";
-import {useShouldExcludeProperty} from "./proxy_utils/ProxyUtils.js";
-import {useRecompute} from "./Recompute.js";
+import {ProxyTree} from "@pt/ProxyTree.js";
+import {OverlayNodeMap} from "@pt/node_map/OverlayNodeMap.js";
+import {reactive} from "vue";
+import {createComputedProxyNode} from "@pt/ProxyNode.js";
+import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
+import {useRecompute} from "@pt/Recompute.js";
 
 const excludedPropsCompTree = new Set(["_root", "isRecomputing", "_isRecomputingObj", "markDirty", "recomputeIfDirty", "markedForRecompute", "_isDirtyObj"]);
 const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);

@@ -1,6 +1,3 @@
-import {reactive} from "vue";
-import {CustomNode} from "../../CustomNode.js";
-
 export function difference(setA, setB) {
     const resultSet = new Set(setA); // Create a new set from setA
     for (const elem of setB) {

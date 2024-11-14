@@ -1,8 +1,7 @@
-import {CustomNode} from "../../CustomNode.js";
-import {isValidUUID} from "../proxy_utils/Utils.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 export function findById(t, prop) {
-    if (typeof prop === 'string' && isValidUUID(prop)) {
+    if (typeof prop === 'string' && CustomNode.isValidID(prop)) {
         return t.asArray.find(c => c.id === prop);
     }
 }

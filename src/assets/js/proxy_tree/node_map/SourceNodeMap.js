@@ -1,7 +1,7 @@
-import {NodeMap} from "./NodeMap.js";
+import {NodeMap} from "@pt/node_map/NodeMap.js";
 import {computed, ref} from "vue";
-import * as RefProxy from "./RefProxy.js"
-import {OverlayType} from "../OverlayType.js";
+import * as RefProxy from "@pt/node_map/RefProxy.js"
+import {OverlayType} from "@pt/OverlayType.js";
 
 export class SourceNodeMap extends NodeMap {
 

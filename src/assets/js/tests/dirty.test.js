@@ -2,7 +2,7 @@ import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 import {createTree} from "./TreeUtil.js";
 import {createEmptyCompTree} from "./trees.js";
-import {CustomNode} from "../CustomNode.js";
+import {CustomNode} from "@pt/CustomNode.js";
 import {OverlayType} from "../proxy_tree/OverlayType.js";
 import {createSourceTree} from "../BasicSrcTree.js";
 

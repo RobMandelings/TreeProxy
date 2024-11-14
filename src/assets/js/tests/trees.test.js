@@ -1,8 +1,8 @@
-import {SourceTree} from "../proxy_tree/SrcTree.js";
-import * as ProxyNodeErrors from "../proxy_tree/ProxyNodeErrors.js"
-import * as ProxyTreeErrors from "../proxy_tree/ProxyTreeErrors.js"
+import {SourceTree} from "@pt/SrcTree.js";
+import * as ProxyNodeErrors from "@pt/ProxyNodeErrors.js"
+import * as ProxyTreeErrors from "@pt/ProxyTreeErrors.js"
 import {watch} from "vue";
-import {addBasicTree, createSourceTree} from "../BasicSrcTree.js";
+import {addBasicTree, createSourceTree} from "@/BasicSrcTree";
 
 test('Root not initialised', () => {
     const srcTree = new SourceTree();

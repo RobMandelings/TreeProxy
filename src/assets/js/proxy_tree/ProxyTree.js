@@ -1,7 +1,6 @@
-import {NodeMap} from "./node_map/NodeMap.js";
-import * as ProxyNode from "../proxy_tree/ProxyNode.js"
-import {NodeNotFoundError, RootNotSetError} from "./ProxyTreeErrors.js";
-import {IncorrectIndexError, UndefinedIndexError} from "./ProxyNodeErrors.js";
+import {NodeMap} from "@pt/node_map/NodeMap.js";
+import {NodeNotFoundError, RootNotSetError} from "@pt/ProxyTreeErrors.js";
+import {IncorrectIndexError, UndefinedIndexError} from "@pt/ProxyNodeErrors.js";
 
 export class ProxyTree extends NodeMap {
 

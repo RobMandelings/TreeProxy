@@ -1,6 +1,5 @@
 import {computed} from "vue";
-import {PosOutOfRangeError} from "../ProxyNodeErrors.js";
-import {decorateNodeRelatives, findById, useNodeRelatives} from "./nodeRelatives.js";
+import {decorateNodeRelatives, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
 
 function useAddChild(rId, proxyTree) {
 

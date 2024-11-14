@@ -1,7 +1,7 @@
-import {ProxyTree} from "./ProxyTree.js";
+import {ProxyTree} from "@pt/ProxyTree.js";
 import {reactive} from "vue";
-import {SourceNodeMap} from "./node_map/SourceNodeMap.js";
-import {createSrcProxyNode} from "./ProxyNode.js";
+import {SourceNodeMap} from "@pt/node_map/SourceNodeMap.js";
+import {createSrcProxyNode} from "@pt/ProxyNode.js";
 
 export class SourceTree extends ProxyTree {
 

@@ -1,12 +1,12 @@
 import {computed, reactive, ref} from "vue";
-import {DirectNodeAccessError, StaleProxyError} from "./ProxyNodeErrors.js";
+import {DirectNodeAccessError, StaleProxyError} from "@pt/ProxyNodeErrors.js";
 import {
     useShouldExcludeProperty,
     wrappedProxyTargetGetter
-} from "./proxy_utils/ProxyUtils.js";
-import {useChildren} from "./proxy_node/useChildren.js";
-import {useAncestors} from "./proxy_node/useAncestors.js";
-import {useDescendants} from "./proxy_node/useDescendants.js";
+} from "@pt/proxy_utils/ProxyUtils.js";
+import {useChildren} from "@pt/proxy_node/useChildren.js";
+import {useAncestors} from "@pt/proxy_node/useAncestors.js";
+import {useDescendants} from "@pt/proxy_node/useDescendants.js";
 
 export function useDelete(proxyTree, rProxyNode) {
     const deleteFn = () => proxyTree.deleteNode(rProxyNode.value.id);
