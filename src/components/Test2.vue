@@ -3,7 +3,7 @@
 import * as Proxies from "../assets/js/proxy_tree/RefProxy.js"
 import {computed, reactive, ref, watch} from "vue";
 import {useProxyWatchTest} from "../assets/js/ProxyWatchTest.js";
-import {SourceNodeMap} from "../assets/js/node_map/NodeMap.js";
+import {SourceNodeMap} from "../assets/js/proxy_tree/node_map/NodeMap.js";
 import {CustomNode} from "../assets/js/CustomNode.js";
 // Example usage
 const sourceNodeMap = reactive(new SourceNodeMap());

@@ -1,4 +1,4 @@
-import {CustomNode} from "../CustomNode.js";
+import {CustomNode} from "../../CustomNode.js";
 import {createRefProxy} from "./RefProxy.js";
 import {computed, ref} from "vue";
 

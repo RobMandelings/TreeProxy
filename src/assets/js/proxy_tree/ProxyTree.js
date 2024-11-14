@@ -1,4 +1,4 @@
-import {NodeMap} from "../node_map/NodeMap.js";
+import {NodeMap} from "./node_map/NodeMap.js";
 import * as ProxyNode from "../proxy_tree/ProxyNode.js"
 import {NodeNotFoundError, RootNotSetError} from "./ProxyTreeErrors.js";
 import {IncorrectIndexError, UndefinedIndexError} from "./ProxyNodeErrors.js";
