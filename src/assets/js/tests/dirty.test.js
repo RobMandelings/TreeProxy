@@ -3,6 +3,7 @@ import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 import {createTree} from "./TreeUtil.js";
 import {createEmptyCompTree} from "./trees.js";
 import {CustomNode} from "../CustomNode.js";
+import {OverlayType} from "../proxy_tree/OverlayType.js";
 
 
 describe('', () => {
@@ -83,7 +84,22 @@ describe('Add children', () => {
         //  (might be able to reuse some tree creation logic)
 
         expect(cRoot.children.has(id)).toBe(true);
+        expect(cRoot.children[id].overlayType).toBe(OverlayType.ADDED);
         expect(cRoot.prev.children.has(id)).toBe(false);
-    })
+    });
+});
+
+test('Delete subtree', () => {
+
+    const srcTree = new SourceTree().init(createTree([5])); // Root has 1 child that has 5 children
+    const cTree = createEmptyCompTree(srcTree).compTree;
+    expect(srcTree.root.descendants.size).toBe(6);
+    const srcChild = srcTree.root.children[0];
+    const cChild = cTree.root.children[0];
+    cChild.delete();
+    expect(cChild.stale).toBe(true);
+    expect(srcChild.stale).toBe(false);
+    expect(srcTree.root.descendants.size).toBe(6)
+    expect(cTree.root.descendants.size).toBe(0);
 
 });

@@ -198,7 +198,6 @@ export class OverlayNodeMap extends NodeMap {
 
     deleteNode(id) {
         this.deletedNodeIds.add(id);
-        return 1;
     }
 
     isDeleted(id) {
