@@ -1,4 +1,3 @@
-import {SourceTree} from "../proxy_tree/SrcTree.js";
 import {createTree} from "./TreeUtil.js";
 import {createSourceTree} from "../BasicSrcTree.js";
 

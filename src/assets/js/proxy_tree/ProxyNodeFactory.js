@@ -19,7 +19,7 @@ const coreGetHandler = (t, prop, receiver) => {
 /**
  * TODO use TypeScript to add typing to the returned objects (e.g. what properties are available etc)
  */
-class ProxyNodeFactory {
+export class ProxyNodeFactory {
 
     _createProxyTarget(proxyTree, id, parentId) {
         throw new Error("Abstract method");
