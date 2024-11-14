@@ -1,4 +1,4 @@
-import {isValidUUID} from "./Utils.js";
+import {isValidUUID} from "./proxy_tree/proxy_utils/Utils.js";
 
 class CoreNode {
     constructor(name) {

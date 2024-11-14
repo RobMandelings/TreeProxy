@@ -3,7 +3,7 @@ import {DirectNodeAccessError, StaleProxyError} from "./ProxyNodeErrors.js";
 import {
     useShouldExcludeProperty,
     wrappedProxyTargetGetter
-} from "../ProxyUtils.js";
+} from "./proxy_utils/ProxyUtils.js";
 import {useChildren} from "./proxy_node/useChildren.js";
 import {useAncestors} from "./proxy_node/useAncestors.js";
 import {useDescendants} from "./proxy_node/useDescendants.js";

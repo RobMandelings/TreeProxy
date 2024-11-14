@@ -1,5 +1,5 @@
 import {computed, reactive, watch} from "vue";
-import {useShouldExcludeProperty, wrappedProxyTargetGetter} from "../../ProxyUtils.js";
+import {useShouldExcludeProperty, wrappedProxyTargetGetter} from "../proxy_utils/ProxyUtils.js";
 
 export function createRefProxy(nodeMap, rId, rNode) {
     const targetObj = reactive({node: rNode, id: rId});

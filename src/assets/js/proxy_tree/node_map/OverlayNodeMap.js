@@ -1,4 +1,4 @@
-import * as Utils from "../../Utils.js";
+import * as Utils from "../proxy_utils/Utils.js";
 import {NodeMap} from "./NodeMap.js";
 import {computed, reactive, ref, toRaw, watch, watchSyncEffect} from "vue";
 import * as RefProxy from "./RefProxy.js";

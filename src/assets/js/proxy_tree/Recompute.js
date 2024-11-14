@@ -1,4 +1,4 @@
-import {useShouldExcludeProperty} from "../ProxyUtils.js";
+import {useShouldExcludeProperty} from "./proxy_utils/ProxyUtils.js";
 import {computed, reactive, watch} from "vue";
 
 function createStateProxy(state, deps) {
