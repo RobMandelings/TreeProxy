@@ -3,6 +3,7 @@ import {NodeMap} from "@pt/node_map/NodeMap.js";
 import {computed, reactive, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js";
 import {OverlayType} from "@pt/OverlayType.js";
+import {CoreNode} from "@pt/CoreNode.js";
 
 function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
@@ -138,7 +139,7 @@ export class OverlayNodeMap extends NodeMap {
     }
 
     _addNode(node) {
-        const id = this.generateId();
+        const id = CoreNode.generateId();
         this.addedNodes.set(id, node);
         return id;
     }

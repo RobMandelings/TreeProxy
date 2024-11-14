@@ -9,6 +9,10 @@ export class CoreNode {
         throw new Error("Abstract method");
     }
 
+    static generateId() {
+        return crypto.randomUUID();
+    }
+
     static isValidID(id) {
         return isValidUUID(id);
     }

@@ -26,10 +26,6 @@ export class NodeMap {
         throw new Error("Abstract method");
     }
 
-    generateId() {
-        return crypto.randomUUID();
-    }
-
     createRefProxy(initialId) {
         throw new Error("Abstract method");
     }

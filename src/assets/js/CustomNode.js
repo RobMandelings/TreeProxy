@@ -1,4 +1,4 @@
-import {CoreNode} from "@pt/CustomNode.js";
+import {CoreNode} from "@pt/CoreNode.js";
 
 export class CustomNode extends CoreNode {
     constructor(name, weight = 0, childrenIds = []) {
