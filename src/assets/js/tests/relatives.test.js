@@ -150,3 +150,19 @@ describe('Relatives', () => {
         });
     });
 })
+
+describe('Finding with custom function', () => {
+
+    let srcTree;
+    beforeEach(() => {
+        srcTree = createSourceTree({
+            name: "Root",
+            children: [{name: "Child1", children: [{name: "ToBeFound"}]}, {name: "Child2"}]
+        });
+    });
+
+    test('Find child', () => {
+        expect(srcTree.root.children.find(c => c.name === "Child2")).toBeTruthy();
+        expect(srcTree.root.descendants.find(c => c.name === "ToBeFound")).toBeTruthy();
+    });
+});

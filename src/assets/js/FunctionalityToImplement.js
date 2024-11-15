@@ -25,6 +25,10 @@ class Test {
         if (!(this.hasParent() && this.parent.forceNotAddTests)) editModes.push(GROUP_EDIT_MODE.EDIT_TEST, GROUP_EDIT_MODE.DELETE_TEST);
         return editModes;
     }
+
+    isEditModeValid(mode) {
+        return this.getValidEditModes().includes(mode);
+    }
 }
 
 class FunctionalityToImplement {

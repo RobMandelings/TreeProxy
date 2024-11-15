@@ -26,6 +26,8 @@ export function useNodeRelatives(asArrayFn) {
     const asSetFn = () => new Set(asArrayFn());
     const getSizeFn = () => asArrayFn().length;
 
+    const findFn = (fn) => asArrayFn().find(fn);
+
     return {
         get asArray() {
             return asArrayFn();
@@ -39,6 +41,7 @@ export function useNodeRelatives(asArrayFn) {
         },
         get: {
             byId: getByIdFn,
-        }
+        },
+        find: findFn
     }
 }
