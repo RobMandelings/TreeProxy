@@ -1,6 +1,6 @@
 import {isReactive, nextTick, ref, watch} from "vue";
-import {createSourceTree} from "@pt/BasicSrcTree.js";
 import {ComputedTree} from "@pt/ComputedTree.js";
+import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 describe('Reactivity checks', () => {
 
@@ -86,7 +86,7 @@ describe("Deep watch", () => {
             const computeFn = (state, root) => {
 
             };
-            compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
+            compTree = createComputedTree(srcTree, computeFn, {count: rCount});
             watch(compTree.root, (vN, vO) => rootWatchTrigger());
         });
 

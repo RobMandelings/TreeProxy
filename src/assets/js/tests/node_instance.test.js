@@ -1,5 +1,5 @@
-import {createSourceTree} from "@pt/BasicSrcTree.js";
 import {CustomNode} from "@pt/CustomNode.js";
+import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 test('Check node instance', () => {
     const tree = createSourceTree({name: "Hello"});

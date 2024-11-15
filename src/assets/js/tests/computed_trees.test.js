@@ -1,14 +1,12 @@
-import {SourceTree} from "../proxy_tree/SrcTree.js";
-import {ComputedTree} from "../proxy_tree/ComputedTree.js";
 import {createTree} from "@pt/TreeUtil.js";
 import {nextTick, ref} from "vue";
 import {createEmptyCompTree} from "./trees.js";
-import {createSourceTree} from "@pt/BasicSrcTree.js";
+import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 import {CustomNode} from "@pt/CustomNode.js";
 
 
 const createSuffixCompTree = (srcTree, concat) => {
-    return new ComputedTree(srcTree, {}, (_, root) => root.name += concat);
+    return createComputedTree(srcTree, (_, root) => root.name += concat);
 }
 
 const createSimpleSourceTree = (rootName = "Root") => createSourceTree({name: rootName});
@@ -41,7 +39,7 @@ describe('ComputedTree', () => {
             beforeEach(() => {
                 computeFn = jest.fn((state, __) => state.count);
                 rCount = ref(initialCount);
-                compTree = new ComputedTree(srcTree, {count: rCount}, computeFn);
+                compTree = createComputedTree(srcTree, computeFn, {count: rCount});
                 expect(srcTree.computedTreeOverlays.length).not.toBeFalsy();
                 expect(computeFn).toBeCalledTimes(1);
             });
@@ -123,7 +121,7 @@ describe('ComputedTree', () => {
 
             beforeEach(() => {
                 computeFn = jest.fn((state, root) => root.weight = getCompWeight());
-                compTree = new ComputedTree(srcTree, {}, computeFn);
+                compTree = createComputedTree(srcTree, computeFn);
             });
 
             test('SRC tree name adjustment', async () => {
@@ -154,7 +152,7 @@ describe('ComputedTree', () => {
 
         beforeEach(() => {
             srcTree = createSourceTree(createTree([[0, 0], 0, 0]));
-            compTree = new ComputedTree(srcTree, {}, (_, __) => undefined);
+            compTree = createComputedTree(srcTree, (_, __) => undefined);
         });
 
         test('Name change', () => {
@@ -177,7 +175,7 @@ describe('Computed tree state changes', () => {
 
         const srcTree = createSimpleSourceTree();
         const rCount = ref(0);
-        const compTree = new ComputedTree(srcTree, {count: rCount}, (state, root) => root.weight = state.count);
+        const compTree = createComputedTree(srcTree, (state, root) => root.weight = state.count, {count: rCount});
         rCount.value++;
         expect(compTree.root.weight).toBe(rCount.value);
 
@@ -188,7 +186,7 @@ describe('Computed tree state changes', () => {
             const srcTree = createSimpleSourceTree();
             const rCount = ref(0);
             const stateObj = {nested1: {nested2: {count: rCount}}};
-            const compTree = new ComputedTree(srcTree, stateObj, (state, root) => root.weight = state.nested1.nested2.count);
+            const compTree = createComputedTree(srcTree, (state, root) => root.weight = state.nested1.nested2.count, stateObj);
             rCount.value++;
             expect(compTree.root.weight).toBe(rCount.value);
         });
@@ -202,10 +200,10 @@ describe('Computed tree state changes', () => {
 
         const srcTree = createSimpleSourceTree();
         const recomputeSpy = jest.fn();
-        const compTree = new ComputedTree(srcTree, stateObj, (state, root) => {
+        const compTree = createComputedTree(srcTree, (state, root) => {
             if (state.syncWeight) root.name = `${state.count}`;
             recomputeSpy();
-        });
+        }, stateObj);
         expect(compTree.root.name).toBe(srcTree.root.name);
         recomputeSpy.mockClear();
         rCount.value++;
@@ -239,7 +237,7 @@ describe('Computed tree behaviour on src change', () => {
 
 
         const computeFn = (_, root) => root.name += " (changed)";
-        const compTree = new ComputedTree(srcTree, {}, computeFn);
+        const compTree = createComputedTree(srcTree, computeFn);
         expect(compTree.root.name).toBe(srcTree.root.name + " (changed)");
         expect(copySpy).toBeCalledTimes(1);
         srcTree.root.name
@@ -267,7 +265,7 @@ test('Shorthand name concatenation using src root', () => {
 
     const concatString = " (changed)";
     const srcTree = createSimpleSourceTree();
-    const compTree = new ComputedTree(srcTree, {}, (_, root) => root.name += concatString);
+    const compTree = createComputedTree(srcTree, (_, root) => root.name += concatString);
     expect(compTree.root.name).toBe(srcTree.root.name + concatString);
 
 })
@@ -277,15 +275,15 @@ test('Layers: previous layer remains unchanged', () => {
     const getLayerName = (root, layer) => `layer${layer}-${root.name}`;
     const recomputeFnAll = jest.fn();
     const layer0 = createSimpleSourceTree("layer0");
-    const layer1 = new ComputedTree(layer0, {}, (_, root) => {
+    const layer1 = createComputedTree(layer0, (_, root) => {
         root.name = getLayerName(root, 1);
         recomputeFnAll();
     });
-    const layer2 = new ComputedTree(layer1, {}, (_, root) => {
+    const layer2 = createComputedTree(layer1, (_, root) => {
         root.name = getLayerName(root, 2)
         recomputeFnAll();
     });
-    const layer3 = new ComputedTree(layer2, {}, (_, root) => {
+    const layer3 = createComputedTree(layer2, (_, root) => {
         root.name = getLayerName(root, 3)
         recomputeFnAll();
     });
@@ -330,10 +328,10 @@ test('Branching layers', () => {
     const add10 = createRecompute((_, root) => root.weight += 10);
     const double = createRecompute((_, root) => root.weight *= 2);
 
-    const layer1 = new ComputedTree(layer0, {}, add10);
-    const layer2_0 = new ComputedTree(layer1, {}, double);
-    const layer_2_1 = new ComputedTree(layer1, {}, add10);
-    const layer_3_1 = new ComputedTree(layer_2_1, {}, double);
+    const layer1 = createComputedTree(layer0, add10);
+    const layer2_0 = createComputedTree(layer1, double);
+    const layer_2_1 = createComputedTree(layer1, add10);
+    const layer_3_1 = createComputedTree(layer_2_1, double);
 
     expect(layer1.root.weight).toBe(10);
     expect(layer2_0.root.weight).toBe(20);

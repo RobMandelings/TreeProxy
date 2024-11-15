@@ -21,7 +21,7 @@ const computeFn = (state, root) => {
   root.name = `${root.name} (c:${state.count}, t:${txt})`
 };
 
-const compTree = new ComputedTree(srcTree, {count: rCount, text: rText}, computeFn);
+const compTree = createComputedTree(srcTree, {count: rCount, text: rText}, computeFn);
 
 const changeCount = () => {
   rCount.value++;

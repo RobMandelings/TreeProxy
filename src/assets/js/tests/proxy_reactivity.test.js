@@ -1,4 +1,4 @@
-import {isReactive, nextTick, reactive, ref, watch} from "vue";
+import {nextTick, reactive, watch} from "vue";
 
 describe('Proxy reactivity', () => {
 

@@ -1,14 +1,14 @@
-import {ElementMap} from "@pt/node_map/ElementMap.js";
+import {RefStore} from "@pt/node_map/RefStore.js";
 import {NodeNotFoundError, RootNotSetError} from "@pt/ProxyTreeErrors.js";
 import {IncorrectIndexError, UndefinedIndexError} from "@pt/ProxyNodeErrors.js";
 import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/ProxyNodeFactory.js";
 
-export class ProxyTree extends ElementMap {
+export class ProxyTree extends RefStore {
 
-    constructor(nodeMap) {
+    constructor(elementRegistry, proxyNodeFactory) {
         super();
-        this.proxyNodeFactory = SIMPLE_PROXY_NODE_FACTORY;
-        this.nodeMap = nodeMap; // TODO make the node map immutable when returned
+        this.proxyNodeFactory = proxyNodeFactory;
+        this.nodeMap = elementRegistry; // TODO make the node map immutable when returned
         this.proxyNodes = new Map();
         this.computedTreeOverlays = [];
         this._root = null;

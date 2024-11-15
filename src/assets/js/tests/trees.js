@@ -1,8 +1,7 @@
-import {ComputedTree} from "../proxy_tree/ComputedTree.js";
-
+import {createComputedTree} from "@/SimpleProxyTreeBuilders.js";
 
 export const createEmptyCompTree = (srcTree) => {
     const computeFn = jest.fn((_, __) => undefined);
-    const compTree = new ComputedTree(srcTree, {}, computeFn);
+    const compTree = createComputedTree(srcTree, computeFn);
     return {compTree, computeFn};
 }

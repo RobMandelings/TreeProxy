@@ -1,14 +1,14 @@
-import {ElementMap} from "@pt/node_map/ElementMap.js";
+import {RefStore} from "@pt/node_map/RefStore.js";
 import {computed, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js"
 import {OverlayType} from "@pt/OverlayType.js";
 import {CoreNode} from "@pt/CoreNode.js";
 
-export class SrcElementMap extends ElementMap {
+export class SrcRefStore extends RefStore {
 
-    constructor() {
+    constructor(nodeMap) {
         super();
-        this.elements = new Map();
+        this.elements = nodeMap;
     }
 
     getOverlayType(id) {

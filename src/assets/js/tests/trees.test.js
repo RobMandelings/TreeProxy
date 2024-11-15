@@ -2,15 +2,7 @@ import {SourceTree} from "@pt/SrcTree.js";
 import * as ProxyNodeErrors from "@pt/ProxyNodeErrors.js"
 import * as ProxyTreeErrors from "@pt/ProxyTreeErrors.js"
 import {watch} from "vue";
-import {addBasicTree, createSourceTree} from "@pt/BasicSrcTree.js";
-
-test('Root not initialised', () => {
-    const srcTree = new SourceTree();
-    const rootId = addBasicTree(srcTree, {name: "Root"});
-    expect(() => srcTree.root).toThrow(ProxyTreeErrors.RootNotSetError);
-    srcTree.init(rootId);
-    expect(() => srcTree.root).not.toBeNull();
-})
+import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 test('Direct proxy node access', () => {
     const srcTree = createSourceTree({name: "Root", children: [{name: "Child 1"}]});

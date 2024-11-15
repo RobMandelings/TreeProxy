@@ -1,11 +1,11 @@
 import {ProxyTree} from "@pt/ProxyTree.js";
 import {reactive} from "vue";
-import {SrcElementMap} from "@pt/node_map/SrcElementMap.js";
+import {SrcRefStore} from "@pt/node_map/SrcRefStore.js";
 
 export class SourceTree extends ProxyTree {
 
-    constructor() {
-        super(reactive(new SrcElementMap()));
+    constructor(nodeMap, proxyNodeFactory) {
+        super(reactive(new SrcRefStore(nodeMap)), proxyNodeFactory);
     }
 
     getSrcNode(id) {

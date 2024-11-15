@@ -1,5 +1,5 @@
 import {createTree} from "@pt/TreeUtil.js";
-import {createSourceTree} from "@pt/BasicSrcTree.js";
+import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 describe('Relatives', () => {
 

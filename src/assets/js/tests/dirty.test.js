@@ -1,10 +1,9 @@
-import {SourceTree} from "../proxy_tree/SrcTree.js";
-import {ComputedTree} from "../proxy_tree/ComputedTree.js";
+import {ComputedTree} from "@pt/ComputedTree.js";
 import {createTree} from "@pt/TreeUtil.js";
 import {createEmptyCompTree} from "./trees.js";
-import {OverlayType} from "../proxy_tree/OverlayType.js";
-import {createSourceTree} from "@pt/BasicSrcTree.js";
+import {OverlayType} from "@pt/OverlayType.js";
 import {CustomNode} from "@pt/CustomNode.js";
+import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 
 describe('', () => {
@@ -12,7 +11,7 @@ describe('', () => {
     let srcTree, cTree;
     beforeEach(() => {
         srcTree = createSourceTree(createTree(0));
-        cTree = new ComputedTree(srcTree, {}, (_, __) => undefined);
+        cTree = createComputedTree(srcTree, (_, __) => undefined);
         expect(srcTree.root.isDirty).toBe(false);
         expect(cTree.root.isDirty).toBe(false);
     })
@@ -47,7 +46,7 @@ describe('', () => {
 test('Overlay tree: move child', () => {
 
     const srcTree = createSourceTree(createTree([1, 0]));
-    const compTree = new ComputedTree(srcTree, {}, (_, __) => undefined);
+    const compTree = createComputedTree(srcTree, (_, __) => undefined);
     const srcRoot = srcTree.root;
     const compRoot = compTree.root;
 

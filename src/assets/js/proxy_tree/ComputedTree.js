@@ -1,5 +1,5 @@
 import {ProxyTree} from "@pt/ProxyTree.js";
-import {OverlayElementMap} from "@pt/node_map/OverlayElementMap.js";
+import {OverlayRefStore} from "@pt/node_map/OverlayRefStore.js";
 import {reactive} from "vue";
 import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
 import {useRecompute} from "@pt/Recompute.js";
@@ -9,10 +9,13 @@ const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);
 
 export class ComputedTree extends ProxyTree {
 
-    constructor(srcTree, state, recomputeFn, proxyNodeFactory = null) {
-        let overlayNodeMap = reactive(new OverlayElementMap(srcTree.nodeMap));
-        super(overlayNodeMap, proxyNodeFactory);
-        this.overlayNodeMap = overlayNodeMap;
+    constructor(srcTree,
+                state,
+                recomputeFn,
+                proxyNodeFactory) {
+        let overlayRefStore = reactive(new OverlayRefStore(srcTree.nodeMap));
+        super(overlayRefStore, proxyNodeFactory);
+        this.overlayRefStore = overlayRefStore;
         this.srcTree = srcTree;
         this.srcTree.addComputedTreeOverlay(this);
         this.initRootId(srcTree.root.id);
@@ -23,7 +26,7 @@ export class ComputedTree extends ProxyTree {
                 this.root,
                 recomputeFn,
                 () => this.markOverlaysDirty(),
-                () => this.overlayNodeMap.clearAllChanges(),
+                () => this.overlayRefStore.clearAllChanges(),
                 () => srcTree.recomputeIfDirty ? srcTree.recomputeIfDirty() : undefined
             );
 
@@ -66,14 +69,14 @@ export class ComputedTree extends ProxyTree {
     }
 
     getOverwrittenNodes() {
-        return this.overlayNodeMap.getOverwrittenNodeIds().map(id => this.getElement(id));
+        return this.overlayRefStore.getOverwrittenNodeIds().map(id => this.getElement(id));
     }
 
     getAddedNodes() {
-        return this.overlayNodeMap.getAddedNodeIds().map(id => this.getElement(id));
+        return this.overlayRefStore.getAddedNodeIds().map(id => this.getElement(id));
     }
 
     getDeletedNodes() {
-        return this.overlayNodeMap.getDeletedNodeIds();
+        return this.overlayRefStore.getDeletedNodeIds();
     }
 }

@@ -6,7 +6,7 @@ class NodeNotExistsError extends Error {
     }
 }
 
-export class ElementMap {
+export class RefStore {
     constructor() {
     }
 
