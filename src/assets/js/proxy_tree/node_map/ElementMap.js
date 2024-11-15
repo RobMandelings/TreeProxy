@@ -6,7 +6,7 @@ class NodeNotExistsError extends Error {
     }
 }
 
-export class NodeMap {
+export class ElementMap {
     constructor() {
     }
 
@@ -30,39 +30,38 @@ export class NodeMap {
         throw new Error("Abstract method");
     }
 
-    _addNode(node) {
+    _addElement(node) {
     }
 
     set(nodeId, prop, value) {
         throw new Error("Abstract method");
     }
 
-    addNode(node) {
-        console.assert(node instanceof CustomNode);
-        if (node == null) throw new Error("Node is null");
-        const id = this._addNode(node);
-        console.assert(this.getNode(id));
+    addElement(el) {
+        if (el == null) throw new Error("Element is null");
+        const id = this._addElement(el);
+        console.assert(this.getElement(id));
         return id;
     }
 
-    replaceNode(id, node) {
+    replaceElement(id, node) {
         throw new Error("Abstract method");
     }
 
-    deleteNode(id) {
+    deleteElement(id) {
         throw new Error("Abstract method");
     }
 
-    getNode(id) {
+    getElement(id) {
         throw new Error("Abstract method")
     }
 
-    getNodeIds() {
+    getElementIds() {
 
     }
 
-    nodeExists(id) {
-        return !!this.getNode(id);
+    elementExists(id) {
+        return !!this.getElement(id);
     }
 }
 

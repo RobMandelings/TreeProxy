@@ -26,7 +26,7 @@ export function useDescendants(proxyTree, children, rId) {
         const findDescendantById = (t, id) => {
             // Try to find in the efficient way.
             // Doing a map query and then finding the proper ancestor should be more efficient.
-            const node = proxyTree.getNode(id);
+            const node = proxyTree.getElement(id);
             if (node && node.ancestors.has(rId.value)) return node;
 
             // Traverse all descendants

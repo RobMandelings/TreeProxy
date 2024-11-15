@@ -4,14 +4,14 @@ import {useAncestors} from "@pt/proxy_node/useAncestors.js";
 import {useDescendants} from "@pt/proxy_node/useDescendants.js";
 
 export function useDelete(proxyTree, rId) {
-    const deleteFn = () => proxyTree.deleteNode(rId.value);
+    const deleteFn = () => proxyTree.deleteElement(rId.value);
     return {deleteFn: deleteFn};
 }
 
 function useParent(rId, proxyTree, initialParentId) {
 
     let rParentId = ref(initialParentId);
-    let rParentProxy = computed(() => proxyTree.getNode(rParentId.value));
+    let rParentProxy = computed(() => proxyTree.getElement(rParentId.value));
     const setParent = (parentId) => {
         proxyTree.moveTo(rId.value, parentId);
         rParentId.value = parentId;
@@ -85,7 +85,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const nodeRef = proxyTree.nodeMap.createRefProxy(id);
 
     const rId = computed(() => nodeRef.id);
-    const rStale = computed(() => !(nodeRef.node && proxyTree.getNode(id)));
+    const rStale = computed(() => !(nodeRef.node && proxyTree.getElement(id)));
 
     const {rParent, setParent} = useParent(rId, proxyTree, parentId)
 

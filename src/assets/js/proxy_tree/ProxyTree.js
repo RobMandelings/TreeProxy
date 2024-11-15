@@ -1,13 +1,13 @@
-import {NodeMap} from "@pt/node_map/NodeMap.js";
+import {ElementMap} from "@pt/node_map/ElementMap.js";
 import {NodeNotFoundError, RootNotSetError} from "@pt/ProxyTreeErrors.js";
 import {IncorrectIndexError, UndefinedIndexError} from "@pt/ProxyNodeErrors.js";
 import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/ProxyNodeFactory.js";
 
-export class ProxyTree extends NodeMap {
+export class ProxyTree extends ElementMap {
 
-    constructor(nodeMap, proxyNodeFactory = null) {
+    constructor(nodeMap) {
         super();
-        this.proxyNodeFactory = proxyNodeFactory ?? SIMPLE_PROXY_NODE_FACTORY;
+        this.proxyNodeFactory = SIMPLE_PROXY_NODE_FACTORY;
         this.nodeMap = nodeMap; // TODO make the node map immutable when returned
         this.proxyNodes = new Map();
         this.computedTreeOverlays = [];
@@ -56,7 +56,7 @@ export class ProxyTree extends NodeMap {
     }
 
     initRootId(rootId) {
-        if (!this.nodeMap.nodeExists(rootId))
+        if (!this.nodeMap.elementExists(rootId))
             throw new Error("Cannot set root: the node does not exist in the node map");
         this._root = this.createProxyNode(rootId, null);
         return this;
@@ -67,17 +67,17 @@ export class ProxyTree extends NodeMap {
         return this._root;
     }
 
-    getNode(id) {
+    getElement(id) {
         return this.proxyNodes.get(id);
     }
 
-    addNode(node) {
-        return this.nodeMap.addNode(node);
+    addElement(node) {
+        return this.nodeMap.addElement(node);
     }
 
-    replaceNode(id, node) {
+    replaceElement(id, node) {
         throw new Error("Node replacement is not yet implemented for computed trees either");
-        const prevNode = this.getNode(id);
+        const prevNode = this.getElement(id);
         if (!prevNode) throw new Error(`Can't replace node: node with id ${id} does not exist in this proxy tree`);
         // Delete all children. TODO: replacement involving trees. Allow for nested nodes to remain if position in tree is the same.
         prevNode.children.asArray.map(c => c.delete());
@@ -89,9 +89,9 @@ export class ProxyTree extends NodeMap {
         if (isNaN(index)) throw new IncorrectIndexError(index);
         if (typeof index === "string") index = parseInt(index);
 
-        const parent = this.getNode(parentId);
+        const parent = this.getElement(parentId);
         if (!parent) throw new Error("Cannot add child: parent not found");
-        const id = this.nodeMap.addNode(node);
+        const id = this.nodeMap.addElement(node);
 
         // Apparently splice with -1 index
         // does not insert at the last position, we have to use array.length.
@@ -105,7 +105,7 @@ export class ProxyTree extends NodeMap {
         return id;
     }
 
-    deleteNode(id) {
+    deleteElement(id) {
         const node = this.proxyNodes.get(id);
         if (node.parent) {
             const newChildrenIds = node.parent.childrenIds.filter(cId => cId !== id);
@@ -114,13 +114,13 @@ export class ProxyTree extends NodeMap {
         const nrDeleted = node.children.asArray.reduce((acc, c) => acc + c.delete(), 1);
 
         this.proxyNodes.delete(id);
-        this.nodeMap.deleteNode(id);
+        this.nodeMap.deleteElement(id);
 
         return nrDeleted;
     }
 
-    deleteNodes(ids) {
-        for (let id of ids) this.deleteNode(id);
+    deleteElements(ids) {
+        for (let id of ids) this.deleteElement(id);
     }
 
     createProxyNode(id, parentId) {
@@ -138,7 +138,7 @@ export class ProxyTree extends NodeMap {
     }
 
     getChildren(id) {
-        const node = this.nodeMap.getNode(id);
+        const node = this.nodeMap.getElement(id);
         if (!node) throw new NodeNotFoundError(id);
 
         return node.childrenIds.map(cId => {
@@ -148,8 +148,8 @@ export class ProxyTree extends NodeMap {
     }
 
     moveTo(nodeId, parentId) {
-        const node = this.getNode(nodeId);
-        const parent = this.getNode(parentId);
+        const node = this.getElement(nodeId);
+        const parent = this.getElement(parentId);
         if (!node) throw new Error("Can't move node to parent: node does not exist");
         if (!parent) throw new Error("Can't move node to parent: parent does not exist");
 

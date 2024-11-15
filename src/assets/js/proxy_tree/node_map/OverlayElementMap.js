@@ -1,5 +1,5 @@
 import * as Utils from "@pt/proxy_utils/Utils.js";
-import {NodeMap} from "@pt/node_map/NodeMap.js";
+import {ElementMap} from "@pt/node_map/ElementMap.js";
 import {computed, reactive, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js";
 import {OverlayType} from "@pt/OverlayType.js";
@@ -36,7 +36,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
     const rSrcNode = computed(() => {
         if (initial) initial = false;
         else srcNodeChanged = true;
-        const srcNode = srcNodeMap.getNode(rId.value);
+        const srcNode = srcNodeMap.getElement(rId.value);
 
         // This one is essential to make the computed prop reactive on deep changes
         // It seems like it does nothing, but this makes sure that the computed prop is recalled whenever any of the properties in the srcNode changes
@@ -75,39 +75,39 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
 }
 
-export class OverlayNodeMap extends NodeMap {
+export class OverlayElementMap extends ElementMap {
 
-    constructor(srcNodeMap) {
+    constructor(srcElementMap) {
         super();
-        this.srcNodeMap = srcNodeMap;
+        this.srcElementMap = srcElementMap;
 
         // Tracks the changes of the nodes on previous layer by keeping an object with the new property values
-        this.nodeChanges = new Map();
+        this.elementChanges = new Map();
         // To treat the values as reactive objects, we make overlayNodes reactive.
-        this.overlayNodes = reactive({}); // We will add computed properties to this object.
+        this.overlayElements = reactive({}); // We will add computed properties to this object.
 
-        this.addedNodes = new Map();
-        this.deletedNodeIds = new Set(); // Node ids which are deleted from the src map
+        this.addedElements = new Map();
+        this.elementNodeIds = new Set(); // Node ids which are deleted from the src map
     }
 
     getOverlayType(id) {
-        if (this.addedNodes.has(id)) return OverlayType.ADDED;
+        if (this.addedElements.has(id)) return OverlayType.ADDED;
         else if (this.isOverwritten(id)) return OverlayType.OVERWRITTEN;
         else return OverlayType.SRC;
     }
 
     isDirty(id) {
-        return this.nodeChanges.has(id);
+        return this.elementChanges.has(id);
     }
 
     isPropDirty(id, prop) {
-        if (!this.nodeChanges.has(id)) return false;
-        return this.nodeChanges.get(id)[prop] !== undefined;
+        if (!this.elementChanges.has(id)) return false;
+        return this.elementChanges.get(id)[prop] !== undefined;
     }
 
     getPropertyValue(id, prop) {
-        if (!this.isPropDirty(id, prop)) return this.srcNodeMap.getPropertyValue(id, prop);
-        return this.nodeChanges.get(id)[prop];
+        if (!this.isPropDirty(id, prop)) return this.srcElementMap.getPropertyValue(id, prop);
+        return this.elementChanges.get(id)[prop];
     }
 
     createRefProxy(id) {
@@ -115,32 +115,32 @@ export class OverlayNodeMap extends NodeMap {
 
         let rNode;
 
-        // We don't need to a copy of the previous layer as the node was added on this layer.
-        // Any adjustments directly apply to the node on this layer
-        if (this.addedNodes.has(id)) rNode = computed(() => this.addedNodes.get(id));
+        // We don't need to a copy of the previous layer as the element was added on this layer.
+        // Any adjustments directly apply to the element on this layer
+        if (this.addedElements.has(id)) rNode = computed(() => this.addedElements.get(id));
         else {
-            const {rCopy} = useOverlayNode(this.nodeChanges, this.srcNodeMap, rId);
-            rNode = computed(() => this.getNode(rId.value));
-            this.overlayNodes[rId.value] = rCopy;
+            const {rCopy} = useOverlayNode(this.elementChanges, this.srcElementMap, rId);
+            rNode = computed(() => this.getElement(rId.value));
+            this.overlayElements[rId.value] = rCopy;
         }
 
         return RefProxy.createRefProxy(this, rId, rNode);
     }
 
     isOverwritten(id) {
-        return this.overlayNodes[id] != null;
+        return this.overlayElements[id] != null;
     }
 
     syncSrc() {
-        // Copy the computed nodes from the computed map to the src map.
-        // Old nodes will be overwritten with their new values
-        // this.changedNodes.forEach((v, k) => this.srcNodeMap.nodes.set(k, v));
+        // Copy the computed elements from the computed map to the src map.
+        // Old elements will be overwritten with their new values
+        // this.changedNodes.forEach((v, k) => this.srcElementMap.nodes.set(k, v));
         // this.changedNodes.clear();
     }
 
-    _addNode(node) {
+    _addElement(node) {
         const id = CoreNode.generateId();
-        this.addedNodes.set(id, node);
+        this.addedElements.set(id, node);
         return id;
     }
 
@@ -151,29 +151,29 @@ export class OverlayNodeMap extends NodeMap {
     set(nodeId, prop, val) {
 
         // TODO we did not yet check for object equalities (only primitives)
-        const remove = (this.srcNodeMap.getPropertyValue(nodeId, prop) === val);
+        const remove = (this.srcElementMap.getPropertyValue(nodeId, prop) === val);
 
         // If the node was added on this layer, any adjustments to this node simply apply to the node itself
-        if (this.addedNodes.has(nodeId)) this.addedNodes.get(nodeId)[prop] = val;
+        if (this.addedElements.has(nodeId)) this.addedElements.get(nodeId)[prop] = val;
         else {
             if (remove) {
-                if (this.nodeChanges.has(nodeId)) {
-                    const changes = this.nodeChanges.get(nodeId);
+                if (this.elementChanges.has(nodeId)) {
+                    const changes = this.elementChanges.get(nodeId);
                     if (Object.hasOwn(changes, prop)) {
-                        delete this.nodeChanges.get(nodeId)[prop];
+                        delete this.elementChanges.get(nodeId)[prop];
                         if (Utils.isEmpty(changes))
-                            this.nodeChanges.delete(nodeId);
+                            this.elementChanges.delete(nodeId);
                     }
                 }
             } else {
 
                 // Sets the property to a value which will be applied to create new nodes
-                if (!this.nodeChanges.has(nodeId)) {
-                    if (!this.srcNodeMap.nodeExists(nodeId)) throw new Error("Cannot make adjustments: " +
+                if (!this.elementChanges.has(nodeId)) {
+                    if (!this.srcElementMap.elementExists(nodeId)) throw new Error("Cannot make adjustments: " +
                         "Node does not exist in the src node map as well as the computed node map.");
-                    this.nodeChanges.set(nodeId, {});
+                    this.elementChanges.set(nodeId, {});
                 }
-                this.nodeChanges.get(nodeId)[prop] = val;
+                this.elementChanges.get(nodeId)[prop] = val;
             }
         }
     }
@@ -192,13 +192,13 @@ export class OverlayNodeMap extends NodeMap {
 
     clearAllChanges() {
 
-        this.nodeChanges.clear();
-        this.addedNodes.clear();
-        this.deletedNodeIds.clear();
+        this.elementChanges.clear();
+        this.addedElements.clear();
+        this.elementNodeIds.clear();
     }
 
-    deleteNode(id) {
-        this.deletedNodeIds.add(id);
+    deleteElement(id) {
+        this.elementNodeIds.add(id);
     }
 
     isDeleted(id) {
@@ -206,29 +206,29 @@ export class OverlayNodeMap extends NodeMap {
     }
 
     getAddedNode(id) {
-        return this.addedNodes.get(id);
+        return this.addedElements.get(id);
     }
 
     getDeletedNodeIds() {
-        return this.deletedNodeIds;
+        return this.elementNodeIds;
     }
 
     getAddedNodeIds() {
-        return new Set(this.addedNodes.keys());
+        return new Set(this.addedElements.keys());
     }
 
-    getNodeIds() {
-        let set = this.srcNodeMap.getNodeIds();
+    getElementIds() {
+        let set = this.srcElementMap.getElementIds();
         set = set.union(this.getAddedNodeIds());
         set = Utils.difference(set, this.getDeletedNodeIds());
         return set;
     }
 
-    getNode(id) {
+    getElement(id) {
         if (this.isDeleted(id)) return null;
 
         return this.getAddedNode(id)
-            ?? this.overlayNodes[id]
-            ?? this.srcNodeMap.getNode(id);
+            ?? this.overlayElements[id]
+            ?? this.srcElementMap.getElement(id);
     }
 }

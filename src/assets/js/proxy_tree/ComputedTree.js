@@ -1,5 +1,5 @@
 import {ProxyTree} from "@pt/ProxyTree.js";
-import {OverlayNodeMap} from "@pt/node_map/OverlayNodeMap.js";
+import {OverlayElementMap} from "@pt/node_map/OverlayElementMap.js";
 import {reactive} from "vue";
 import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
 import {useRecompute} from "@pt/Recompute.js";
@@ -10,7 +10,7 @@ const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);
 export class ComputedTree extends ProxyTree {
 
     constructor(srcTree, state, recomputeFn, proxyNodeFactory = null) {
-        let overlayNodeMap = reactive(new OverlayNodeMap(srcTree.nodeMap));
+        let overlayNodeMap = reactive(new OverlayElementMap(srcTree.nodeMap));
         super(overlayNodeMap, proxyNodeFactory);
         this.overlayNodeMap = overlayNodeMap;
         this.srcTree = srcTree;
@@ -50,7 +50,7 @@ export class ComputedTree extends ProxyTree {
     }
 
     getSrcNode(id) {
-        return this.srcTree.getNode(id);
+        return this.srcTree.getElement(id);
     }
 
     get markedForRecompute() {
@@ -66,11 +66,11 @@ export class ComputedTree extends ProxyTree {
     }
 
     getOverwrittenNodes() {
-        return this.overlayNodeMap.getOverwrittenNodeIds().map(id => this.getNode(id));
+        return this.overlayNodeMap.getOverwrittenNodeIds().map(id => this.getElement(id));
     }
 
     getAddedNodes() {
-        return this.overlayNodeMap.getAddedNodeIds().map(id => this.getNode(id));
+        return this.overlayNodeMap.getAddedNodeIds().map(id => this.getElement(id));
     }
 
     getDeletedNodes() {

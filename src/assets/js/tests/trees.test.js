@@ -27,7 +27,7 @@ describe('Delayed child computation', () => {
             // Log the method call
             // console.log('Method called with args:', args);
 
-            // console.log(`Method called with id: ${id} and name ${this.getNode(id).name}`)
+            // console.log(`Method called with id: ${id} and name ${this.getElement(id).name}`)
             // Call the original implementation and store the result
             const result = originalMethod.apply(this, [id]);
 

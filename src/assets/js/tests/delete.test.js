@@ -15,13 +15,13 @@ describe('Deletion', () => {
     test('Stale proxy', () => {
 
         const id = srcTree.root.id;
-        expect(srcTree.nodeMap.getNode(id)).toBeTruthy();
-        expect(srcTree.getNode(id)).toBeTruthy();
+        expect(srcTree.nodeMap.getElement(id)).toBeTruthy();
+        expect(srcTree.getElement(id)).toBeTruthy();
         srcTree.root.delete();
         expect(srcTree.root.stale).toBe(true);
         expect(() => srcTree.root.id).toThrow(ProxyNodeErrors.StaleProxyError);
-        expect(srcTree.getNode(id)).toBeFalsy();
-        expect(srcTree.nodeMap.getNode(id)).toBeFalsy();
+        expect(srcTree.getElement(id)).toBeFalsy();
+        expect(srcTree.nodeMap.getElement(id)).toBeFalsy();
     });
 
     test('Parent remove child relation', () => {
