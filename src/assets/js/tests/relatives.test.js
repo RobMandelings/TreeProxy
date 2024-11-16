@@ -45,14 +45,14 @@ describe('Relatives', () => {
         describe('Finding nodes', () => {
             describe('Finding ancestors', () => {
                 test('No ancestor', () => expect(root.ancestors[0]).toBeUndefined());
-                test('Root via index', () => expect(child.ancestors[0]).toBe(root));
-                test('Root via id', () => expect(child.ancestors[root.id]).toBe(root));
+                test('Root via index', () => expect(child.ancestors[0].__proxyId__).toBe(root.__proxyId__));
+                test('Root via id', () => expect(child.ancestors[root.id].__proxyId__).toBe(root.__proxyId__));
             });
 
             describe('Finding descendants', () => {
-                test('Child from root by id', () => expect(root.descendants[child.id]).toBe(child));
+                test('Child from root by id', () => expect(root.descendants[child.id].__proxyId__).toBe(child.__proxyId__));
                 test('Root from child by id (undefined)', () => expect(child.descendants[root.id]).toBeUndefined());
-                test('Child from root via path', () => expect(root.descendants["0"]).toBe(child));
+                test('Child from root via path', () => expect(root.descendants["0"].__proxyId__).toBe(child.__proxyId__));
                 test('Undefined from root via path', () => expect(root.descendants["0,0"]).toBeUndefined());
             })
         });
@@ -70,8 +70,8 @@ describe('Relatives', () => {
         })
 
         describe('Negative index to find last', () => {
-            test('Root via ancestors', () => expect(childLvl2.ancestors[-1]).toBe(root));
-            test('Last child', () => expect(root.children[-1]).toBe(childLvl1));
+            test('Root via ancestors', () => expect(childLvl2.ancestors[-1].__proxyId__).toBe(root.__proxyId__));
+            test('Last child', () => expect(root.children[-1].__proxyId__).toBe(childLvl1.__proxyId__));
         })
 
         describe('Nr ancestors', () => {
@@ -80,7 +80,7 @@ describe('Relatives', () => {
             test('Child lvl 2', () => expect(childLvl2.ancestors.size).toBe(2));
         });
 
-        test('Ancestor from child lvl 2', () => expect(childLvl2.ancestors.root).toBe(root));
+        test('Ancestor from child lvl 2', () => expect(childLvl2.ancestors.root.__proxyId__).toBe(root.__proxyId__));
         describe('Depth tests', () => {
             test('Root', () => expect(root.depth).toBe(0))
             test('Child lvl 1', () => expect(childLvl1.depth).toBe(1))
@@ -127,9 +127,9 @@ describe('Relatives', () => {
 
                 test('Descendants from path correctness', () => {
 
-                    expect(c1.parent).toBe(root);
+                    expect(c1.parent.__proxyId__).toBe(root.__proxyId__);
                     expect(c1.children.size).toBe(2);
-                    expect(c2?.parent?.parent).toBe(root);
+                    expect(c2?.parent?.parent.__proxyId__).toBe(root.__proxyId__);
                     expect(c2.children.size).toBe(4);
                     expect(c3?.parent?.parent?.parent?.id).toBe(root.id);
                     expect(c3.children.size).toBe(0);
@@ -139,12 +139,12 @@ describe('Relatives', () => {
             describe('Finding ancestors', () => {
 
                 test('Ancestors via child 3', () => {
-                    expect(c3.ancestors[root.id]).toBe(root);
-                    expect(c3.ancestors[c1.id]).toBe(c1);
-                    expect(c3.ancestors[c2.id]).toBe(c2);
-                    expect(c3.ancestors[0]).toBe(c2);
-                    expect(c3.ancestors[1]).toBe(c1);
-                    expect(c3.ancestors[2]).toBe(root);
+                    expect(c3.ancestors[root.id].__proxyId__).toBe(root.__proxyId__);
+                    expect(c3.ancestors[c1.id].__proxyId__).toBe(c1.__proxyId__);
+                    expect(c3.ancestors[c2.id].__proxyId__).toBe(c2.__proxyId__);
+                    expect(c3.ancestors[0].__proxyId__).toBe(c2.__proxyId__);
+                    expect(c3.ancestors[1].__proxyId__).toBe(c1.__proxyId__);
+                    expect(c3.ancestors[2].__proxyId__).toBe(root.__proxyId__);
                 });
             });
         });

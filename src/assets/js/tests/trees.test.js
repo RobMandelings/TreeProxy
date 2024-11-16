@@ -91,6 +91,6 @@ describe('Children', () => {
 describe('Parent and Child relation', () => {
     const srcTree = createSourceTree({name: "Root", children: [{name: "Child"}]});
     const child = srcTree.root.children[0];
-    test('Parent relation test', () => expect(child.parent).toBe(srcTree.root));
+    test('Parent relation test', () => expect(child.parent.__proxyId__).toBe(srcTree.root.__proxyId__));
     test('Child instance via parent equal to child instance', () => expect(child.parent.children[0]).toBe(child));
 });

@@ -27,6 +27,7 @@ export class ProxyNodeFactory {
 
     _createProxyNode(proxyTree, id, parentId, beforeGetFn) {
 
+        const proxyId = crypto.randomUUID(); // Unique id for each proxy. Used in testing while comparing proxies.
         const target = this._createProxyTarget(proxyTree, id, parentId);
         const excludePropFn = useShouldExcludeProperty(target);
         const handler = {
@@ -34,6 +35,7 @@ export class ProxyNodeFactory {
                 // Otherwise vue will get the raw target upon assignment in reactive object
                 // Then we will lose our Proxy! Very important line.
                 if (prop === "__v_raw") return undefined;
+                if (prop === "__proxyId__") return proxyId;
                 if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
 
                 if (beforeGetFn) beforeGetFn(t, prop, receiver);

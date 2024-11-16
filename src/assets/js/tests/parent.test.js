@@ -19,9 +19,9 @@ describe("Parent relation test", () => {
 
     test('Parent relation test', () => {
 
-        expect(child1.parent).toBe(srcTree.root);
-        expect(subchild1.parent).toBe(child1);
-        expect(subchild1.parent.parent).toBe(srcTree.root);
+        expect(child1.parent.__proxyId__).toBe(srcTree.root.__proxyId__);
+        expect(subchild1.parent.__proxyId__).toBe(child1.__proxyId__);
+        expect(subchild1.parent.parent.__proxyId__).toBe(srcTree.root.__proxyId__);
 
     });
 
