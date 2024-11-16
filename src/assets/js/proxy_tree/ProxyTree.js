@@ -125,8 +125,8 @@ export class ProxyTree extends RefStore {
 
     createProxyNode(id, parentId) {
         console.assert(!this.proxyNodes.has(id));
-        console.assert(!parentId || this.proxyNodes.get(parentId),
-            `Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
+        if (parentId && !this.proxyNodes.get(parentId))
+            throw new Error(`Cannot create proxy child: there is no proxy node for the parent (id ${parentId})`);
 
         const proxyNode = this.createProxyNodeFn(id, parentId);
         this.proxyNodes.set(id, proxyNode);
