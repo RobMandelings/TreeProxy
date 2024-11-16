@@ -1,7 +1,7 @@
 import {SourceTree} from "@pt/SrcTree.js";
 import * as ProxyNodeErrors from "@pt/ProxyNodeErrors.js"
 import * as ProxyTreeErrors from "@pt/ProxyTreeErrors.js"
-import {watch} from "vue";
+import {nextTick, watch} from "vue";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 test('Direct proxy node access', () => {

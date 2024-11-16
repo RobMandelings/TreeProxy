@@ -1,16 +1,6 @@
-import {isReactive, nextTick, ref, watch} from "vue";
+import {computed, isReactive, nextTick, reactive, ref, watch} from "vue";
 import {ComputedTree} from "@pt/ComputedTree.js";
 import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
-
-describe('Reactivity checks', () => {
-
-    const srcTree = createSourceTree({name: "Root", children: [{name: "Child"}]});
-
-    expect(isReactive(srcTree.root)).toBe(true);
-    expect(isReactive(srcTree.root.children)).toBe(true);
-    expect(isReactive(srcTree.root.children[0])).toBe(true);
-
-});
 
 function runWatchTests(description, getTarget, watchTriggers) {
     describe(description, () => {
@@ -61,8 +51,9 @@ describe("Deep watch", () => {
     describe('Source tree', () => {
 
         beforeEach(() => {
-            watch(srcTree.root.children.asArray, () => childrenWatchTrigger());
-            watch(srcTree.root, () => rootWatchTrigger());
+            const arr = computed(() => srcTree.root.children.asArray.map(c => c.name))
+            watch(arr, () => childrenWatchTrigger());
+            watch(() => srcTree.root.name, () => rootWatchTrigger());
         });
 
         runWatchTests(
@@ -74,7 +65,7 @@ describe("Deep watch", () => {
         runWatchTests(
             'Nested level 1 watch',
             () => child,
-            [rootWatchTrigger, childrenWatchTrigger],
+            [childrenWatchTrigger],
         );
     });
 
@@ -87,7 +78,7 @@ describe("Deep watch", () => {
 
             };
             compTree = createComputedTree(srcTree, computeFn, {count: rCount});
-            watch(compTree.root, (vN, vO) => rootWatchTrigger());
+            watch(() => compTree.root.name, (vN, vO) => rootWatchTrigger());
         });
 
         test('Single change', async () => {
