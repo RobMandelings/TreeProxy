@@ -51,15 +51,14 @@ describe("Deep watch", () => {
     describe('Source tree', () => {
 
         beforeEach(() => {
-            const arr = computed(() => srcTree.root.children.asArray.map(c => c.name))
-            watch(arr, () => childrenWatchTrigger());
-            watch(() => srcTree.root.name, () => rootWatchTrigger());
+            watch(srcTree.root.children.asArray, () => childrenWatchTrigger());
+            watch(srcTree.root, () => rootWatchTrigger());
         });
 
         runWatchTests(
             'Root level watch',
             () => srcTree.root,
-            [rootWatchTrigger],
+            [rootWatchTrigger, childrenWatchTrigger],
         );
 
         runWatchTests(
@@ -78,7 +77,7 @@ describe("Deep watch", () => {
 
             };
             compTree = createComputedTree(srcTree, computeFn, {count: rCount});
-            watch(() => compTree.root.name, (vN, vO) => rootWatchTrigger());
+            watch(compTree.root, (vN, vO) => rootWatchTrigger());
         });
 
         test('Single change', async () => {

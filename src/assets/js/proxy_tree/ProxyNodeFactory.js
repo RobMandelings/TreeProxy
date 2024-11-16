@@ -31,7 +31,6 @@ export class ProxyNodeFactory {
         const excludePropFn = useShouldExcludeProperty(target);
         const handler = {
             get: (t, prop, receiver) => {
-                if (prop === "__v_isReactive") return false;
                 if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
 
                 if (beforeGetFn) beforeGetFn(t, prop, receiver);
