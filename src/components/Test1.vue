@@ -1,9 +1,8 @@
 <script setup>
 
-import {SourceTree} from "../assets/js/proxy_tree/SrcTree.js";
-import {ComputedTree} from "../assets/js/proxy_tree/ComputedTree.js";
-import {computed, ref} from "vue";
-import {createSourceTree} from "@pt/BasicSrcTree.js";
+
+import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
+import {ref} from "vue";
 
 const srcTree = createSourceTree({name: "Root"});
 
@@ -21,7 +20,7 @@ const computeFn = (state, root) => {
   root.name = `${root.name} (c:${state.count}, t:${txt})`
 };
 
-const compTree = createComputedTree(srcTree, {count: rCount, text: rText}, computeFn);
+const compTree = createComputedTree(srcTree, computeFn, {count: rCount, text: rText});
 
 const changeCount = () => {
   rCount.value++;
