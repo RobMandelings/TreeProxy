@@ -13,8 +13,10 @@ test('No children', () => {
     srcTree.root.children.addNode(new CustomNode("Child", []), 0);
     expect(srcTree.root.children.size).toBe(1);
     expect(srcTree.root.children[0]).toBeTruthy();
-    expect(srcTree.root.children[0].parent).toBe(srcTree.root);
+    const t = srcTree.root.children[0].parent;
+    expect(srcTree.root.children[0].parent === srcTree.root).toBe(true)
 });
+
 
 describe('Multiple children', () => {
     let srcTree, root;

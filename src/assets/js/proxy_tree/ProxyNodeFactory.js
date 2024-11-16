@@ -31,6 +31,9 @@ export class ProxyNodeFactory {
         const excludePropFn = useShouldExcludeProperty(target);
         const handler = {
             get: (t, prop, receiver) => {
+                // Otherwise vue will get the raw target upon assignment in reactive object
+                // Then we will lose our Proxy! Very important line.
+                if (prop === "__v_raw") return undefined;
                 if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
 
                 if (beforeGetFn) beforeGetFn(t, prop, receiver);
