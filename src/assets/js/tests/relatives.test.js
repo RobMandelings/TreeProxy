@@ -166,3 +166,13 @@ describe('Finding with custom function', () => {
         expect(srcTree.root.descendants.find(c => c.name === "ToBeFound")).toBeTruthy();
     });
 });
+
+describe('Leafs', () => {
+
+    const srcTree = createSourceTree(createTree([10, 5]));
+    test('Number of leafs', () => expect(srcTree.root.leafs.size).toBe(15));
+    test('Root is leaf', () => expect(srcTree.root.isLeaf).toBe(false));
+    test('Child is leaf', () => expect(srcTree.root.descendants[0].isLeaf).toBe(false));
+    test('Leaf is leaf', () => expect(srcTree.root.descendants["0,0"].isLeaf).toBe(true));
+
+})

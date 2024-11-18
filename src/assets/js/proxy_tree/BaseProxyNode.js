@@ -2,6 +2,7 @@ import {computed, reactive, ref} from "vue";
 import {useChildren} from "@pt/proxy_node/useChildren.js";
 import {useAncestors} from "@pt/proxy_node/useAncestors.js";
 import {useDescendants} from "@pt/proxy_node/useDescendants.js";
+import {useLeafs} from "@pt/proxy_node/useLeafs.js";
 
 export function useDelete(proxyTree, rId) {
     const deleteFn = () => proxyTree.deleteElement(rId.value);
@@ -92,8 +93,11 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const children = useChildren(rId, computed(() => nodeRef.childrenIds), proxyTree);
     const ancestors = useAncestors(rParent);
     const descendants = useDescendants(proxyTree, children, rId);
+    const leafs = useLeafs(proxyTree, descendants);
     const isDescendantOf = (id) => !!ancestors.has(id);
     const isAncestorOf = (id) => !!descendants.has(id);
+    const hasChildren = computed(() => children.size > 0);
+    const isLeaf = computed(() => !hasChildren.value);
 
     const {deleteFn} = useDelete(proxyTree, rId);
     const {replaceFn} = useReplace(proxyTree, rId);
@@ -111,8 +115,11 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
         children,
         ancestors,
         descendants,
+        leafs,
         isDescendantOf,
         isAncestorOf,
+        hasChildren,
+        isLeaf,
         replace: replaceFn,
         parent: rParent,
         setParent,

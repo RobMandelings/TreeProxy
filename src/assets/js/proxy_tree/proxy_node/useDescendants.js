@@ -1,10 +1,7 @@
 import {decorateWithFind, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
 
 export function useDescendants(proxyTree, children, rId) {
-
-    /**
-     * Descendants are inclusive: the node itself is also part of the list
-     */
+    
     const getDescendantsAsArray = () => {
         if (!children) return [];
         const descendants = [...children.asArray.flatMap(c => [c, ...c.descendants.asArray])];
