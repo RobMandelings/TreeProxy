@@ -1,5 +1,7 @@
 import {createTree} from "@pt/TreeUtil.js";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
+import {CustomNode} from "@pt/CustomNode.js";
+import {CoreNode} from "@pt/CoreNode.js";
 
 describe('Relatives', () => {
 
@@ -211,3 +213,10 @@ describe('Position', () => {
         expect(c0.pos).toBe(0);
     })
 })
+
+describe('Has check based on instance', () => {
+    test('CustomNode', () => {
+        const srcTree = createSourceTree(createTree(3));
+        expect(srcTree.root.children.has(CoreNode)).toBe(true);
+    });
+});

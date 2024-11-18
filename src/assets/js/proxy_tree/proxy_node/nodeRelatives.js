@@ -35,7 +35,14 @@ export function decorateWithFind(nodeRelatives, customFindFn = null) {
 
 export function useNodeRelatives(asArrayFn) {
 
-    const hasFn = (id) => !!getByIdFn(id);
+    /**
+     * E.g. has(Vakonderdeel)
+     */
+    const hasFn = (criteria) => {
+        if (typeof criteria === 'string') return !!getByIdFn(criteria)
+        else if (typeof criteria === 'function') return !!asArrayFn().find(e => e.nodeInstanceOf(criteria));
+        else throw new Error("Invalid type");
+    }
     const getByIdFn = (id) => asArrayFn().find(e => e.id === id);
     const asSetFn = () => new Set(asArrayFn());
     const getSizeFn = () => asArrayFn().length;
