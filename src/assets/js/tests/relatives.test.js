@@ -179,10 +179,14 @@ describe('Leafs', () => {
 
 describe('Position', () => {
 
-    const srcTree = createSourceTree(createTree(3));
-    const c0 = srcTree.root.children[0];
-    const c1 = srcTree.root.children[1];
-    const c2 = srcTree.root.children[2];
+    let srcTree, c0, c1, c2;
+    beforeEach(() => {
+        srcTree = createSourceTree(createTree(3));
+        c0 = srcTree.root.children[0];
+        c1 = srcTree.root.children[1];
+        c2 = srcTree.root.children[2];
+    });
+
     test('Root pos', () => expect(srcTree.root.pos).toBe(0));
     test('Root max pos', () => expect(srcTree.root.maxPos).toBe(0));
     test('Child 0 pos', () => expect(c0.pos).toBe(0))
@@ -196,4 +200,14 @@ describe('Position', () => {
         expect(c2.pos).toBe(1); // Shifted one to the left
         expect(srcTree.root.children[2].id).toBe(c0.id);
     });
+
+    test('Move pos outside range', () => {
+        c0.movePos(5);
+        expect(c0.pos).toBe(c0.maxPos);
+    })
+
+    test('Move pos less than 0', () => {
+        c0.movePos(-5);
+        expect(c0.pos).toBe(0);
+    })
 })
