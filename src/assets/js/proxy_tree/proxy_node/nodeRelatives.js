@@ -1,18 +1,32 @@
 import {CustomNode} from "@pt/CustomNode.js";
+import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
 
-export function findById(t, prop) {
-    if (typeof prop === 'string' && CustomNode.isValidID(prop)) {
-        return t.asArray.find(c => c.id === prop);
-    }
+export function findById(t, str) {
+    if (CustomNode.isValidID(str))
+        return t.asArray.find(c => c.id === str);
 }
 
-export function decorateNodeRelatives(nodeRelatives, customGetHandler) {
+export function findByIndex(t, str) {
+    if (!isNaN(str)) str = parseInt(str);
+    if (typeof str === "number") return t.asArray.at(str);
+}
+
+export function findFn(t, str) {
+    let res;
+    res = findById(t, str);
+    if (res !== undefined) return res;
+    res = findByIndex(t, str)
+    if (res !== undefined) return res;
+}
+
+export function decorateWithFind(nodeRelatives, customFindFn = null) {
+
     return new Proxy(nodeRelatives, {
         get(t, prop, receiver) {
-            if (prop in t) return Reflect.get(t, prop, receiver);
-
-            const res = customGetHandler(t, prop);
-            if (res !== undefined) return res;
+            if (!(prop in t) && typeof prop === "string") {
+                let res = customFindFn ? customFindFn(t, prop) : findFn(t, prop);
+                if (res !== undefined) return res;
+            }
 
             return Reflect.get(t, prop, receiver); // Always a Reflect.get required for vue to properly initialise reactivity and such
         }

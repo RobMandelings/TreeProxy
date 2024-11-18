@@ -1,5 +1,5 @@
 import {computed} from "vue";
-import {decorateNodeRelatives, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
+import {decorateWithFind, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
 
 function useAddChild(rId, proxyTree) {
 
@@ -36,16 +36,5 @@ export function useChildren(rId, rChildrenIds, proxyTree) {
 
     childrenObj.addNode = addNodeFn;
 
-    const decorateChildren = (children) => {
-        return decorateNodeRelatives(children, (t, prop) => {
-            if (typeof prop === 'string' && !isNaN(prop)) prop = parseInt(prop);
-
-            const res = findById(t, prop);
-            if (res !== undefined) return res;
-
-            if (typeof prop === "number") return t.asArray.at(prop);
-        })
-    }
-
-    return decorateChildren(childrenObj);
+    return decorateWithFind(childrenObj);
 }

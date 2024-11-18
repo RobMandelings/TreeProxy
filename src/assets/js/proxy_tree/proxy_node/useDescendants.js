@@ -1,4 +1,4 @@
-import {decorateNodeRelatives, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
+import {decorateWithFind, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
 
 export function useDescendants(proxyTree, children, rId) {
 
@@ -34,18 +34,21 @@ export function useDescendants(proxyTree, children, rId) {
             if (res !== undefined) return res;
         }
 
-        return decorateNodeRelatives(descendants, (t, prop) => {
+        const findDescendantViaPath = (t, prop) => {
+            // Try to find the descendant via path
+            const numbers = prop.split(',').map(num => parseInt(num.trim()));
+            if (numbers.some(n => isNaN(n))) return undefined; // Incorrect format
+            if (numbers.length > 0) return getDescendantFromPath(numbers);
+        }
 
-            if (typeof prop === "string") {
-                const res = findDescendantById(t, prop);
-                if (res !== undefined) return res;
+        const findDescendant = (t, prop) => {
+            let res = findDescendantById(t, prop);
+            if (res !== undefined) return res;
+            res = findDescendantViaPath(t, prop)
+            return res;
+        }
 
-                // Try to find the descendant via path
-                const numbers = prop.split(',').map(num => parseInt(num.trim()));
-                if (numbers.some(n => isNaN(n))) return undefined; // Incorrect format
-                if (numbers.length > 0) return getDescendantFromPath(numbers);
-            }
-        })
+        return decorateWithFind(descendants, findDescendant)
     }
 
     return decorateDescendants(nodeRelativesCore);

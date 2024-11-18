@@ -1,4 +1,4 @@
-import {decorateNodeRelatives, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
+import {decorateWithFind, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
 
 export function useAncestors(rParent) {
 
@@ -7,17 +7,6 @@ export function useAncestors(rParent) {
         if (!parent) return [];
 
         return [parent, ...parent.ancestors.asArray];
-    }
-
-    const decorateAncestors = (ancestors) => {
-        return decorateNodeRelatives(ancestors, (t, prop) => {
-            if (typeof prop === 'string' && !isNaN(prop)) prop = parseInt(prop);
-
-            const res = findById(t, prop);
-            if (res !== undefined) return res;
-
-            if (typeof prop === "number") return t.asArray.at(prop); // ancestors[n] -> retrieve the n-th ancestor
-        });
     }
 
     const nodeRelativesCore = useNodeRelatives(getAncestorsAsArrayFn)
@@ -35,5 +24,6 @@ export function useAncestors(rParent) {
         },
     });
 
-    return decorateAncestors(ancestorsObj);
+    // ancestors[n] -> retrieve the n-th ancestor
+    return decorateWithFind(ancestorsObj);
 }
