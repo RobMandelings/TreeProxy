@@ -194,5 +194,6 @@ describe('Position', () => {
         c0.movePos(2);
         expect(c0.pos).toBe(2); // Shifted all the way to the end
         expect(c2.pos).toBe(1); // Shifted one to the left
+        expect(srcTree.root.children[2].id).toBe(c0.id);
     });
 })
