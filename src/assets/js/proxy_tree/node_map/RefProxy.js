@@ -1,6 +1,18 @@
 import {reactive} from "vue";
 import {useShouldExcludeProperty, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
 
+function createdNestedRefProxy(nodeMap, target) {
+    return new Proxy(target, {
+        get(t, p, receiver) {
+            const r = Reflect.get(t, p, receiver);
+            if (typeof r === 'object') return createdNestedRefProxy(nodeMap, r);
+        },
+        set(t, p, newValue, receiver) {
+
+        }
+    })
+}
+
 export function createRefProxy(nodeMap, rId, rNode) {
     const targetObj = reactive({node: rNode, id: rId});
 
