@@ -104,6 +104,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const children = useChildren(rId, computed(() => nodeRef.childrenIds), proxyTree);
     const ancestors = useAncestors(rParent);
     const descendants = useDescendants(proxyTree, children, rId);
+    const rRoot = computed(() => ancestors[-1])
     const leafs = useLeafs(proxyTree, descendants);
     const isDescendantOf = (id) => !!ancestors.has(id);
     const isAncestorOf = (id) => !!descendants.has(id);
@@ -129,6 +130,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
         ancestors,
         descendants,
         leafs,
+        root: rRoot,
         isDescendantOf,
         isAncestorOf,
         hasChildren,
