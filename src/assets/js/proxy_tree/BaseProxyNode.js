@@ -94,6 +94,7 @@ function usePos(proxyTree, rParent, rId) {
 }
 
 export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
+
     const nodeRef = proxyTree.nodeMap.createRefProxy(id);
 
     const rId = computed(() => nodeRef.id);
@@ -104,7 +105,10 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const children = useChildren(rId, computed(() => nodeRef.childrenIds), proxyTree);
     const ancestors = useAncestors(rParent);
     const descendants = useDescendants(proxyTree, children, rId);
-    const rRoot = computed(() => ancestors[-1])
+    const rRoot = computed(() => {
+        if (!ancestors.size) return proxyTree.getElement(rId.value);
+        return ancestors[-1];
+    })
     const leafs = useLeafs(proxyTree, descendants);
     const isDescendantOf = (id) => !!ancestors.has(id);
     const isAncestorOf = (id) => !!descendants.has(id);

@@ -214,12 +214,19 @@ describe('Position', () => {
     })
 })
 
-test('Finding root', () => {
-    const srcTree = createSourceTree(createTree([[[[]]]]));
-    const descendant = srcTree.root.descendants["0,0,0"];
-    const root = descendant.root;
-    expect(root.id).toBe(srcTree.root.id);
-});
+describe('Finding root', () => {
+    test('From descendant', () => {
+        const srcTree = createSourceTree(createTree([[[[]]]]));
+        const descendant = srcTree.root.descendants["0,0,0"];
+        const root = descendant.root;
+        expect(root.id).toBe(srcTree.root.id);
+    });
+
+    test('From self', () => {
+        const srcTree = createSourceTree(createTree(0));
+        expect(srcTree.root.root).toBe(srcTree.root);
+    })
+})
 
 describe('Has check based on instance', () => {
     test('CustomNode', () => {
