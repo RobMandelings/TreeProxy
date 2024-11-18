@@ -36,6 +36,7 @@ export class ProxyNodeFactory {
                 // Then we will lose our Proxy! Very important line.
                 if (prop === "__v_raw") return undefined;
                 if (prop === "__proxyId__") return proxyId;
+                if (prop === "__target__") return t;
                 if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
 
                 if (beforeGetFn) beforeGetFn(t, prop, receiver);
