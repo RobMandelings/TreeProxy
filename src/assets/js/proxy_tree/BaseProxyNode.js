@@ -76,10 +76,21 @@ function useOverlayType(proxyTree, rId) {
     return computed(() => proxyTree.getOverlayType(rId.value));
 }
 
-function usePos(rParent) {
+function usePos(proxyTree, rParent, rId) {
 
-    // const rPos = computed(() => )
+    const rPos = computed(() => {
+        if (!rParent.value) return 0;
+        return rParent.value.children.asArray.findIndex(c => c.id === rId.value);
+    });
 
+    const movePosFn = (p) => proxyTree.movePos(rId.value, p);
+
+    const rMaxPos = computed(() => {
+        if (!rParent.value) return 0;
+        return rParent.value.children.size - 1;
+    });
+
+    return {rPos, rMaxPos, movePosFn}
 }
 
 export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
@@ -98,6 +109,8 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const isAncestorOf = (id) => !!descendants.has(id);
     const hasChildren = computed(() => children.size > 0);
     const isLeaf = computed(() => !hasChildren.value);
+
+    const {rPos, rMaxPos, movePosFn} = usePos(proxyTree, rParent, rId);
 
     const {deleteFn} = useDelete(proxyTree, rId);
     const {replaceFn} = useReplace(proxyTree, rId);
@@ -120,6 +133,9 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
         isAncestorOf,
         hasChildren,
         isLeaf,
+        pos: rPos,
+        maxPos: rMaxPos,
+        movePos: movePosFn,
         replace: replaceFn,
         parent: rParent,
         setParent,

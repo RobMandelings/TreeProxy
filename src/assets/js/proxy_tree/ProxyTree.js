@@ -156,4 +156,21 @@ export class ProxyTree extends RefStore {
         // TODO make childrenIds only accessible internally (proxy tree)
         // TODO don't allow methods to be executed upon childrenIds, these do not work well with computed trees.
     }
+
+    movePos(nodeId, pos) {
+        const node = this.getElement(nodeId);
+        const parent = node.parent;
+        if (!node) throw new Error("Can't move pos: node does not exist");
+
+        if (!parent) return; // Position can't change as it has no siblings
+
+        // Clamp to valid positions
+        if (pos < 0) pos = 0;
+        if (pos > parent.childrenIds.length - 1) pos = parent.childrenIds.length - 1;
+
+        const childrenIds = parent.childrenIds.filter(cId => cId !== nodeId);
+
+        childrenIds.splice(pos, 0, nodeId);
+        parent.childrenIds = childrenIds;
+    }
 }

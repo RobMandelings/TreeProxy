@@ -176,3 +176,23 @@ describe('Leafs', () => {
     test('Leaf is leaf', () => expect(srcTree.root.descendants["0,0"].isLeaf).toBe(true));
 
 })
+
+describe('Position', () => {
+
+    const srcTree = createSourceTree(createTree(3));
+    const c0 = srcTree.root.children[0];
+    const c1 = srcTree.root.children[1];
+    const c2 = srcTree.root.children[2];
+    test('Root pos', () => expect(srcTree.root.pos).toBe(0));
+    test('Root max pos', () => expect(srcTree.root.maxPos).toBe(0));
+    test('Child 0 pos', () => expect(c0.pos).toBe(0))
+    test('Child 1 pos', () => expect(c1.pos).toBe(1))
+    test('Child 2 pos', () => expect(c2.pos).toBe(2))
+    test('Child max pos', () => expect(c0.maxPos).toBe(2));
+
+    test('Move pos', () => {
+        c0.movePos(2);
+        expect(c0.pos).toBe(2); // Shifted all the way to the end
+        expect(c2.pos).toBe(1); // Shifted one to the left
+    });
+})
