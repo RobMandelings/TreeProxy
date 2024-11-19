@@ -14,3 +14,13 @@ export function isValidUUID(uuid) {
 export function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
+
+/**
+ * Retrieve object value via nested property access. E.g. deepGet(obj, "value.nested");
+ * @param obj
+ * @param path
+ * @return {*}
+ */
+export const deepGet = (obj, path) => {
+    return path.split('.').reduce((acc, part) => acc[part], obj);
+};
