@@ -180,6 +180,14 @@ test('Check deeply applied changes', () => {
 
 });
 
+test('Apply changes: Assign object value', () => {
+    const prev = {value: {a: 0, b: 1}}
+    const cur = {value: {a: 1, b: {abc: 0, style: 0}}};
+    const src = {value: {a: 1, b: 0}};
+    const changes = deepGetChangesToApply(prev, cur, src);
+    applyChanges(src, changes);
+})
+
 test('Changes to apply', () => {
 
     const prev = {value: 0};

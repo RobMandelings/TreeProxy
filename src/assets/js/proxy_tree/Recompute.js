@@ -8,7 +8,7 @@ function createStateProxy(state, deps) {
             if (excludePropFn(prop)) return Reflect.get(target, prop, receiver);
 
             const res = Reflect.get(target, prop, receiver);
-            if (typeof res === 'object') return createStateProxy(res, deps);
+            if (typeof res === 'object' && res != null) return createStateProxy(res, deps);
             else {
                 // These access properties are tracked, so that they can be used to re-trigger
                 // Any recomputations that need to happen

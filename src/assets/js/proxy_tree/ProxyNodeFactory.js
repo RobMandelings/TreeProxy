@@ -1,5 +1,5 @@
 import {DirectNodeAccessError, StaleProxyError} from "@pt/ProxyNodeErrors.js";
-import {createCustomProxy, useShouldExcludeProperty, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
+import {createCustomProxy, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
 import {createBaseProxyNodeTarget} from "@pt/coreProxyNode.js";
 import {computed, isReactive, reactive, toRefs} from "vue";
 

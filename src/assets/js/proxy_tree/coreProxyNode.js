@@ -115,6 +115,8 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const hasChildren = computed(() => children.size > 0);
     const isLeaf = computed(() => !hasChildren.value);
 
+    const findFn = (id) => proxyTree.getElement(id);
+
     const {rPos, rMaxPos, movePosFn} = usePos(proxyTree, rParent, rId);
 
     const {deleteFn} = useDelete(proxyTree, rId);
@@ -132,6 +134,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
         children,
         ancestors,
         descendants,
+        findNode: findFn,
         leafs,
         root: rRoot,
         isDescendantOf,
