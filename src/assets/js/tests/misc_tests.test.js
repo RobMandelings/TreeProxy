@@ -22,6 +22,9 @@ test('Set unexisting nested object', () => {
     deepSet(obj, "value.nested.anotherLevel", 5);
     expect(obj.value.nested.anotherLevel).toBe(5);
 
+    deepSet(obj, "value", {nested: 0});
+    expect(obj.value.nested).toBe(0);
+
 })
 
 test('Set object on path where null', () => {
