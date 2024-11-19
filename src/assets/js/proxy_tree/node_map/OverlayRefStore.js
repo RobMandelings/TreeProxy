@@ -4,7 +4,7 @@ import {computed, reactive, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js";
 import {OverlayType} from "@pt/OverlayType.js";
 import {CoreNode} from "@pt/CoreNode.js";
-import {deepEqual, deepSet} from "@pt/utils/deepObjectUtil.js";
+import {deepDelete, deepEqual, deepSet} from "@pt/utils/deepObjectUtil.js";
 
 function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
@@ -160,11 +160,9 @@ export class OverlayRefStore extends RefStore {
             if (remove) {
                 if (this.elementChanges.has(nodeId)) {
                     const changes = this.elementChanges.get(nodeId);
-                    if (Object.hasOwn(changes, prop)) {
-                        delete this.elementChanges.get(nodeId)[prop];
-                        if (Utils.isEmpty(changes))
-                            this.elementChanges.delete(nodeId);
-                    }
+                    deepDelete(changes, prop);
+                    if (Utils.isEmpty(changes))
+                        this.elementChanges.delete(nodeId);
                 }
             } else {
 
