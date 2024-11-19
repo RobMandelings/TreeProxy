@@ -38,7 +38,9 @@ export function createRefProxy(nodeMap, rId, rNode) {
     const nodeInstanceOf = (instType) => rNode.value instanceof instType;
 
     // Target object is made reactive so that all properties of the node can be watched
-    const targetObj = reactive({__node__: rNode, nodeInstanceOf, id: rId});
+    const rStale = computed(() => !rNode.value);
+
+    const targetObj = reactive({__node__: rNode, nodeInstanceOf, stale: rStale, id: rId});
 
     const setHandler = (t, prop, value) => {
         nodeMap.set(rId.value, prop, value);
