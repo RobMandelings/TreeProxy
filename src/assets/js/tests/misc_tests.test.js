@@ -147,11 +147,15 @@ test('Changes to apply', () => {
 
 test('Changes to apply', () => {
 
+    // These are the adjustments that were applied previously
     const prev = {value: 0};
     const cur = {value2: 5};
+    // value prop is removed, so restore to the src value.
+    // value2 is added as a property, so we overwrite this from the src value
     const src = {value: 5, value2: 3};
 
     const changes = deepGetChangesToApply(prev, cur, src);
+
     expect(deepEqual(changes, {value: 5, value2: 5})).toBe(true)
 
 })
@@ -164,5 +168,25 @@ test('Changes to apply', () => {
 
     const noRestorePossible = () => deepGetChangesToApply(prev, cur, src);
     expect(noRestorePossible).toThrow();
+
+})
+
+test('Array changes', () => {
+
+    const prev = {childrenIds: ["A", "B", "C"]};
+    const cur = {childrenIds: ["A", "B"]};
+    const src = {childrenIds: ["A", "B"]};
+    const changes = deepGetChangesToApply(prev, cur, src);
+    expect(deepEqual(changes, {childrenIds: ["A", "B"]})).toBe(true);
+
+})
+
+test('Restore to src array', () => {
+
+    const prev = {childrenIds: ["A", "B", "C"]};
+    const cur = {};
+    const src = {childrenIds: ["A", "B"]};
+    const changes = deepGetChangesToApply(prev, cur, src);
+    expect(deepEqual(changes, {childrenIds: ["A", "B"]})).toBe(true);
 
 })

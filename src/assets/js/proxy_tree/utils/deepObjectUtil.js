@@ -49,7 +49,7 @@ export const deepEqual = (a, b) => {
     if (a == null || b == null || typeof a !== 'object' || typeof b !== 'object') return false;
 
     // Get the keys of both objects
-    const keysA = Object.keys(a);
+    const keysA =  Object.keys(a);
     const keysB = Object.keys(b);
 
     // If the number of keys is different, they're not equal
@@ -115,8 +115,10 @@ export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
             const newPath = path ? `${path}.${key}` : key;
             if (!(key in cur)) {
                 const srcValue = deepGet(src, newPath);
-                if (srcValue === undefined) throw new Error(`Source value for path '${newPath}' is undefined. 
+                if (srcValue === undefined) {
+                    throw new Error(`Source value for path '${newPath}' is undefined. 
                 Always make sure that the source node has the correct property. Object: ${JSON.stringify(src)}`);
+                }
                 deepSet(changesToApply, newPath, srcValue); // Restore if the change is removed
             }
         }
@@ -126,8 +128,8 @@ export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
             const newPath = path ? `${path}.${key}` : key;
             if (!(key in prev)) {
                 deepSet(changesToApply, newPath, cur[key]); // New change
-            } else if (typeof cur[key] === 'object' && cur[key] !== null &&
-                typeof prev[key] === 'object' && prev[key] !== null) {
+            } else if (typeof cur[key] === 'object' && cur[key] !== null && (!prev[key] instanceof Array) &&
+                typeof prev[key] === 'object' && prev[key] !== null && !(prev[key] instanceof Array)) {
                 // Recursively compare nested objects
                 compareChanges(prev[key], cur[key], deepGet(src, newPath), newPath);
             } else if (cur[key] !== prev[key]) {

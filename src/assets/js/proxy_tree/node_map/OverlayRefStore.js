@@ -4,29 +4,13 @@ import {computed, reactive, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js";
 import {OverlayType} from "@pt/OverlayType.js";
 import {CoreNode} from "@pt/CoreNode.js";
-import {deepDelete, deepEqual, deepSet} from "@pt/utils/deepObjectUtil.js";
+import {deepDelete, deepEqual, deepGetChangesToApply, deepSet} from "@pt/utils/deepObjectUtil.js";
 
 function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
         if (!node.hasOwnProperty(key)) throw new Error("Cannot apply changes: this node does not have ")
         node[key] = value;
     });
-}
-
-function getChangesToApply(prevChanges, curChanges, srcNode) {
-    const changesToApply = {...curChanges};
-    for (const key in prevChanges) {
-        if (!(key in curChanges)) {
-            changesToApply[key] = srcNode[key]; // Restore if the change is removed
-        }
-    }
-
-    for (const key in curChanges) {
-        if (key in prevChanges && prevChanges[key] === curChanges[key])
-            delete changesToApply[key];
-    }
-
-    return changesToApply;
 }
 
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {
@@ -62,7 +46,7 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
             srcNodeChanged = false;
         } else {
             // Compute the changes that should be applied based on current and prev changes.
-            changesToApply = getChangesToApply(prevChanges, curChanges, srcNode);
+            changesToApply = deepGetChangesToApply(prevChanges, curChanges, srcNode);
         }
 
         if (copy && Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
