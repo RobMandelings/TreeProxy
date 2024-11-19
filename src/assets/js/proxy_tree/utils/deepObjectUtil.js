@@ -147,7 +147,7 @@ function isObject(v) {
 
 export function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
-        if (!node.hasOwnProperty(key)) throw new Error(`Cannot apply changes: this node does not have the key ${key}`);
+        if (!(key in node)) throw new Error(`Cannot apply changes: this node does not have the key ${key}`);
         if (isObject(value)) applyChanges(node[key], value);
         else node[key] = value;
     });
