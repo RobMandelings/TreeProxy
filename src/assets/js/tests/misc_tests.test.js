@@ -2,19 +2,23 @@
 //     return path.split('.').reduce((acc, part) => acc[part], obj);
 // };
 
-import {deepDelete, deepEqual, deepSet} from "@pt/utils/deepObjectUtil.js";
+import {deepDelete, deepEqual, deepGet, deepSet} from "@pt/utils/deepObjectUtil.js";
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
 
 test('Testing object access', () => {
-
-    // const obj = {value: {nested: 0}};
-    // const v = obj.value.nested;
-    // const v2 = deepGet(obj, "value.nested.something.hello");
-    // console.log("hi")
-
     const obj = {value: {nested: 0}};
     deepSet(obj, "value.nested", 5);
     expect(obj.value.nested).toBe(5);
+})
+
+test('Testing deep object access', () => {
+
+    const obj = {value: {nested: 0}};
+    const v2 = deepGet(obj, "value.nested.something.hello");
+    expect(v2).toBeUndefined();
+
+    // const v = obj.value.nested;
+    // console.log("hi")
 })
 
 test('Set unexisting nested object', () => {

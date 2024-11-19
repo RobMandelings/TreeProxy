@@ -7,7 +7,7 @@ import {isEmpty} from "@pt/proxy_utils/Utils.js";
  * @return {*}
  */
 export const deepGet = (obj, path) => {
-    return path.split('.').reduce((acc, part) => acc[part], obj);
+    return path.split('.').reduce((acc, part) => acc !== undefined ? acc[part] : undefined, obj);
 };
 
 /**
@@ -104,3 +104,38 @@ export const deepDelete = (obj, path) => {
 
     return true;
 };
+
+function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
+    const changesToApply = {};
+
+    function compareChanges(prev, cur, src, path = '') {
+        // Handle removed changes
+        for (const key in prev) {
+            const newPath = path ? `${path}.${key}` : key;
+            if (!(key in cur)) {
+                const srcValue = deepGet(src, newPath);
+                // TODO should not allow changes to be set when it is not part of the interface (use TypeScript!)
+                if (srcValue !== undefined) {
+                    deepSet(changesToApply, newPath, srcValue); // Restore if the change is removed
+                }
+            }
+        }
+
+        // Handle new and updated changes
+        for (const key in cur) {
+            const newPath = path ? `${path}.${key}` : key;
+            if (!(key in prev)) {
+                deepSet(changesToApply, newPath, cur[key]); // New change
+            } else if (typeof cur[key] === 'object' && cur[key] !== null &&
+                typeof prev[key] === 'object' && prev[key] !== null) {
+                // Recursively compare nested objects
+                compareChanges(prev[key], cur[key], deepGet(src, newPath), newPath);
+            } else if (cur[key] !== prev[key]) {
+                deepSet(changesToApply, newPath, cur[key]); // Updated change
+            }
+        }
+    }
+
+    compareChanges(prevChanges, curChanges, srcNode);
+    return changesToApply;
+}
