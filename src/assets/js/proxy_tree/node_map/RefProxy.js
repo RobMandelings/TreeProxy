@@ -53,6 +53,7 @@ export function createRefProxy(nodeMap, rId, rNode) {
         let res = wrappedProxyTargetGetter(t, t.__node__, prop, receiver)
         if (typeof res === 'object'
             && !(res instanceof Array)
+            && !(res == null)
             && !(res === t.__node__) // Don't wrap the node object in a proxy. If it is explicitly retrieved, then raw access is meant.
         ) res = createdNestedRefProxy(nodeMap, rNode, rId, prop);
         return res;
