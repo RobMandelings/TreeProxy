@@ -161,5 +161,5 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     };
     target.hasProp = (prop) => prop in target || prop in target.nodeRef;
 
-    return reactive(target);
+    return target;
 }

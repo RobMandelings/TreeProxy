@@ -1,7 +1,7 @@
 import {DirectNodeAccessError, StaleProxyError} from "@pt/ProxyNodeErrors.js";
 import {createCustomProxy, useShouldExcludeProperty, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
 import {createBaseProxyNodeTarget} from "@pt/BaseProxyNode.js";
-import {isReactive, reactive, toRefs} from "vue";
+import {computed, isReactive, reactive, toRefs} from "vue";
 
 /**
  * TODO use TypeScript to add typing to the returned objects (e.g. what properties are available etc)
@@ -17,7 +17,8 @@ export class ProxyNodeFactory {
      * Then checks in nodeRef.
      */
     __createBaseProxyNode(proxyTree, id, parentId) {
-        const target = createBaseProxyNodeTarget(proxyTree, id, parentId);
+        let target = createBaseProxyNodeTarget(proxyTree, id, parentId);
+        if (!isReactive(target)) target = reactive(target);
         return createCustomProxy(target, {
             get(t, prop, receiver) {
                 return wrappedProxyTargetGetter(t, t.nodeRef, prop, receiver);
@@ -38,7 +39,7 @@ export class ProxyNodeFactory {
         const decoratedFunctionality = this.decorateProxyNode(proxyTree, proxyNode);
         const decoratedFunctionalityAsRefs = isReactive(decoratedFunctionality) ? toRefs(decoratedFunctionality) : decoratedFunctionality;
 
-        const target = reactive({__proxyNode__: proxyNode});
+        const target = reactive({__proxyNode__: proxyNode, ...decoratedFunctionalityAsRefs});
 
         const handler = {
             get: (t, prop, receiver) => {
@@ -81,8 +82,8 @@ export class ProxyNodeFactory {
 
 class SimpleProxyNodeFactory extends ProxyNodeFactory {
 
-    _createProxyTarget(proxyTree, id, parentId) {
-        return createBaseProxyNodeTarget(proxyTree, id, parentId);
+    decorateProxyNode(proxyTree, proxyNode) {
+        return {randomStuff: computed(() => proxyNode.children.size + proxyNode.name)};
     }
 }
 
