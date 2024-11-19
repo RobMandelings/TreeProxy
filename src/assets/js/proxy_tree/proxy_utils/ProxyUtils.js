@@ -33,3 +33,34 @@ export function wrappedProxyTargetGetter(t, tWrapped, prop, receiver) {
     if (tWrapped) return Reflect.get(tWrapped, prop, receiver);
     return undefined;
 }
+
+/**
+ * Helper function that creates a proxy that uses common interceptions used in this system.
+ * Such as ignoring vue properties and providing a __target__ property for debugging purposes.
+ * @param target
+ * @param handler
+ * @return {*|object}
+ */
+export function createCustomProxy(target, handler) {
+
+    /**
+     * I deal with reactive targets, vue breaks some of the mechanics of default proxies.
+     * E.g. when a reactive target is wrapped in a proxy, you receive all vue properties as well.
+     * Such as __v_Reactive and __v_raw. Most of these things need to be ignored.
+     */
+    const excludePropFn = useShouldExcludeProperty(target);
+
+    const proxyId = crypto.randomUUID(); // Unique id for each proxy. Used in testing while comparing proxies.
+    return new Proxy(target, {
+        get(t, prop, receiver) {
+            // Otherwise vue will get the raw target upon assignment in reactive object
+            // Then we will lose our Proxy! Very important line.
+            if (prop === "__v_raw") return undefined;
+            if (prop === "__proxyId__") return proxyId;
+            if (prop === "__target__") return t;
+            if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
+            return handler.get(t, prop, receiver);
+        },
+        set: handler.set
+    })
+}

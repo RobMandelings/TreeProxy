@@ -1,5 +1,5 @@
 import {DirectNodeAccessError, StaleProxyError} from "@pt/ProxyNodeErrors.js";
-import {useShouldExcludeProperty, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
+import {createCustomProxy, useShouldExcludeProperty, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
 import {createBaseProxyNodeTarget} from "@pt/BaseProxyNode.js";
 
 const coreGetHandler = (t, prop, receiver) => {
@@ -27,18 +27,9 @@ export class ProxyNodeFactory {
 
     _createProxyNode(proxyTree, id, parentId, beforeGetFn) {
 
-        const proxyId = crypto.randomUUID(); // Unique id for each proxy. Used in testing while comparing proxies.
         const target = this._createProxyTarget(proxyTree, id, parentId);
-        const excludePropFn = useShouldExcludeProperty(target);
         const handler = {
             get: (t, prop, receiver) => {
-                // Otherwise vue will get the raw target upon assignment in reactive object
-                // Then we will lose our Proxy! Very important line.
-                if (prop === "__v_raw") return undefined;
-                if (prop === "__proxyId__") return proxyId;
-                if (prop === "__target__") return t;
-                if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
-
                 if (beforeGetFn) beforeGetFn(t, prop, receiver);
                 return coreGetHandler(t, prop, receiver);
             },
@@ -49,7 +40,7 @@ export class ProxyNodeFactory {
             }
         }
 
-        return new Proxy(target, handler);
+        return new createCustomProxy(target, handler);
     }
 
     createSrcProxyNode(srcProxyTree, id, parentId) {
