@@ -2,7 +2,8 @@
 //     return path.split('.').reduce((acc, part) => acc[part], obj);
 // };
 
-import {deepEqual, deepSet} from "@pt/utils/deepObjectUtil.js";
+import {deepDelete, deepEqual, deepSet} from "@pt/utils/deepObjectUtil.js";
+import {isEmpty} from "@pt/proxy_utils/Utils.js";
 
 test('Testing object access', () => {
 
@@ -80,5 +81,34 @@ test('Deep equal based on primitive', () => {
     const obj1 = "5";
     const obj2 = 5;
     expect(deepEqual(obj1, obj2)).toBe(false)
+
+})
+
+test('Deep delete', () => {
+
+    const obj = {value: {nested: {nested2: 0}}};
+    deepDelete(obj, "value.nested.nested2");
+    expect(isEmpty(obj)).toBe(true);
+
+})
+
+test('Deep delete not empty', () => {
+
+    const obj = {value: {nested: {nested2: 0, secondNested2: 0}}};
+    deepDelete(obj, "value.nested.nested2");
+    expect(isEmpty(obj)).toBe(false);
+    expect(isEmpty(obj.value.nested)).toBe(false);
+    expect(obj.value.nested.nested2).toBeUndefined();
+    deepDelete(obj, "value.nested.secondNested2");
+    expect(isEmpty(obj));
+
+})
+
+test('Cascade delete stops in time', () => {
+
+    const obj = {value: {nested: {nested2: 0}}, value2: 0};
+    deepDelete(obj, "value.nested.nested2");
+    expect(isEmpty(obj)).toBe(false);
+    expect(obj.value).toBeUndefined();
 
 })

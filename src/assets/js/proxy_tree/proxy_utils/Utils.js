@@ -14,4 +14,3 @@ export function isValidUUID(uuid) {
 export function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
-

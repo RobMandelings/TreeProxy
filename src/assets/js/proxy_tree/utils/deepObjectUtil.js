@@ -1,3 +1,5 @@
+import {isEmpty} from "@pt/proxy_utils/Utils.js";
+
 /**
  * Retrieve object value via nested property access. E.g. deepGet(obj, "value.nested");
  * @param obj
@@ -60,5 +62,45 @@ export const deepEqual = (a, b) => {
     }
 
     // If we've made it this far, the objects are equal
+    return true;
+};
+
+/**
+ * Deletes a nested property from an object and removes empty parent objects.
+ * @param {Object} obj - The object to modify
+ * @param {string} path - The path to the property to delete, using dot notation
+ * @return {boolean} - Returns true if the property was deleted, false if the path was invalid
+ */
+export const deepDelete = (obj, path) => {
+    const parts = path.split('.');
+    let current = obj;
+    const stack = [];
+
+    // Traverse to the property to delete
+    for (let i = 0; i < parts.length - 1; i++) {
+        if (current[parts[i]] === undefined) {
+            return false; // Path is invalid
+        }
+        stack.push({object: current, key: parts[i]});
+        current = current[parts[i]];
+    }
+
+    // Delete the property
+    const lastPart = parts[parts.length - 1];
+    if (!(lastPart in current)) {
+        return false; // Property doesn't exist
+    }
+    delete current[lastPart];
+
+    // Check and remove empty parent objects
+    while (stack.length > 0) {
+        const {object, key} = stack.pop();
+        if (isEmpty(object[key])) {
+            delete object[key];
+        } else {
+            break; // If an object is not empty, stop the process
+        }
+    }
+
     return true;
 };
