@@ -5,6 +5,7 @@ export class CustomNode extends CoreNode {
         super(childrenIds);
         this.weight = weight;
         this.name = name;
+        this.gui = {}
     }
 
     copy() {

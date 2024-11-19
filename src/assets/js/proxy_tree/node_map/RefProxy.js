@@ -1,6 +1,7 @@
 import {computed, reactive} from "vue";
 import {createCustomProxy, useShouldExcludeProperty, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
-import {deepGet} from "@pt/proxy_utils/Utils.js";
+
+import {deepGet} from "@pt/utils/deepObjectUtil.js";
 
 function createdNestedRefProxy(nodeMap, rNode, rId, targetPath) {
 
