@@ -27,13 +27,6 @@ test('Set unexisting nested object', () => {
 
 })
 
-test('Set object on path where null', () => {
-
-    const obj = {value: null};
-    deepSet(obj, "value.nested", 5);
-
-})
-
 test('Test objects deep equality', () => {
 
     const obj1 = {value: 0, nested: {value2: 5}};

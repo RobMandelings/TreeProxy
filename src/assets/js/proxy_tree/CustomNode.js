@@ -5,7 +5,10 @@ export class CustomNode extends CoreNode {
         super(childrenIds);
         this.weight = weight;
         this.name = name;
-        this.gui = {}
+        this.gui = {
+            leftClick: null,
+            style: {},
+        }
     }
 
     copy() {

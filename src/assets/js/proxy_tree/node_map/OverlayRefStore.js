@@ -4,6 +4,7 @@ import {computed, reactive, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js";
 import {OverlayType} from "@pt/OverlayType.js";
 import {CoreNode} from "@pt/CoreNode.js";
+import {deepEqual} from "@pt/utils/deepObjectUtil.js";
 
 function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
@@ -151,7 +152,7 @@ export class OverlayRefStore extends RefStore {
     set(nodeId, prop, val) {
 
         // TODO we did not yet check for object equalities (only primitives)
-        const remove = (this.srcElementMap.getPropertyValue(nodeId, prop) === val);
+        const remove = deepEqual(this.srcElementMap.getPropertyValue(nodeId, prop), val);
 
         // If the node was added on this layer, any adjustments to this node simply apply to the node itself
         if (this.addedElements.has(nodeId)) this.addedElements.get(nodeId)[prop] = val;
