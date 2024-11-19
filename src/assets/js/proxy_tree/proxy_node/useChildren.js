@@ -1,10 +1,8 @@
 import {computed} from "vue";
-import {decorateWithFind, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
+import {decorateWithFind, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
 
-function useAddChild(rId, proxyTree) {
-
-    const addNodeFn = (node, index = undefined) => proxyTree.addChild(rId.value, node, index);
-    return {addNodeFn}
+export function useAddChild(rId, proxyTree) {
+    return (node, index = undefined) => proxyTree.addChild(rId.value, node, index)
 }
 
 export function useChildren(rId, rChildrenIds, proxyTree) {
@@ -13,7 +11,6 @@ export function useChildren(rId, rChildrenIds, proxyTree) {
     const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
     const getChildrenIdsAsSet = () => new Set(rChildrenIdsAsArray.value);
     const nodeRelativesCore = useNodeRelatives(() => rChildrenArray.value);
-    const {addNodeFn} = useAddChild(rId, proxyTree);
 
     const childrenObj = Object.create(
         Object.getPrototypeOf(nodeRelativesCore),
@@ -33,8 +30,6 @@ export function useChildren(rId, rChildrenIds, proxyTree) {
             configurable: true,
         }
     });
-
-    childrenObj.addNode = addNodeFn;
 
     return decorateWithFind(childrenObj);
 }

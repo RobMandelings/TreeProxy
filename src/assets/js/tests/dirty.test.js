@@ -75,7 +75,7 @@ describe('Add children', () => {
         const srcTree = createSourceTree(createTree(0));
         const cTree = createEmptyCompTree(srcTree).compTree;
         const cRoot = cTree.root;
-        const id = cRoot.children.addNode(new CustomNode("Child", 1), 0);
+        const id = cRoot.addChild(new CustomNode("Child", 1), 0);
         // TODO add to the end by default
         // TODO add entire tree structure and add an array of nodes / tree structures
         //  (might be able to reuse some tree creation logic)

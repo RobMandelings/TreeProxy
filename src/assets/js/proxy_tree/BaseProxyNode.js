@@ -1,5 +1,5 @@
 import {computed, reactive, ref} from "vue";
-import {useChildren} from "@pt/proxy_node/useChildren.js";
+import {useAddChild, useChildren} from "@pt/proxy_node/useChildren.js";
 import {useAncestors} from "@pt/proxy_node/useAncestors.js";
 import {useDescendants} from "@pt/proxy_node/useDescendants.js";
 import {useLeafs} from "@pt/proxy_node/useLeafs.js";
@@ -124,6 +124,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const {prevProxy} = usePreviousValue(proxyTree, rId);
     const {rIsDirty, dirtyPropProxy} = useDirty(proxyTree, rParent, rId, prevProxy);
     const rOverlayType = useOverlayType(proxyTree, rId);
+    const addChildFn = useAddChild(rId, proxyTree);
 
     const target = {
         nodeRef,
@@ -140,6 +141,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
         pos: rPos,
         maxPos: rMaxPos,
         movePos: movePosFn,
+        addChild: addChildFn,
         replace: replaceFn,
         parent: rParent,
         setParent,

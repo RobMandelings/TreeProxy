@@ -10,7 +10,7 @@ import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 test('No children', () => {
     const srcTree = createSourceTree(createTree(0));
     expect(srcTree.root.children.size).toBe(0);
-    srcTree.root.children.addNode(new CustomNode("Child", []), 0);
+    srcTree.root.addChild(new CustomNode("Child", []), 0);
     expect(srcTree.root.children.size).toBe(1);
     expect(srcTree.root.children[0]).toBeTruthy();
     expect(srcTree.root.children[0].parent.__proxyId__ === srcTree.root.__proxyId__).toBe(true);
@@ -33,7 +33,7 @@ describe('Multiple children', () => {
 
 const testAddChildToIndex = (root, index) => {
     const prevSize = root.children.size;
-    const id = root.children.addNode(new CustomNode("Child"), index);
+    const id = root.addChild(new CustomNode("Child"), index);
     expect(root.children.size).toBe(prevSize + 1);
     expect(root.children[index]?.id).toBe(id);
 }
