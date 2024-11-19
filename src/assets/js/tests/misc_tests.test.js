@@ -2,7 +2,7 @@
 //     return path.split('.').reduce((acc, part) => acc[part], obj);
 // };
 
-import {deepSet} from "@pt/utils/deepObjectUtil.js";
+import {deepEqual, deepSet} from "@pt/utils/deepObjectUtil.js";
 
 test('Testing object access', () => {
 
@@ -31,5 +31,61 @@ test('Set object on path where null', () => {
 
     const obj = {value: null};
     deepSet(obj, "value.nested", 5);
+
+})
+
+test('Test objects deep equality', () => {
+
+    const obj1 = {value: 0, nested: {value2: 5}};
+    const obj2 = obj1;
+    expect(deepEqual(obj1, obj2)).toBe(true);
+
+})
+
+test('Test objects deep equality', () => {
+
+    const obj1 = {value: 0, nested: {value2: 5}};
+    const obj2 = {value: 0, nested: {value2: 5}};
+    expect(deepEqual(obj1, obj2)).toBe(true);
+
+})
+
+test('Test objects deep equality', () => {
+
+    const obj1 = {value: 0, nested: {value2: 5}};
+    const obj2 = {value: 1, nested: {value2: 5}};
+    expect(deepEqual(obj1, obj2)).toBe(false);
+
+})
+
+test('Test objects deep equality', () => {
+
+    const obj1 = {value: 0, nested: {value2: 5}};
+    const obj2 = {value: 0, nested: {value2: 0}};
+    expect(deepEqual(obj1, obj2)).toBe(false);
+
+})
+
+test('Deep equal based on primitive', () => {
+
+    const obj1 = "5";
+    const obj2 = "5";
+    expect(deepEqual(obj1, obj2)).toBe(true)
+
+})
+
+test('Deep equal based on primitive', () => {
+
+    const obj1 = "5";
+    const obj2 = "6";
+    expect(deepEqual(obj1, obj2)).toBe(false)
+
+})
+
+test('Deep equal based on primitive', () => {
+
+    const obj1 = "5";
+    const obj2 = 5;
+    expect(deepEqual(obj1, obj2)).toBe(false)
 
 })

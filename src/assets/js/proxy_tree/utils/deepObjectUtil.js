@@ -32,3 +32,33 @@ export const deepSet = (obj, path, value) => {
     current[parts[parts.length - 1]] = value;
     return true;
 };
+
+/**
+ * Performs a deep comparison between two values to determine if they are equivalent.
+ * @param {*} a - The first value to compare
+ * @param {*} b - The second value to compare
+ * @return {boolean} - Returns true if the values are equivalent, false otherwise
+ */
+export const deepEqual = (a, b) => {
+    // If the values are strictly equal, return true
+    if (a === b) return true;
+
+    // If either value is null or not an object, they can't be equal
+    if (a == null || b == null || typeof a !== 'object' || typeof b !== 'object') return false;
+
+    // Get the keys of both objects
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+
+    // If the number of keys is different, they're not equal
+    if (keysA.length !== keysB.length) return false;
+
+    // Check each key in a
+    for (let key of keysA) {
+        // If b doesn't have the key, or the values for the key are not equal, return false
+        if (!keysB.includes(key) || !deepEqual(a[key], b[key])) return false;
+    }
+
+    // If we've made it this far, the objects are equal
+    return true;
+};
