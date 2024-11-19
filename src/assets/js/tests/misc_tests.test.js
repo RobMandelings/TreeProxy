@@ -2,7 +2,14 @@
 //     return path.split('.').reduce((acc, part) => acc[part], obj);
 // };
 
-import {deepDelete, deepEqual, deepGet, deepGetChangesToApply, deepSet} from "@pt/utils/deepObjectUtil.js";
+import {
+    applyChanges,
+    deepDelete,
+    deepEqual,
+    deepGet,
+    deepGetChangesToApply,
+    deepSet
+} from "@pt/utils/deepObjectUtil.js";
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
 
 test('Testing object access', () => {
@@ -159,6 +166,19 @@ test('Changes to apply', () => {
     expect(deepEqual(changes, {value: 5, value2: 5})).toBe(true)
 
 })
+
+test('Check deeply applied changes', () => {
+
+    const prev = {value: {a: 0, b: 1}};
+    const cur = {value: {a: 1, b: 1}};
+    const comp = {value: {a: 0, b: 1}};
+    const src = {};
+    const changes = deepGetChangesToApply(prev, cur, src);
+    expect(deepEqual(changes, {value: {a: 1}})).toBe(true);
+    applyChanges(comp, changes);
+    expect(deepEqual(comp, {value: {a: 1, b: 1}})).toBe(true);
+
+});
 
 test('Changes to apply', () => {
 

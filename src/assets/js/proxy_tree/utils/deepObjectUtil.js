@@ -49,7 +49,7 @@ export const deepEqual = (a, b) => {
     if (a == null || b == null || typeof a !== 'object' || typeof b !== 'object') return false;
 
     // Get the keys of both objects
-    const keysA =  Object.keys(a);
+    const keysA = Object.keys(a);
     const keysB = Object.keys(b);
 
     // If the number of keys is different, they're not equal
@@ -128,8 +128,7 @@ export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
             const newPath = path ? `${path}.${key}` : key;
             if (!(key in prev)) {
                 deepSet(changesToApply, newPath, cur[key]); // New change
-            } else if (typeof cur[key] === 'object' && cur[key] !== null && (!prev[key] instanceof Array) &&
-                typeof prev[key] === 'object' && prev[key] !== null && !(prev[key] instanceof Array)) {
+            } else if (isObject(cur[key]) && isObject(prev[key])) {
                 // Recursively compare nested objects
                 compareChanges(prev[key], cur[key], deepGet(src, newPath), newPath);
             } else if (cur[key] !== prev[key]) {
@@ -140,4 +139,16 @@ export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
 
     compareChanges(prevChanges, curChanges, srcNode);
     return changesToApply;
+}
+
+function isObject(v) {
+    return typeof v === 'object' && v !== null && !(v instanceof Array)
+}
+
+export function applyChanges(node, changes) {
+    Object.entries(changes).forEach(([key, value]) => {
+        if (!node.hasOwnProperty(key)) throw new Error(`Cannot apply changes: this node does not have the key ${key}`);
+        if (isObject(value)) applyChanges(node[key], value);
+        else node[key] = value;
+    });
 }

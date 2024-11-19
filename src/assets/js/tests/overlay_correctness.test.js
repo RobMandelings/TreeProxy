@@ -79,14 +79,13 @@ describe('Deep overlays', () => {
 
     test('Full object replacement', () => {
 
-        compTree.root.gui = {style: "A", leftClick: "left", rightClick: "right"};
+        compTree.root.gui = {style: "A", leftClick: "left"};
         expect(compTree.root.gui.style).toBe("A");
         expect(compTree.root.gui.leftClick).toBe("left");
-        expect(compTree.root.gui.rightClick).toBe("right");
         expect(copySpy).toBeCalledTimes(1);
 
         expect(srcTree.root.gui.style).toBe(null);
-    })
+    });
 
     test('Test proxy', () => {
         srcTree.root.gui.style;

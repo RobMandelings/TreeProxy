@@ -1,4 +1,5 @@
 import {CoreNode} from "@pt/CoreNode.js";
+import {toRaw} from "vue";
 
 export class CustomNode extends CoreNode {
     constructor(name, weight = 0, childrenIds = []) {
@@ -13,7 +14,7 @@ export class CustomNode extends CoreNode {
 
     copy() {
         const node = new CustomNode(this.name, this.weight, this.childrenIds)
-        node.gui = this.gui;
+        node.gui = structuredClone(toRaw(this.gui)); // toRaw in case the object is reactive, otherwise it can't clone;
         return node;
     }
 }
