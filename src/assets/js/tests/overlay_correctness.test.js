@@ -16,6 +16,8 @@ describe('Removing change if same as src', () => {
     });
 });
 
+const getNodeChanges = (compTree) => compTree.nodeMap.elementChanges;
+
 describe('Deep overlays', () => {
 
     let srcTree, compTree;
@@ -48,6 +50,18 @@ describe('Deep overlays', () => {
         compTree.root.gui.style = "B";
         expect(compTree.root.gui.style).toBe("B");
         expect(srcTree.root.gui.style).toBe("A");
+
+    });
+
+    test('Deep change in compTree, then undo change by setting value', () => {
+
+        compTree.root.gui.style = "B";
+        expect(compTree.root.gui.style).toBe("B")
+        expect(srcTree.root.gui.style).toBe(null);
+        expect(getNodeChanges(compTree).size).toBe(1);
+        compTree.root.gui.style = null;
+        expect(srcTree.root.gui.style).toBe(compTree.root.gui.style);
+        expect(getNodeChanges(compTree).size).toBe(0);
 
     });
 
