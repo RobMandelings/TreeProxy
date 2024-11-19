@@ -46,13 +46,10 @@ export class ProxyNodeFactory {
                 if (beforeGetFn) beforeGetFn(t, prop, receiver);
 
                 if (prop === "node") throw new DirectNodeAccessError();
-
-                if (prop in t || proxyNode.hasProp(prop)) {
-                    if (prop === "stale") return proxyNode.stale;
-                    else if (proxyNode.stale) {
-                        if (prop === "toJSON") return {msg: "This proxy is stale"};
-                        else throw new StaleProxyError();
-                    }
+                else if (prop === "stale") return proxyNode.stale;
+                else if (proxyNode.stale) {
+                    if (prop === "toJSON") return {msg: "This proxy is stale"};
+                    else throw new StaleProxyError();
                 }
 
                 return wrappedProxyTargetGetter(t, proxyNode, prop, receiver);

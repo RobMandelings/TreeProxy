@@ -161,7 +161,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
             return obj;
         }
     };
-    target.hasProp = (prop) => prop in target || prop in target.nodeRef;
+    target.hasProp = (prop) => prop in target || target.nodeRef.hasProp(prop);
 
     return target;
 }
