@@ -7,11 +7,13 @@ export class CustomNode extends CoreNode {
         this.name = name;
         this.gui = {
             leftClick: null,
-            style: {},
+            style: null,
         }
     }
 
     copy() {
-        return new CustomNode(this.name, this.weight, this.childrenIds);
+        const node = new CustomNode(this.name, this.weight, this.childrenIds)
+        node.gui = this.gui;
+        return node;
     }
 }

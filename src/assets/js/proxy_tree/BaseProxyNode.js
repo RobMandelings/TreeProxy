@@ -124,11 +124,9 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const {prevProxy} = usePreviousValue(proxyTree, rId);
     const {rIsDirty, dirtyPropProxy} = useDirty(proxyTree, rParent, rId, prevProxy);
     const rOverlayType = useOverlayType(proxyTree, rId);
-    const nodeInstanceOf = (instType) => nodeRef.node instanceof instType;
 
     const target = reactive({
         nodeRef,
-        nodeInstanceOf,
         overlayType: rOverlayType,
         children,
         ancestors,

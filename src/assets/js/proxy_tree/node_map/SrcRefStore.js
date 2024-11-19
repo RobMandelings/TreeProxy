@@ -3,6 +3,7 @@ import {computed, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js"
 import {OverlayType} from "@pt/OverlayType.js";
 import {CoreNode} from "@pt/CoreNode.js";
+import {deepSet} from "@pt/utils/deepObjectUtil.js";
 
 export class SrcRefStore extends RefStore {
 
@@ -47,7 +48,7 @@ export class SrcRefStore extends RefStore {
 
     set(nodeId, prop, value) {
         if (!this.elementExists(nodeId)) throw new Error("Cannot set node property: node does not exist");
-        this.getElement(nodeId)[prop] = value;
+        deepSet(this.getElement(nodeId), prop, value);
     }
 
     deleteElement(id) {
