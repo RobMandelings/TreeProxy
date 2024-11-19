@@ -1,5 +1,7 @@
 import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 import {createTree} from "@pt/TreeUtil.js";
+import {deepEqual} from "@pt/utils/deepObjectUtil.js";
+import {CustomNode} from "@pt/CustomNode.js";
 
 describe('Removing change if same as src', () => {
     let srcTree, compTree;
@@ -17,6 +19,11 @@ describe('Removing change if same as src', () => {
 });
 
 const getNodeChanges = (compTree) => compTree.nodeMap.elementChanges;
+
+let copySpy = jest.spyOn(CustomNode.prototype, 'copy');
+beforeEach(() => {
+    jest.clearAllMocks();
+})
 
 describe('Deep overlays', () => {
 
@@ -50,6 +57,10 @@ describe('Deep overlays', () => {
         compTree.root.gui.style = "B";
         expect(compTree.root.gui.style).toBe("B");
         expect(srcTree.root.gui.style).toBe("A");
+        expect(copySpy).toBeCalledTimes(1);
+        srcTree.root.weight = 1;
+        compTree.root.weight; // Access to trigger recompute
+        expect(copySpy).toBeCalledTimes(2);
 
     });
 
@@ -62,8 +73,20 @@ describe('Deep overlays', () => {
         compTree.root.gui.style = null;
         expect(srcTree.root.gui.style).toBe(compTree.root.gui.style);
         expect(getNodeChanges(compTree).size).toBe(0);
+        expect(copySpy).toBeCalledTimes(1);
 
     });
+
+    test('Full object replacement', () => {
+
+        compTree.root.gui = {style: "A", leftClick: "left", rightClick: "right"};
+        expect(compTree.root.gui.style).toBe("A");
+        expect(compTree.root.gui.leftClick).toBe("left");
+        expect(compTree.root.gui.rightClick).toBe("right");
+        expect(copySpy).toBeCalledTimes(1);
+
+        expect(srcTree.root.gui.style).toBe(null);
+    })
 
     test('Test proxy', () => {
         srcTree.root.gui.style;
