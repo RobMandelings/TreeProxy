@@ -92,3 +92,21 @@ describe('Deep overlays', () => {
         srcTree.root.gui.style;
     })
 });
+
+describe('Deep mutations preserved under recomputation', () => {
+
+    let srcTree, compTree;
+    beforeEach(() => {
+        srcTree = createSourceTree({name: "Root"});
+        compTree = createComputedTree(srcTree, (_, root) => root.gui.style = "NewStyle");
+    });
+
+    test('Src tree adjusments', () => {
+        expect(compTree.root.gui.style).toBe("NewStyle");
+        expect(copySpy).toBeCalledTimes(1);
+        srcTree.root.weight = 10;
+        expect(compTree.root.weight).toBe(10);
+        expect(compTree.root.gui.style).toBe("NewStyle");
+        expect(copySpy).toBeCalledTimes(2);
+    })
+})
