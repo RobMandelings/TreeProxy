@@ -98,7 +98,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const nodeRef = proxyTree.nodeMap.createRefProxy(id);
 
     const rId = computed(() => nodeRef.id);
-    const rStale = computed(() => !(nodeRef.node && proxyTree.getElement(id)));
+    const rStale = computed(() => !(nodeRef.__node__ && proxyTree.getElement(id)));
 
     const {rParent, setParent} = useParent(rId, proxyTree, parentId)
 

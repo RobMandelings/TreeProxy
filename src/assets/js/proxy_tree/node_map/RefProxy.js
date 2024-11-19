@@ -29,11 +29,16 @@ function createdNestedRefProxy(nodeMap, rNode, rId, targetPath) {
     })
 }
 
+/**
+ * rNode: ref to the current node (with id). A ref is used such that the underlying reference can be changed dynamically.
+ * This is essential for computed trees, as computed nodes reference a copied version if altered, and otherwise reference the source node version
+ */
 export function createRefProxy(nodeMap, rId, rNode) {
 
     const nodeInstanceOf = (instType) => rNode.value instanceof instType;
 
-    const targetObj = reactive({node: rNode, nodeInstanceOf, id: rId});
+    // Target object is made reactive so that all properties of the node can be watched
+    const targetObj = reactive({__node__: rNode, nodeInstanceOf, id: rId});
 
     const setHandler = (t, prop, value) => {
         nodeMap.set(rId.value, prop, value);
@@ -43,10 +48,10 @@ export function createRefProxy(nodeMap, rId, rNode) {
     // TODO provide array support as well: childrenIds.push etc. Now you have to do careful assignment to not mess up
     // References
     const getHandler = (t, prop, receiver) => {
-        let res = wrappedProxyTargetGetter(t, t.node, prop, receiver)
+        let res = wrappedProxyTargetGetter(t, t.__node__, prop, receiver)
         if (typeof res === 'object'
             && !(res instanceof Array)
-            && !(res === t.node) // Don't wrap the node object in a proxy. If it is explicitly retrieved, then raw access is meant.
+            && !(res === t.__node__) // Don't wrap the node object in a proxy. If it is explicitly retrieved, then raw access is meant.
         ) res = createdNestedRefProxy(nodeMap, rNode, rId, prop);
         return res;
     }
