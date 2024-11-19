@@ -25,6 +25,12 @@ export function useShouldExcludeProperty(target) {
     }
 }
 
+export function fallbackProxyGetter(target, fallbackTarget, prop, receiver) {
+    const r = Reflect.get(target, prop, receiver);
+    if (r === undefined) return Reflect.get(fallbackTarget, prop, receiver);
+    else return r;
+}
+
 export function wrappedProxyTargetGetter(t, tWrapped, prop, receiver) {
     const r = Reflect.get(t, prop, receiver); // First we check the wrapper target
     // It might be that r is undefined, but that it is a property in the target which results in undefined
