@@ -172,7 +172,7 @@ export class OverlayRefStore extends RefStore {
                         "Node does not exist in the src node map as well as the computed node map.");
                     this.elementChanges.set(nodeId, {});
                 }
-                this.elementChanges.get(nodeId)[prop] = val;
+                deepSet(this.elementChanges.get(nodeId), prop, val);
             }
         }
     }
