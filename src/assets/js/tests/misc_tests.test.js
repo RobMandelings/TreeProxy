@@ -2,7 +2,7 @@
 //     return path.split('.').reduce((acc, part) => acc[part], obj);
 // };
 
-import {deepDelete, deepEqual, deepGet, deepSet} from "@pt/utils/deepObjectUtil.js";
+import {deepDelete, deepEqual, deepGet, deepGetChangesToApply, deepSet} from "@pt/utils/deepObjectUtil.js";
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
 
 test('Testing object access', () => {
@@ -64,6 +64,12 @@ test('Test objects deep equality', () => {
 
 })
 
+test('Extra property', () => {
+    const obj1 = {value0: 0};
+    const obj2 = {value0: 0, value1: 5};
+    expect(deepEqual(obj1, obj2)).toBe(false);
+})
+
 test('Deep equal based on primitive', () => {
 
     const obj1 = "5";
@@ -114,5 +120,49 @@ test('Cascade delete stops in time', () => {
     deepDelete(obj, "value.nested.nested2");
     expect(isEmpty(obj)).toBe(false);
     expect(obj.value).toBeUndefined();
+
+})
+
+test('Changes to apply', () => {
+
+    const prev = {value: 0};
+    const cur = {value: 1};
+    const src = {value: 5};
+
+    const changes = deepGetChangesToApply(prev, cur, src);
+    expect(changes.value).toBe(1)
+
+});
+
+test('Changes to apply', () => {
+
+    const prev = {value: 0};
+    const cur = {value: 0, value2: 5};
+    const src = {value: 5, value2: 3};
+
+    const changes = deepGetChangesToApply(prev, cur, src);
+    expect(deepEqual(changes, {value2: 5})).toBe(true)
+
+})
+
+test('Changes to apply', () => {
+
+    const prev = {value: 0};
+    const cur = {value2: 5};
+    const src = {value: 5, value2: 3};
+
+    const changes = deepGetChangesToApply(prev, cur, src);
+    expect(deepEqual(changes, {value: 5, value2: 5})).toBe(true)
+
+})
+
+test('Changes to apply', () => {
+
+    const prev = {value: 0};
+    const cur = {};
+    const src = {};
+
+    const noRestorePossible = () => deepGetChangesToApply(prev, cur, src);
+    expect(noRestorePossible).toThrow();
 
 })

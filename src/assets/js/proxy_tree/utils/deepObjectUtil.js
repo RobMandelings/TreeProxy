@@ -105,7 +105,8 @@ export const deepDelete = (obj, path) => {
     return true;
 };
 
-function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
+// TODO should not allow changes to be set when it is not part of the interface (use TypeScript!)
+export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
     const changesToApply = {};
 
     function compareChanges(prev, cur, src, path = '') {
@@ -114,10 +115,9 @@ function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
             const newPath = path ? `${path}.${key}` : key;
             if (!(key in cur)) {
                 const srcValue = deepGet(src, newPath);
-                // TODO should not allow changes to be set when it is not part of the interface (use TypeScript!)
-                if (srcValue !== undefined) {
-                    deepSet(changesToApply, newPath, srcValue); // Restore if the change is removed
-                }
+                if (srcValue === undefined) throw new Error(`Source value for path '${newPath}' is undefined. 
+                Always make sure that the source node has the correct property. Object: ${JSON.stringify(src)}`);
+                deepSet(changesToApply, newPath, srcValue); // Restore if the change is removed
             }
         }
 
