@@ -4,15 +4,21 @@ import {deepGet} from "@pt/proxy_utils/Utils.js";
 
 function createdNestedRefProxy(nodeMap, rNode, rId, targetPath) {
 
+    /*
+    We cannot use static targets because rNode might change
+    (When a value is adjusted and we are working with overlay nodes,
+    then rNode will change to a new reference. In that case, target should also change to reflect the
+    new node reference.
+     */
     const rTarget = computed(() => deepGet(rNode.value, targetPath));
-    return createCustomProxy(reactive({rTarget}), {
+    return createCustomProxy(reactive({target: rTarget}), {
         get(t, p, receiver) {
-            const r = Reflect.get(t, p, receiver);
-            if (typeof r === 'object') {
+            const res = Reflect.get(t, p, receiver);
+            if (typeof res === 'object') {
                 targetPath += `.${p}`;
-                return createdNestedRefProxy(nodeMap, rNode, rId, r, targetPath);
+                return createdNestedRefProxy(nodeMap, rNode, rId, targetPath);
             }
-            return r;
+            return res;
         },
         set(t, p, newValue, receiver) {
             nodeMap.set(rId.value, p, newValue);
