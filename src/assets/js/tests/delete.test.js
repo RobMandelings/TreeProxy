@@ -38,6 +38,7 @@ test('Delete many at once check', () => {
     const srcTree = createSourceTree(createTree([0, 3, 0]));
     const nrDescendants1 = srcTree.root.descendants.size;
     const nrDeleted = srcTree.root.children[1].delete();
+    srcTree.getChildren(srcTree.root.id);
     expect(nrDeleted).toBe(4);
     expect(srcTree.root.descendants.size).toBe(nrDescendants1 - nrDeleted);
     expect(srcTree.root.children.size).toBe(2);

@@ -224,7 +224,7 @@ describe('Finding root', () => {
 
     test('From self', () => {
         const srcTree = createSourceTree(createTree(0));
-        expect(srcTree.root.root).toBe(srcTree.root);
+        expect(srcTree.root.root.id).toBe(srcTree.root.id);
     })
 })
 

@@ -1,20 +1,7 @@
 import {DirectNodeAccessError, StaleProxyError} from "@pt/ProxyNodeErrors.js";
 import {createCustomProxy, useShouldExcludeProperty, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
 import {createBaseProxyNodeTarget} from "@pt/BaseProxyNode.js";
-
-const coreGetHandler = (t, prop, receiver) => {
-    if (prop === "node") throw new DirectNodeAccessError();
-
-    if (prop in t || prop in t.nodeRef) {
-        if (prop === "stale") return t.stale;
-        else if (t.stale) {
-            if (prop === "toJSON") return {msg: "This proxy is stale"};
-            else throw new StaleProxyError();
-        }
-    }
-
-    return wrappedProxyTargetGetter(t, t.nodeRef, prop, receiver);
-}
+import {isReactive, reactive, toRefs} from "vue";
 
 /**
  * TODO use TypeScript to add typing to the returned objects (e.g. what properties are available etc)
@@ -25,16 +12,52 @@ export class ProxyNodeFactory {
         throw new Error("Abstract method");
     }
 
+    /**
+     * All core functionality of proxy nodes is included here. Simple proxy that checks in target first
+     * Then checks in nodeRef.
+     */
+    __createBaseProxyNode(proxyTree, id, parentId) {
+        const target = createBaseProxyNodeTarget(proxyTree, id, parentId);
+        return createCustomProxy(target, {
+            get(t, prop, receiver) {
+                return wrappedProxyTargetGetter(t, t.nodeRef, prop, receiver);
+            },
+            set(t, prop, value, receiver) {
+                return Reflect.set(t.nodeRef, prop, value, receiver);
+            }
+        });
+    }
+
+    decorateProxyNode(proxyTree, proxyNode) {
+        return {};
+    }
+
     _createProxyNode(proxyTree, id, parentId, beforeGetFn) {
 
-        const target = this._createProxyTarget(proxyTree, id, parentId);
+        const proxyNode = this.__createBaseProxyNode(proxyTree, id, parentId);
+        const decoratedFunctionality = this.decorateProxyNode(proxyTree, proxyNode);
+        const decoratedFunctionalityAsRefs = isReactive(decoratedFunctionality) ? toRefs(decoratedFunctionality) : decoratedFunctionality;
+
+        const target = reactive({__proxyNode__: proxyNode});
+
         const handler = {
             get: (t, prop, receiver) => {
                 if (beforeGetFn) beforeGetFn(t, prop, receiver);
-                return coreGetHandler(t, prop, receiver);
+
+                if (prop === "node") throw new DirectNodeAccessError();
+
+                if (prop in t || proxyNode.hasProp(prop)) {
+                    if (prop === "stale") return proxyNode.stale;
+                    else if (proxyNode.stale) {
+                        if (prop === "toJSON") return {msg: "This proxy is stale"};
+                        else throw new StaleProxyError();
+                    }
+                }
+
+                return wrappedProxyTargetGetter(t, proxyNode, prop, receiver);
             },
             set: (t, prop, value, receiver) => {
-                const success = Reflect.set(t.nodeRef, prop, value, receiver);
+                const success = Reflect.set(t.__proxyNode__, prop, value, receiver);
                 if (success) proxyTree.markOverlaysDirty();
                 return success;
             }

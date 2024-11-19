@@ -125,7 +125,7 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
     const {rIsDirty, dirtyPropProxy} = useDirty(proxyTree, rParent, rId, prevProxy);
     const rOverlayType = useOverlayType(proxyTree, rId);
 
-    const target = reactive({
+    const target = {
         nodeRef,
         overlayType: rOverlayType,
         children,
@@ -158,7 +158,8 @@ export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
             if (children.size) obj.children = children.asArray.map(c => c.toJSON());
             return obj;
         }
-    })
+    };
+    target.hasProp = (prop) => prop in target || prop in target.nodeRef;
 
-    return target;
+    return reactive(target);
 }

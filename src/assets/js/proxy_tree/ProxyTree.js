@@ -137,7 +137,9 @@ export class ProxyTree extends RefStore {
 
     getChildren(id) {
         const node = this.nodeMap.getElement(id);
-        if (!node) throw new NodeNotFoundError(id);
+        if (!node) {
+            throw new NodeNotFoundError(id);
+        }
 
         return node.childrenIds.map(cId => {
             return this.proxyNodes.get(cId)
