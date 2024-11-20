@@ -25,7 +25,7 @@ export function computedEffect(effectFn) {
 
     const run = () => effect.value;
 
-    run();
+    run(); // Initial effect to start the dependency tracking (much like how watchEffect works)
 
     return run;
 }
