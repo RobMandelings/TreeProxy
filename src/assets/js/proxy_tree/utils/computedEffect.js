@@ -16,18 +16,14 @@ export function computedEffect(effectFn) {
      * Initial is required to trigger the computed effect at least once, such that all dependencies
      * can be tracked. Once any of the reactive dependencies in the effect change, the computed effect will run again
      */
-    let hasRecomputed = false;
+    let initial = true;
     const effect = computed(() => {
         fallbackRef.value;
-        effectFn();
-        hasRecomputed = true;
+        effectFn(initial);
+        if (initial) initial = false;
     });
 
-    const run = () => {
-        hasRecomputed = false;
-        effect.value;
-        return hasRecomputed;
-    }
+    const run = () => effect.value;
 
     run();
 
@@ -48,19 +44,19 @@ function checkDeps(deps) {
 
 export function trackDependencies(depsArray) {
 
-    const effect = computedEffect(() => checkDeps(depsArray))
-
     const hasDirtyDeps = ref(false);
+    const effect = computedEffect((initial) => {
+        checkDeps(depsArray)
+        if (!initial) hasDirtyDeps.value = true;
+    })
 
     /**
      * Sets hasDirtyDeps to true if the effect was recomputed.
      *
      */
     const hasDirtyDepsFn = () => {
-        const hasRecomputed = effect();
-        console.log(hasRecomputed);
-        if (hasRecomputed) hasDirtyDeps.value = hasRecomputed;
-        return hasDirtyDeps.value; // If hasDirtyDeps is true, we don't need to re-run the effect
+        effect(); // Run the effect. If the effect is re-run once, hasDirtyDeps is set to true
+        return hasDirtyDeps.value;
     }
 
     const resetDirtyDeps = () => hasDirtyDeps.value = false;

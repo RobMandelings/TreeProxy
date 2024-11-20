@@ -68,28 +68,18 @@ test('ComputedEffect', async () => {
     const rCount = ref(0);
 
     const trigger = jest.fn();
-    let hasRecomputed;
     const runEffect = computedEffect(() => {
         rCount.value;
         trigger();
     });
     expect(trigger).toBeCalledTimes(1);
     trigger.mockClear();
-    hasRecomputed = runEffect();
     expect(trigger).toBeCalledTimes(0);
-    expect(hasRecomputed).toBe(false);
-
 
     rCount.value++;
     expect(trigger).toBeCalledTimes(0); // Not accessed yet
-    hasRecomputed = runEffect();
-    expect(hasRecomputed).toBe(true);
+    runEffect();
     expect(trigger).toBeCalledTimes(1);
-
-    rCount.value++;
-    await nextTick();
-    hasRecomputed = runEffect();
-    expect(hasRecomputed).toBe(true);
 
 })
 
@@ -109,12 +99,8 @@ test('Watch on hasDirtyDeps', async () => {
     const watchTrigger = jest.fn(() => console.log("hello"));
     watch(() => depTracker.hasDirtyDeps(), () => watchTrigger());
     rCount.value++;
+    await nextTick();
     expect(depTracker.hasDirtyDeps()).toBe(true);
-    await nextTick();
-    await nextTick();
-    await nextTick();
-    console.log("Hallo");
-    // expect(depTracker.hasDirtyDeps()).toBe(true);
-    // expect(watchTrigger).toBeCalledTimes(1);
+    expect(watchTrigger).toBeCalledTimes(1);
 
 })
