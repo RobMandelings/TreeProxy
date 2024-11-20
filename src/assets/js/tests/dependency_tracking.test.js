@@ -52,6 +52,11 @@ describe('Single dirty dep', () => {
         expect(depTracker.hasDirtyDeps()).toBe(true);
         depTracker.resetDirtyDeps();
         expect(depTracker.hasDirtyDeps()).toBe(false);
+        expect(depTracker.hasDirtyDeps()).toBe(false); // Still false after second access
+        rCount.value++;
+        expect(depTracker.hasDirtyDeps()).toBe(true);
+        expect(depTracker.hasDirtyDeps()).toBe(true);
+
 
     })
 

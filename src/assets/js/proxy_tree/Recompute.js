@@ -40,9 +40,9 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     let dirty = {value: true};
     let reactiveDirty = reactive(dirty);
     let checkDependenciesForDirty;
-    let hasDirtyDeps;
+    let trackDeps;
     let recomputeWatcher;
-    
+
     const checkDep = (d) => {
         const t = d.target;
         const res = t[d.prop];
@@ -52,9 +52,8 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
 
     const initCheckDependencies = () => {
 
-        const deps = rDependencies.value;
-        const depsArray = Object.values(deps.value);
-        hasDirtyDeps = trackDependencies(depsArray);
+        const depsArray = Object.values(rDependencies.value);
+        trackDeps = trackDependencies(depsArray);
 
     }
 
@@ -95,7 +94,10 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
 
     const recomputeIfDirty = () => {
         if (isRecomputing.value) return false;
-        if (hasDirtyDeps()) dirty.value = true;
+        if (trackDeps.hasDirtyDeps()) {
+            dirty.value = true;
+            trackDeps.resetDirtyDeps();
+        }
 
         if (dirty.value) {
             recompute();
