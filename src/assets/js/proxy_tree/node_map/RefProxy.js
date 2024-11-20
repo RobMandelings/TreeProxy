@@ -26,7 +26,7 @@ function createdNestedRefProxy(nodeMap, rNode, rId, targetPath) {
             nodeMap.set(rId.value, `${targetPath}.${prop}`, newValue);
             return true;
         }
-    })
+    }, {name: "NestedRefProxy", targetPath: targetPath})
 }
 
 /**

@@ -61,7 +61,7 @@ export class ProxyNodeFactory {
             }
         }
 
-        return new createCustomProxy(target, handler);
+        return new createCustomProxy(target, handler, {name: "ProxyNode"});
     }
 
     createSrcProxyNode(srcProxyTree, id, parentId) {

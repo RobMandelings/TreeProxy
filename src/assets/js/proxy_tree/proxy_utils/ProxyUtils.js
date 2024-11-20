@@ -47,7 +47,7 @@ export function wrappedProxyTargetGetter(t, tWrapped, prop, receiver) {
  * @param handler
  * @return {*|object}
  */
-export function createCustomProxy(target, handler) {
+export function createCustomProxy(target, handler, proxyInfo = {}) {
 
     /**
      * I deal with reactive targets, vue breaks some of the mechanics of default proxies.
@@ -55,6 +55,7 @@ export function createCustomProxy(target, handler) {
      * Such as __v_Reactive and __v_raw. Most of these things need to be ignored.
      */
     const excludePropFn = useShouldExcludeProperty(target);
+    let __proxyInfo__ = proxyInfo; // Provides information when debugging
 
     const proxyId = crypto.randomUUID(); // Unique id for each proxy. Used in testing while comparing proxies.
     return new Proxy(target, {
@@ -65,6 +66,7 @@ export function createCustomProxy(target, handler) {
             if (prop === "__proxyId__") return proxyId;
             if (prop === "__target__") return t;
             if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
+            const proxInfo = __proxyInfo__;
             return handler.get(t, prop, receiver);
         },
         set: handler.set

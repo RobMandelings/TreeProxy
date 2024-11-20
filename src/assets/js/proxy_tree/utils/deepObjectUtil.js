@@ -113,7 +113,11 @@ export function isNonNullObject(v) {
 export function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
         const change = changes;
-        if (!(key in node)) throw new Error(`Cannot apply changes: this node does not have the key ${key}`);
+        if (!(key in node)) {
+            let errorMsg = `Trying to change property '${key}' on object that does not have this property. 
+            Available properties: ${Object.keys(node).join(', ')}`;
+            throw new Error(errorMsg);
+        }
         if (value instanceof ChangeUnit) node[key] = value.value;
         else if (isNonNullObject(value)) applyChanges(node[key], value);
         else node[key] = value;
