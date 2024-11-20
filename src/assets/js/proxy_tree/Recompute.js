@@ -1,5 +1,5 @@
 import {createCustomProxy, reactiveReflectGet, useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
-import {computed, reactive, ref, watch, watchSyncEffect} from "vue";
+import {computed, isRef, reactive, ref, watch, watchSyncEffect} from "vue";
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
 
 function createStateProxy(state, rDeps, path = null) {
@@ -41,7 +41,12 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     let checkDependenciesForDirty;
     let recomputeWatcher;
 
-    const checkDep = (d) => reactiveReflectGet(d.target, d.prop, d.receiver)
+    const checkDep = (d) => {
+        const t = d.target;
+        const res = Reflect.get(t, d.prop, d.rev);
+        if (isRef(res)) return res.value;
+        return res;
+    }
 
     const initCheckDependencies = () => {
 
