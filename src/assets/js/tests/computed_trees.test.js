@@ -195,16 +195,23 @@ describe('Computed tree state changes', () => {
     test('Conditional', () => {
 
         const rCount = ref(0);
+        const rCount2 = ref(0);
         const rSyncWeight = ref(false);
-        const stateObj = {count: rCount, syncWeight: rSyncWeight};
+        const stateObj = {count: rCount, syncWeight: rSyncWeight, anotherCount: rCount2};
 
         const srcTree = createSimpleSourceTree();
         const recomputeSpy = jest.fn();
         const compTree = createComputedTree(srcTree, (state, root) => {
-            if (state.syncWeight) root.name = `${state.count}`;
+
+            if (state.syncWeight) {
+                console.log(`SyncWeight is true: ${state.count}`);
+                root.name = `${state.count}`;
+                root.weight = state.anotherCount;
+            }
             recomputeSpy();
         }, stateObj);
         expect(compTree.root.name).toBe(srcTree.root.name);
+        expect(recomputeSpy).toBeCalledTimes(1);
         recomputeSpy.mockClear();
         rCount.value++;
         expect(compTree.root.name).toBe(srcTree.root.name);

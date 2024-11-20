@@ -75,6 +75,7 @@ export function createCustomProxy(target, handler, proxyInfo = {}) {
             // Then we will lose our Proxy! Very important line.
             if (prop === "__v_raw") return undefined;
             if (prop === "__proxyId__") return proxyId;
+            if (prop === "__proxyInfo__") return proxyInfo;
             if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
             const res = handler.get(t, prop, receiver);
             if (isRef(res)) return res.value; // Same mechanics as if it were a reactive object

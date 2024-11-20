@@ -1,36 +1,38 @@
-import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
-import {computed, reactive, watch} from "vue";
+import {createCustomProxy, reactiveReflectGet, useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
+import {computed, reactive, ref, watch, watchSyncEffect} from "vue";
+import {isEmpty} from "@pt/proxy_utils/Utils.js";
 
-function createStateProxy(state, deps) {
-    const excludePropFn = useShouldExcludeProperty(state);
-    return new Proxy(state, {
+function createStateProxy(state, rDeps, path = null) {
+    const proxy = {value: null};
+
+    proxy.value = createCustomProxy(state, {
         get(target, prop, receiver) {
-            if (excludePropFn(prop)) return Reflect.get(target, prop, receiver);
-
-            const res = Reflect.get(target, prop, receiver);
-            if (typeof res === 'object' && res != null) return createStateProxy(res, deps);
+            const res = reactiveReflectGet(state, prop, receiver);
+            if (typeof res === 'object' && res != null) return createStateProxy(res, rDeps, `${path}.${prop}`);
             else {
+                const newPath = path ? `${path}.${prop}` : prop;
+
                 // These access properties are tracked, so that they can be used to re-trigger
                 // Any recomputations that need to happen
-                deps.push({target, prop, receiver});
+                if (!(newPath in rDeps.value)) rDeps.value[newPath] = {target, prop, receiver};
                 return res;
             }
         },
-    });
+    }, {name: "StateProxy", path, __rDeps__: rDeps});
+    return proxy.value;
 }
 
 function useDependencyTracker(state) {
-    state = reactive(state); // Need to make reactive for computed prop to work
-    let dependencies = [];
-    const stateProxy = createStateProxy(state, dependencies);
-    const clearDependencies = () => dependencies.length = 0;
-    return {stateProxy, dependencies, clearDependencies};
+    let rDependencies = {value: {}};
+    const stateProxy = createStateProxy(state, rDependencies);
+    const clearDependencies = () => rDependencies.value = {};
+    return {stateProxy, rDependencies, clearDependencies};
 
 }
 
 export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, resetRootFn, recomputeSrcFn) {
 
-    const {stateProxy, dependencies, clearDependencies} = useDependencyTracker(state);
+    const {stateProxy, rDependencies, clearDependencies} = useDependencyTracker(state);
     recomputeFn = recomputeFn ?? ((_) => undefined);
 
     let isRecomputing = {value: false};
@@ -39,14 +41,18 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     let checkDependenciesForDirty;
     let recomputeWatcher;
 
-    const checkDep = (d) => Reflect.get(d.target, d.prop, d.receiver)
+    const checkDep = (d) => reactiveReflectGet(d.target, d.prop, d.receiver)
 
     const initCheckDependencies = () => {
 
-        if (dependencies.length) {
+        const deps = rDependencies.value;
+        if (!isEmpty(deps)) {
             let initial = true;
             let rCheckDependencies = computed(() => {
-                dependencies.forEach(d => checkDep(d));
+                console.debug("Recomputing dirty via dependencies...");
+                console.debug(`Dependencies: ${Object.keys(deps).join(',')}`);
+                console.debug(`Initial: ${initial}`);
+                Object.values(deps).forEach(d => checkDep(d));
                 if (initial) initial = false;
                 else dirty.value = true;
             });
@@ -72,7 +78,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
      */
     const initRecomputeWatcher = () => {
         if (recomputeWatcher) recomputeWatcher();
-        recomputeWatcher = watch(dependencies.map(d => () => checkDep(d)), () => recomputeIfDirty());
+        recomputeWatcher = watch(Object.values(rDependencies.value).map(d => () => checkDep(d)), () => recomputeIfDirty());
     }
 
     const recompute = () => {
@@ -82,6 +88,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
         isRecomputing.value = true;
         resetRootFn();
         clearDependencies();
+
         recomputeFn(stateProxy, root);
         resetDirty();
         initCheckDependencies();
@@ -94,8 +101,16 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     const recomputeIfDirty = () => {
         if (isRecomputing.value) return false;
 
+        const prevDirty = dirty.value;
         checkDependenciesForDirty();
         if (dirty.value) {
+            if (prevDirty !== dirty) {
+                const depKeys = Object.keys(rDependencies.value);
+                let depsStr;
+                if (!depKeys.length) depsStr = "(None)";
+                else depsStr = depKeys.join(',');
+                console.debug(`dirty after depsCheck. Dependencies: ${depsStr}`);
+            }
             recompute();
             return true;
         }
