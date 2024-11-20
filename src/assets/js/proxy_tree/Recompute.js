@@ -1,6 +1,7 @@
 import {createCustomProxy, reactiveReflectGet, useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
 import {computed, isRef, reactive, ref, watch, watchSyncEffect} from "vue";
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
+import {trackDependencies} from "@pt/utils/computedEffect.js";
 
 function createStateProxy(state, rDeps, path = null) {
     const proxy = {value: null};
@@ -39,8 +40,9 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     let dirty = {value: true};
     let reactiveDirty = reactive(dirty);
     let checkDependenciesForDirty;
+    let hasDirtyDeps;
     let recomputeWatcher;
-
+    
     const checkDep = (d) => {
         const t = d.target;
         const res = t[d.prop];
@@ -51,21 +53,9 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     const initCheckDependencies = () => {
 
         const deps = rDependencies.value;
-        if (!isEmpty(deps)) {
-            let initial = true;
-            let rCheckDependencies = computed(() => {
-                console.debug("Recomputing dirty via dependencies...");
-                console.debug(`Dependencies: ${Object.keys(deps).join(',')}`);
-                console.debug(`Initial: ${initial}`);
-                Object.values(deps).forEach(d => checkDep(d));
-                if (initial) initial = false;
-                else dirty.value = true;
-            });
+        const depsArray = Object.values(deps.value);
+        hasDirtyDeps = trackDependencies(depsArray);
 
-            rCheckDependencies.value;
-
-            checkDependenciesForDirty = () => rCheckDependencies.value;
-        } else checkDependenciesForDirty = () => undefined; // There are no dependencies to check, so we don't create a computed prop
     }
 
     /**
@@ -105,17 +95,9 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
 
     const recomputeIfDirty = () => {
         if (isRecomputing.value) return false;
+        if (hasDirtyDeps()) dirty.value = true;
 
-        const prevDirty = dirty.value;
-        checkDependenciesForDirty();
         if (dirty.value) {
-            if (prevDirty !== dirty) {
-                const depKeys = Object.keys(rDependencies.value);
-                let depsStr;
-                if (!depKeys.length) depsStr = "(None)";
-                else depsStr = depKeys.join(',');
-                console.debug(`dirty after depsCheck. Dependencies: ${depsStr}`);
-            }
             recompute();
             return true;
         }

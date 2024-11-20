@@ -39,15 +39,28 @@ function checkDeps(deps) {
             throw new Error(`Cannot check dependency '${d.prop}': 
             target is not reactive target.prop is not a ref`);
 
-        if (isRef(res)) return res;
+        if (isRef(res)) return res.value;
         return res;
     });
 }
 
-export function trackDependencies(deps) {
+export function trackDependencies(depsArray) {
 
-    const effect = computedEffect(() => checkDeps(deps))
-    const dependenciesChanged = () => effect();
+    const effect = computedEffect(() => checkDeps(depsArray))
 
-    return dependenciesChanged;
+    let hasDirtyDeps = false;
+
+    /**
+     * Sets hasDirtyDeps to true if the effect was recomputed.
+     *
+     */
+    const hasDirtyDepsFn = () => {
+
+        if (!hasDirtyDeps) hasDirtyDeps = effect();
+        return hasDirtyDeps; // If hasDirtyDeps is true, we don't need to re-run the effect
+    }
+
+    const resetDirtyDeps = () => hasDirtyDeps = false;
+
+    return {hasDirtyDeps: hasDirtyDepsFn, resetDirtyDeps};
 }
