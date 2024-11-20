@@ -1,6 +1,8 @@
 // Vue also attempts to get properties such as __v_isRef that are related to the reactive targets within the proxy
 // We need to make sure that our proxies do not interfere with vue, so make sure that the __v_isRef is always called on
 // TODO we need to test that all queries are limited to __v!
+import {reactive} from "vue";
+
 function isVueProperty(prop) {
     if (!(typeof prop === "string")) return false;
     return prop.startsWith("__v");
@@ -57,18 +59,20 @@ export function createCustomProxy(target, handler, proxyInfo = {}) {
     const excludePropFn = useShouldExcludeProperty(target);
     let __proxyInfo__ = proxyInfo; // Provides information when debugging
 
+    const newTarget = reactive({__proxyInfo__: proxyInfo, __target__: target});
+
     const proxyId = crypto.randomUUID(); // Unique id for each proxy. Used in testing while comparing proxies.
-    return new Proxy(target, {
+    return new Proxy(newTarget, {
         get(t, prop, receiver) {
             // Otherwise vue will get the raw target upon assignment in reactive object
             // Then we will lose our Proxy! Very important line.
             if (prop === "__v_raw") return undefined;
             if (prop === "__proxyId__") return proxyId;
-            if (prop === "__target__") return t;
             if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
-            const proxInfo = __proxyInfo__;
-            return handler.get(t, prop, receiver);
+            return handler.get(t.__target__, prop, receiver);
         },
-        set: handler.set
+        set(t, p, newValue, receiver) {
+            return handler.set(t.__target__, p, newValue, receiver);
+        }
     })
 }
