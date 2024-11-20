@@ -10,7 +10,11 @@ import {
     deepSet
 } from "@pt/utils/deepObjectUtil.js";
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
-import {ChangeUnit, deepGetChangesToApply} from "@pt/node_map/ChangeUnit.js";
+import {ChangeUnit, deepGetChangesToApply, unwrapChangeUnits} from "@pt/node_map/ChangeUnit.js";
+
+const getUnwrappedDeepChanges = (prev, cur, src) => {
+    return unwrapChangeUnits(deepGetChangesToApply(prev, cur, src));
+}
 
 test('Testing object access', () => {
     const obj = {value: {nested: 0}};
@@ -136,16 +140,16 @@ test('Changes to apply', () => {
     const cur = {value: new ChangeUnit(1)};
     const src = {value: new ChangeUnit(5)};
 
-    const changes = deepGetChangesToApply(prev, cur, src);
+    const changes = getUnwrappedDeepChanges(prev, cur, src);
     expect(changes.value).toBe(1)
 
 });
 
 test('Changes to apply', () => {
 
-    const prev = {value: 0};
-    const cur = {value: 0, value2: 5};
-    const src = {value: 5, value2: 3};
+    const prev = {value: new ChangeUnit(0)};
+    const cur = {value: new ChangeUnit(0), value2: new ChangeUnit(5)};
+    const src = {value: new ChangeUnit(5), value2: new ChangeUnit(3)};
 
     const changes = deepGetChangesToApply(prev, cur, src);
     expect(deepEqual(changes, {value2: 5})).toBe(true)

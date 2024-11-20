@@ -54,6 +54,7 @@ export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
 }
 
 export function unwrapChangeUnits(changes) {
+    if (!(typeof changes === 'object')) throw new Error(`Object value expected, not: '${changes}'`);
     const unwrapped = {};
     Object.entries(changes).forEach(([key, value]) => {
         if (value instanceof ChangeUnit) unwrapped[key] = value.value;
