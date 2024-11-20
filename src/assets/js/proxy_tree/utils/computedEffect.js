@@ -1,4 +1,4 @@
-import {computed, isReactive, isRef, ref} from "vue";
+import {computed, isReactive, isRef, ref, watch} from "vue";
 
 export function computedEffect(effectFn) {
 
@@ -57,8 +57,9 @@ export function trackDependencies(depsArray) {
      *
      */
     const hasDirtyDepsFn = () => {
-
-        if (!hasDirtyDeps.value) hasDirtyDeps.value = effect();
+        const hasRecomputed = effect();
+        console.log(hasRecomputed);
+        if (hasRecomputed) hasDirtyDeps.value = hasRecomputed;
         return hasDirtyDeps.value; // If hasDirtyDeps is true, we don't need to re-run the effect
     }
 
