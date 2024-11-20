@@ -1,16 +1,17 @@
 import {computedEffect, trackDependencies} from "@pt/utils/computedEffect.js";
 import {nextTick, ref, watch} from "vue";
 
-test('Track dependencies', () => {
+test('Track dependencies: no dependencies', () => {
 
+    const rCount = ref(0);
     const depTracker = trackDependencies([]);
+    expect(depTracker.hasDirtyDeps()).toBe(false);
+    // For some reason if a computed property does not access any reactive props, it becomes dirty after any ref changes
+    // Changing the count should not  trigger any hasDirtyDeps to be true (see fallbackRef)
+    rCount.value++;
     expect(depTracker.hasDirtyDeps()).toBe(false);
 
 });
-
-test('Computed effect: no dependencies', () => {
-
-})
 
 
 describe('Single dirty dep', () => {
