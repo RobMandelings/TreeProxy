@@ -1,4 +1,5 @@
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
+import {ChangeUnit} from "@pt/node_map/ChangeUnit.js";
 
 /**
  * Retrieve object value via nested property access. E.g. deepGet(obj, "value.nested");
@@ -105,50 +106,15 @@ export const deepDelete = (obj, path) => {
     return true;
 };
 
-// TODO should not allow changes to be set when it is not part of the interface (use TypeScript!)
-export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
-    const changesToApply = {};
-
-    function compareChanges(prev, cur, src, path = '') {
-        // Handle removed changes
-        for (const key in prev) {
-            const newPath = path ? `${path}.${key}` : key;
-            if (!(key in cur)) {
-                const srcValue = deepGet(src, newPath);
-                if (srcValue === undefined) {
-                    throw new Error(`Source value for path '${newPath}' is undefined. 
-                Always make sure that the source node has the correct property. Object: ${JSON.stringify(src)}`);
-                }
-                deepSet(changesToApply, newPath, srcValue); // Restore if the change is removed
-            }
-        }
-
-        // Handle new and updated changes
-        for (const key in cur) {
-            const newPath = path ? `${path}.${key}` : key;
-            if (!(key in prev)) {
-                deepSet(changesToApply, newPath, cur[key]); // New change
-            } else if (isObject(cur[key]) && isObject(prev[key])) {
-                // Recursively compare nested objects
-                compareChanges(prev[key], cur[key], deepGet(src, newPath), newPath);
-            } else if (cur[key] !== prev[key]) {
-                deepSet(changesToApply, newPath, cur[key]); // Updated change
-            }
-        }
-    }
-
-    compareChanges(prevChanges, curChanges, srcNode);
-    return changesToApply;
-}
-
-function isObject(v) {
+export function isObject(v) {
     return typeof v === 'object' && v !== null && !(v instanceof Array)
 }
 
 export function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
         if (!(key in node)) throw new Error(`Cannot apply changes: this node does not have the key ${key}`);
-        if (isObject(value)) applyChanges(node[key], value);
-        else node[key] = value;
+        if (value instanceof ChangeUnit) node[key] = value.value;
+        else if (isObject(value)) applyChanges(node[key], value);
+        else throw new Error("Invalid change format provided");
     });
 }

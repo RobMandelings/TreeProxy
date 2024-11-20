@@ -9,9 +9,9 @@ import {
     deepDelete,
     deepEqual,
     deepGet,
-    deepGetChangesToApply,
     deepSet
 } from "@pt/utils/deepObjectUtil.js";
+import {ChangeUnit, deepGetChangesToApply} from "@pt/node_map/ChangeUnit.js";
 
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
@@ -48,6 +48,8 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
             // Compute the changes that should be applied based on current and prev changes.
             changesToApply = deepGetChangesToApply(prevChanges, curChanges, srcNode);
         }
+
+        const deep = deepGetChangesToApply(prevChanges, curChanges, srcNode);
 
         if (copy && Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
         prevChanges = {...curChanges};
@@ -139,7 +141,7 @@ export class OverlayRefStore extends RefStore {
         const remove = deepEqual(this.srcElementMap.getPropertyValue(nodeId, prop), val);
 
         // If the node was added on this layer, any adjustments to this node simply apply to the node itself
-        if (this.addedElements.has(nodeId)) deepSet(this.addedElements.get(nodeId), prop, val);
+        if (this.addedElements.has(nodeId)) deepSet(this.addedElements.get(nodeId), prop, new ChangeUnit(val));
         else {
             if (remove) {
                 if (this.elementChanges.has(nodeId)) {
@@ -156,7 +158,7 @@ export class OverlayRefStore extends RefStore {
                         "Node does not exist in the src node map as well as the computed node map.");
                     this.elementChanges.set(nodeId, {});
                 }
-                deepSet(this.elementChanges.get(nodeId), prop, val);
+                deepSet(this.elementChanges.get(nodeId), prop, new ChangeUnit(val));
             }
         }
     }
