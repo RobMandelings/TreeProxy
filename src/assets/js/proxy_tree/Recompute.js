@@ -1,12 +1,14 @@
 import {createCustomProxy, reactiveReflectGet, useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
-import {computed, isRef, reactive, ref, watch, watchSyncEffect} from "vue";
+import {computed, isReactive, isRef, reactive, ref, toRefs, watch, watchSyncEffect} from "vue";
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
 import {trackDependencies} from "@pt/utils/computedEffect.js";
 
 function createStateProxy(state, rDeps, path = null) {
     const proxy = {value: null};
 
-    proxy.value = createCustomProxy(state, {
+    const refsState = isReactive(state) ? toRefs(state) : state;
+
+    proxy.value = createCustomProxy(refsState, {
         get(target, prop, receiver) {
             const res = reactiveReflectGet(state, prop, receiver);
             if (typeof res === 'object' && res != null) return createStateProxy(res, rDeps, `${path}.${prop}`);
@@ -39,8 +41,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     let isRecomputing = {value: false};
     let dirty = {value: true};
     let reactiveDirty = reactive(dirty);
-    let checkDependenciesForDirty;
-    let trackDeps;
+    let rDepTracker = ref(null);
     let recomputeWatcher;
 
     const checkDep = (d) => {
@@ -53,7 +54,8 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     const initCheckDependencies = () => {
 
         const depsArray = Object.values(rDependencies.value);
-        trackDeps = trackDependencies(depsArray);
+        console.log(`Length of dependencies: ${depsArray.length}`)
+        rDepTracker.value = trackDependencies(depsArray);
 
     }
 
@@ -94,9 +96,9 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
 
     const recomputeIfDirty = () => {
         if (isRecomputing.value) return false;
-        if (trackDeps.hasDirtyDeps()) {
+        if (rDepTracker.value.hasDirtyDeps()) {
             dirty.value = true;
-            trackDeps.resetDirtyDeps();
+            rDepTracker.value.resetDirtyDeps();
         }
 
         if (dirty.value) {
@@ -127,6 +129,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     return {
         recomputeIfDirty,
         markDirty,
+        rDepTracker,
         isDirtyObj: dirty,
         isRecomputingObj: isRecomputing
     }

@@ -46,6 +46,7 @@ export function trackDependencies(depsArray) {
 
     const hasDirtyDeps = ref(false);
     const effect = computedEffect((initial) => {
+        console.log("Effect function called");
         checkDeps(depsArray)
         if (!initial) hasDirtyDeps.value = true;
     })
@@ -55,6 +56,7 @@ export function trackDependencies(depsArray) {
      *
      */
     const hasDirtyDepsFn = () => {
+        console.debug("Has dirty dependencies called");
         effect(); // Run the effect. If the effect is re-run once, hasDirtyDeps is set to true
         return hasDirtyDeps.value;
     }

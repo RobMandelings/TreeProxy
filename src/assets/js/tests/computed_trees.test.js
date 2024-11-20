@@ -1,5 +1,5 @@
 import {createTree} from "@pt/TreeUtil.js";
-import {nextTick, ref} from "vue";
+import {nextTick, reactive, ref, toRefs} from "vue";
 import {createEmptyCompTree} from "./trees.js";
 import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 import {CustomNode} from "@pt/CustomNode.js";
@@ -197,8 +197,9 @@ describe('Computed tree state changes', () => {
         const rCount = ref(0);
         const rCount2 = ref(0);
         const rSyncWeight = ref(false);
-        const stateObj = {count: rCount, syncWeight: rSyncWeight, anotherCount: rCount2};
-
+        const anotherReactive = reactive({hello: 5});
+        const stateObj = {count: rCount, syncWeight: rSyncWeight, anotherCount: rCount2, anotherReactive};
+        
         const srcTree = createSimpleSourceTree();
         const recomputeSpy = jest.fn();
         const compTree = createComputedTree(srcTree, (state, root) => {
