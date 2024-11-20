@@ -8,6 +8,10 @@ test('Track dependencies', () => {
 
 });
 
+test('Computed effect: no dependencies', () => {
+
+})
+
 
 describe('Single dirty dep', () => {
 
