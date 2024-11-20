@@ -1,6 +1,6 @@
-import {computed, ref} from "vue";
+import {computed, isReactive, isRef, ref} from "vue";
 
-export function computedEffect(fn) {
+export function computedEffect(effectFn) {
 
     /**
      * When a computed property does not access any reactive values or refs
@@ -16,11 +16,10 @@ export function computedEffect(fn) {
      * Initial is required to trigger the computed effect at least once, such that all dependencies
      * can be tracked. Once any of the reactive dependencies in the effect change, the computed effect will run again
      */
-    let initial = true;
     let hasRecomputed = false;
     const effect = computed(() => {
         fallbackRef.value;
-        if (initial) initial = false;
+        effectFn();
         hasRecomputed = true;
     });
 
@@ -33,6 +32,22 @@ export function computedEffect(fn) {
     return run;
 }
 
+function checkDeps(deps) {
+    deps.forEach(d => {
+        const res = d.target[d.prop];
+        if (!isRef(res) && !isReactive(d.target))
+            throw new Error(`Cannot check dependency '${d.prop}': 
+            target is not reactive target.prop is not a ref`);
+
+        if (isRef(res)) return res;
+        return res;
+    });
+}
+
 export function trackDependencies(deps) {
 
+    const effect = computedEffect(() => checkDeps(deps))
+    const dependenciesChanged = () => effect();
+
+    return dependenciesChanged;
 }

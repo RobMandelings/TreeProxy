@@ -43,7 +43,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
 
     const checkDep = (d) => {
         const t = d.target;
-        const res = Reflect.get(t, d.prop, d.rev);
+        const res = t[d.prop];
         if (isRef(res)) return res.value;
         return res;
     }
