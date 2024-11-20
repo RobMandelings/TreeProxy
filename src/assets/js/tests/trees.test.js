@@ -9,45 +9,6 @@ test('Direct proxy node access', () => {
     expect(() => srcTree.root.node).toThrow(ProxyNodeErrors.DirectNodeAccessError);
 });
 
-describe('Delayed child computation', () => {
-
-    let srcTree, spy;
-    beforeEach(() => {
-        const originalMethod = SourceTree.prototype.getChildren;
-        // spy = jest.spyOn(SourceTree.prototype, 'getChildren');
-        spy = jest.spyOn(SourceTree.prototype, 'getChildren').mockImplementation(function (id) {
-            // Log the method call
-            // console.log('Method called with args:', args);
-
-            // console.log(`Method called with id: ${id} and name ${this.getElement(id).name}`)
-            // Call the original implementation and store the result
-            const result = originalMethod.apply(this, [id]);
-
-            // Log the result
-            // console.log('Method returned:', result);
-
-            // Return the original result
-            return result;
-        });
-        srcTree = createSourceTree({
-            name: "Root",
-            children: [{name: "Child1"}, {name: "Child2", children: [{name: "Subchild1"}]}, {name: "Child3"}]
-        });
-        spy.mockClear();
-    });
-
-    afterEach(() => {
-        spy.mockRestore();
-    });
-
-    test('Watch install', () => {
-        // Deep watching triggers nested properties to be tracked as well. This triggers therefore .children (getChildren) on each node.
-        watch(srcTree.root, () => undefined);
-        const callCount = spy.mock.calls.length;
-        spy.mockRestore();
-    });
-})
-
 describe('Children', () => {
 
     let srcTree = new SourceTree();

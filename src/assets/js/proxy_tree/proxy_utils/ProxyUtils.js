@@ -1,7 +1,7 @@
 // Vue also attempts to get properties such as __v_isRef that are related to the reactive targets within the proxy
 // We need to make sure that our proxies do not interfere with vue, so make sure that the __v_isRef is always called on
 // TODO we need to test that all queries are limited to __v!
-import {reactive} from "vue";
+import {isRef, reactive} from "vue";
 
 function isVueProperty(prop) {
     if (!(typeof prop === "string")) return false;
@@ -28,18 +28,26 @@ export function useShouldExcludeProperty(target) {
 }
 
 export function fallbackProxyGetter(target, fallbackTarget, prop, receiver) {
-    const r = Reflect.get(target, prop, receiver);
-    if (r === undefined) return Reflect.get(fallbackTarget, prop, receiver);
+    const r = reactiveReflectGet(target, prop, receiver);
+    if (r === undefined) return reactiveReflectGet(fallbackTarget, prop, receiver);
     else return r;
 }
 
 export function wrappedProxyTargetGetter(t, tWrapped, prop, receiver) {
-    const r = Reflect.get(t, prop, receiver); // First we check the wrapper target
+    const r = reactiveReflectGet(t, prop, receiver); // First we check the wrapper target
     // It might be that r is undefined, but that it is a property in the target which results in undefined
     // E.g. t.node can be undefined, but that doesn't mean the property does not exist on the target.
-    if (r !== undefined || prop in t) return r;
-    if (tWrapped) return Reflect.get(tWrapped, prop, receiver);
+    if (r !== undefined || prop in t) return reactiveGet(r);
+    if (tWrapped) return reactiveReflectGet(tWrapped, prop, receiver);
     return undefined;
+}
+
+const reactiveGet = (v) => isRef(v) ? v.value : v;
+
+export function reactiveReflectGet(t, p, receiver) {
+    const res = Reflect.get(t, p, receiver);
+    if (isRef(res)) return res.value;
+    return res;
 }
 
 /**
@@ -57,9 +65,8 @@ export function createCustomProxy(target, handler, proxyInfo = {}) {
      * Such as __v_Reactive and __v_raw. Most of these things need to be ignored.
      */
     const excludePropFn = useShouldExcludeProperty(target);
-    let __proxyInfo__ = proxyInfo; // Provides information when debugging
 
-    const newTarget = reactive({__proxyInfo__: proxyInfo, __target__: target});
+    const newTarget = {__proxyInfo__: proxyInfo, ...target};
 
     const proxyId = crypto.randomUUID(); // Unique id for each proxy. Used in testing while comparing proxies.
     return new Proxy(newTarget, {
@@ -69,10 +76,12 @@ export function createCustomProxy(target, handler, proxyInfo = {}) {
             if (prop === "__v_raw") return undefined;
             if (prop === "__proxyId__") return proxyId;
             if (excludePropFn(prop)) return Reflect.get(t, prop, receiver);
-            return handler.get(t.__target__, prop, receiver);
+            const res = handler.get(t, prop, receiver);
+            if (isRef(res)) return res.value; // Same mechanics as if it were a reactive object
+            else return res;
         },
         set(t, p, newValue, receiver) {
-            return handler.set(t.__target__, p, newValue, receiver);
+            return handler.set(t, p, newValue, receiver);
         }
     })
 }

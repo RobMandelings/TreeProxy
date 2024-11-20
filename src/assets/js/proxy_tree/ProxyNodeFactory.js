@@ -18,7 +18,6 @@ export class ProxyNodeFactory {
      */
     __createBaseProxyNode(proxyTree, id, parentId) {
         let target = createBaseProxyNodeTarget(proxyTree, id, parentId);
-        if (!isReactive(target)) target = reactive(target);
         return createCustomProxy(target, {
             get(t, prop, receiver) {
                 return wrappedProxyTargetGetter(t, t.nodeRef, prop, receiver);
@@ -37,9 +36,8 @@ export class ProxyNodeFactory {
 
         const proxyNode = this.__createBaseProxyNode(proxyTree, id, parentId);
         const decoratedFunctionality = this.decorateProxyNode(proxyTree, proxyNode);
-        const decoratedFunctionalityAsRefs = isReactive(decoratedFunctionality) ? toRefs(decoratedFunctionality) : decoratedFunctionality;
 
-        const target = reactive({__proxyNode__: proxyNode, ...decoratedFunctionalityAsRefs});
+        const target = {__base__: proxyNode, __decorated__: decoratedFunctionality};
 
         const handler = {
             get: (t, prop, receiver) => {
@@ -52,10 +50,10 @@ export class ProxyNodeFactory {
                     else throw new StaleProxyError();
                 }
 
-                return wrappedProxyTargetGetter(t, proxyNode, prop, receiver);
+                return wrappedProxyTargetGetter(t.__decorated__, t.__base__, prop, receiver);
             },
             set: (t, prop, value, receiver) => {
-                const success = Reflect.set(t.__proxyNode__, prop, value, receiver);
+                const success = Reflect.set(t.__base__, prop, value, receiver);
                 if (success) proxyTree.markOverlaysDirty();
                 return success;
             }

@@ -234,3 +234,11 @@ describe('Has check based on instance', () => {
         expect(srcTree.root.children.has(CoreNode)).toBe(true);
     });
 });
+
+describe('Check new structure', () => {
+    test('CustomNode', () => {
+        const srcTree = createSourceTree(createTree(3));
+        srcTree.root.name;
+        // expect(srcTree.root.children.has(CoreNode)).toBe(true);
+    });
+});

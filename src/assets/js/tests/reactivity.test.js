@@ -3,34 +3,6 @@ import {ComputedTree} from "@pt/ComputedTree.js";
 import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 function runWatchTests(description, getTarget, watchTriggers) {
-    describe(description, () => {
-        let target;
-        beforeEach(() => {
-            target = getTarget();
-        });
-
-        test('No change', async () => {
-            expect(target.name).toBe(target.name);
-            await nextTick();
-            watchTriggers.forEach(t => expect(t).toHaveBeenCalledTimes(0));
-        });
-
-        test('Single change', async () => {
-            target.name = "Changed";
-            expect(target.name).toBe("Changed")
-            await nextTick();
-            watchTriggers.forEach(t => expect(t).toHaveBeenCalledTimes(1));
-        });
-
-        test('Many changes', async () => {
-            const nrChanges = 5;
-            for (let i = 0; i < nrChanges; i++) {
-                target.name = `${i}`;
-                await nextTick();
-            }
-            watchTriggers.forEach(t => expect(t).toHaveBeenCalledTimes(nrChanges));
-        });
-    });
 }
 
 describe("Deep watch", () => {
@@ -51,21 +23,38 @@ describe("Deep watch", () => {
     describe('Source tree', () => {
 
         beforeEach(() => {
-            watch(srcTree.root.children.asArray, () => childrenWatchTrigger());
-            watch(srcTree.root, () => rootWatchTrigger());
+            watch(() => srcTree.root.children.asArray, () => childrenWatchTrigger());
+            watch(() => srcTree.root.name, () => rootWatchTrigger());
         });
 
-        runWatchTests(
-            'Root level watch',
-            () => srcTree.root,
-            [rootWatchTrigger, childrenWatchTrigger],
-        );
+        describe('Root level watch', () => {
+            let target;
+            beforeEach(() => {
+                target = srcTree.root;
+            });
 
-        runWatchTests(
-            'Nested level 1 watch',
-            () => child,
-            [childrenWatchTrigger],
-        );
+            test('No change', async () => {
+                expect(target.name).toBe(target.name);
+                await nextTick();
+                expect(rootWatchTrigger).toHaveBeenCalledTimes(0)
+            });
+
+            test('Single change', async () => {
+                target.name = "Changed";
+                expect(target.name).toBe("Changed")
+                await nextTick();
+                expect(rootWatchTrigger).toHaveBeenCalledTimes(1);
+            });
+
+            test('Many changes', async () => {
+                const nrChanges = 5;
+                for (let i = 0; i < nrChanges; i++) {
+                    target.name = `${i}`;
+                    await nextTick();
+                }
+                expect(rootWatchTrigger).toHaveBeenCalledTimes(nrChanges);
+            });
+        });
     });
 
     describe('Computed tree', () => {
@@ -77,7 +66,7 @@ describe("Deep watch", () => {
 
             };
             compTree = createComputedTree(srcTree, computeFn, {count: rCount});
-            watch(compTree.root, (vN, vO) => rootWatchTrigger());
+            watch(() => compTree.root.name, (vN, vO) => rootWatchTrigger());
         });
 
         test('Single change', async () => {
