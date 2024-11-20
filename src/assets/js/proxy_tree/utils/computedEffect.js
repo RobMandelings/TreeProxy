@@ -29,6 +29,8 @@ export function computedEffect(effectFn) {
         return hasRecomputed;
     }
 
+    run();
+
     return run;
 }
 
