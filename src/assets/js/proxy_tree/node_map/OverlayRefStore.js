@@ -11,7 +11,7 @@ import {
     deepGet,
     deepSet
 } from "@pt/utils/deepObjectUtil.js";
-import {ChangeUnit, deepGetChangesToApply} from "@pt/node_map/ChangeUnit.js";
+import {ChangeUnit, deepGetChangesToApply, setChange, wrapInChangeUnitIfRequired} from "@pt/node_map/ChangeUnit.js";
 
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
@@ -141,7 +141,7 @@ export class OverlayRefStore extends RefStore {
         const remove = deepEqual(this.srcElementMap.getPropertyValue(nodeId, prop), val);
 
         // If the node was added on this layer, any adjustments to this node simply apply to the node itself
-        if (this.addedElements.has(nodeId)) deepSet(this.addedElements.get(nodeId), prop, new ChangeUnit(val));
+        if (this.addedElements.has(nodeId)) setChange(this.addedElements.get(nodeId), prop, val);
         else {
             if (remove) {
                 if (this.elementChanges.has(nodeId)) {
@@ -158,7 +158,7 @@ export class OverlayRefStore extends RefStore {
                         "Node does not exist in the src node map as well as the computed node map.");
                     this.elementChanges.set(nodeId, {});
                 }
-                deepSet(this.elementChanges.get(nodeId), prop, new ChangeUnit(val));
+                setChange(this.elementChanges.get(nodeId), prop, val);
             }
         }
     }

@@ -106,15 +106,16 @@ export const deepDelete = (obj, path) => {
     return true;
 };
 
-export function isObject(v) {
-    return typeof v === 'object' && v !== null && !(v instanceof Array)
+export function isNonNullObject(v) {
+    return typeof v === 'object' && v !== null;
 }
 
 export function applyChanges(node, changes) {
     Object.entries(changes).forEach(([key, value]) => {
+        const change = changes;
         if (!(key in node)) throw new Error(`Cannot apply changes: this node does not have the key ${key}`);
         if (value instanceof ChangeUnit) node[key] = value.value;
-        else if (isObject(value)) applyChanges(node[key], value);
-        else throw new Error("Invalid change format provided");
+        else if (isNonNullObject(value)) applyChanges(node[key], value);
+        else node[key] = value;
     });
 }

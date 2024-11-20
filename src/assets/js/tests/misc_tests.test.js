@@ -147,16 +147,16 @@ test('Changes to apply', () => {
 
 test('Changes to apply', () => {
 
-    const prev = {value: new ChangeUnit(0)};
-    const cur = {value: new ChangeUnit(0), value2: new ChangeUnit(5)};
-    const src = {value: new ChangeUnit(5), value2: new ChangeUnit(3)};
+    const prev = {value: 0};
+    const cur = {value: 0, value2: 5};
+    const src = {value: 5, value2: 3};
 
     const changes = deepGetChangesToApply(prev, cur, src);
     expect(deepEqual(changes, {value2: 5})).toBe(true)
 
 })
 
-xtest('Changes to apply', () => {
+test('Changes to apply', () => {
 
     // These are the adjustments that were applied previously
     const prev = {value: 0};
@@ -171,7 +171,7 @@ xtest('Changes to apply', () => {
 
 })
 
-xtest('Check deeply applied changes', () => {
+test('Check deeply applied changes', () => {
 
     const prev = {value: {a: 0, b: 1}};
     const cur = {value: {a: 1, b: 1}};
@@ -185,11 +185,14 @@ xtest('Check deeply applied changes', () => {
 });
 
 test('Apply changes: Assign object value', () => {
+
+
     const prev = {value: {a: 0, b: 1}}
-    const cur = {value: {a: 1, b: {abc: 0, style: 0}}};
+    const cur = {value: {a: 1, b: new ChangeUnit({abc: 0, style: 0})}};
     const src = {value: {a: 1, b: 0}};
     const changes = deepGetChangesToApply(prev, cur, src);
     applyChanges(src, changes);
+    console.log("Hello");
 })
 
 test('Changes to apply', () => {

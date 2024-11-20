@@ -1,4 +1,4 @@
-import {deepGet, deepSet, isObject} from "@pt/utils/deepObjectUtil.js";
+import {deepGet, deepSet, isNonNullObject} from "@pt/utils/deepObjectUtil.js";
 
 /**
  * Used in the overlay store to determine the assigned value to some (nested) property. This is because
@@ -17,6 +17,15 @@ export class ChangeUnit {
     }
 }
 
+export function wrapInChangeUnitIfRequired(obj) {
+    if (isNonNullObject(obj)) return new ChangeUnit(obj);
+    return obj;
+}
+
+export function setChange(obj, path, value) {
+    deepSet(obj, path, wrapInChangeUnitIfRequired(value));
+}
+
 // TODO should not allow changes to be set when it is not part of the interface (use TypeScript!)
 export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
     const changesToApply = {};
@@ -31,7 +40,7 @@ export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
                     throw new Error(`Source value for path '${newPath}' is undefined. 
                 Always make sure that the source node has the correct property. Object: ${JSON.stringify(src)}`);
                 }
-                deepSet(changesToApply, newPath, new ChangeUnit(srcValue)); // Restore if the change is removed
+                setChange(changesToApply, newPath, srcValue);// Restore if the change is removed
             }
         }
 
@@ -40,11 +49,13 @@ export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
             const newPath = path ? `${path}.${key}` : key;
             if (!(key in prev)) {
                 deepSet(changesToApply, newPath, cur[key]); // New change
-            } else if (cur[key] instanceof ChangeUnit) {
-                deepSet(changesToApply, newPath, cur[key]);
-            } else if (isObject(cur[key]) && isObject(prev[key])) {
+            } else if (isNonNullObject(cur[key])) {
+                if (cur[key] instanceof ChangeUnit) deepSet(changesToApply, newPath, cur[key]);
                 // Recursively compare nested objects
-                compareChanges(prev[key], cur[key], deepGet(src, newPath), newPath);
+                else if (isNonNullObject(prev[key])) compareChanges(prev[key], cur[key], deepGet(src, newPath), newPath);
+                else throw new Error("Can't make deep change: prev is not an object");
+            } else if (cur[key] !== prev[key]) {
+                deepSet(changesToApply, newPath, cur[key]); // Updated change
             }
         }
     }
