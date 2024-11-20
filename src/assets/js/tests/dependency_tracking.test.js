@@ -1,5 +1,5 @@
 import {trackDependencies} from "@pt/utils/computedEffect.js";
-import {ref} from "vue";
+import {nextTick, ref, watch} from "vue";
 
 test('Track dependencies', () => {
 
@@ -11,7 +11,7 @@ test('Track dependencies', () => {
 
 describe('Single dirty dep', () => {
 
-    let rCount, state, dep;
+    let rCount, state, dep, depTracker;
     beforeEach(() => {
         rCount = ref(null);
         state = {
@@ -22,13 +22,12 @@ describe('Single dirty dep', () => {
             target: state,
             prop: "count"
         }
+        depTracker = trackDependencies([dep]);
+        expect(depTracker.hasDirtyDeps()).toBe(false);
     });
 
     test('Has dirty', () => {
 
-
-        const depTracker = trackDependencies([dep]);
-        expect(depTracker.hasDirtyDeps()).toBe(false);
         rCount.value++;
         expect(depTracker.hasDirtyDeps()).toBe(true);
 
@@ -36,8 +35,6 @@ describe('Single dirty dep', () => {
 
     test('Remains dirty after check', () => {
 
-        const depTracker = trackDependencies([dep]);
-        expect(depTracker.hasDirtyDeps()).toBe(false);
         rCount.value++;
         expect(depTracker.hasDirtyDeps()).toBe(true);
         expect(depTracker.hasDirtyDeps()).toBe(true);
@@ -46,12 +43,22 @@ describe('Single dirty dep', () => {
 
     test('Remains dirty after check', () => {
 
-        const depTracker = trackDependencies([dep]);
-        expect(depTracker.hasDirtyDeps()).toBe(false);
         rCount.value++;
         expect(depTracker.hasDirtyDeps()).toBe(true);
         depTracker.resetDirtyDeps();
         expect(depTracker.hasDirtyDeps()).toBe(false);
+
+    })
+
+    test('Watch on hasDirtyDeps', async () => {
+
+        const watchTrigger = jest.fn();
+        watch(() => depTracker.hasDirtyDeps(), () => watchTrigger());
+        expect(depTracker.hasDirtyDeps()).toBe(false);
+        rCount.value++;
+        await nextTick()
+        expect(depTracker.hasDirtyDeps()).toBe(true);
+        expect(watchTrigger).toBeCalledTimes(1);
 
     })
 });

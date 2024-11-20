@@ -50,7 +50,7 @@ export function trackDependencies(depsArray) {
 
     const effect = computedEffect(() => checkDeps(depsArray))
 
-    let hasDirtyDeps = false;
+    const hasDirtyDeps = ref(false);
 
     /**
      * Sets hasDirtyDeps to true if the effect was recomputed.
@@ -58,11 +58,11 @@ export function trackDependencies(depsArray) {
      */
     const hasDirtyDepsFn = () => {
 
-        if (!hasDirtyDeps) hasDirtyDeps = effect();
-        return hasDirtyDeps; // If hasDirtyDeps is true, we don't need to re-run the effect
+        if (!hasDirtyDeps.value) hasDirtyDeps.value = effect();
+        return hasDirtyDeps.value; // If hasDirtyDeps is true, we don't need to re-run the effect
     }
 
-    const resetDirtyDeps = () => hasDirtyDeps = false;
+    const resetDirtyDeps = () => hasDirtyDeps.value = false;
 
     return {hasDirtyDeps: hasDirtyDepsFn, resetDirtyDeps};
 }
