@@ -1,8 +1,4 @@
-import {DirectNodeAccessError, StaleProxyError} from "@pt/tree_node/ProxyNodeErrors.js";
-import {wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
-import {createBaseProxyNode, createBaseProxyNodeTarget} from "@pt/tree_node/core/baseProxyNode.js";
-import {computed, isReactive, reactive, toRefs} from "vue";
-import {createCustomProxy} from "@pt/proxy_utils/CustomProxy.js";
+import {createBaseProxyNode} from "@pt/tree_node/core/baseProxyNode.js";
 import {createFullProxyNode} from "@pt/tree_node/fullProxyNode.js";
 
 /**

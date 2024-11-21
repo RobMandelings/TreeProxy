@@ -1,5 +1,4 @@
 import {CustomNode} from "@pt/nodes/CustomNode.js";
-import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
 
 export function findById(t, str) {
     if (CustomNode.isValidID(str))
