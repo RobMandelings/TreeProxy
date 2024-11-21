@@ -1,5 +1,5 @@
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
-import {ChangeUnit} from "@pt/ref_store/ChangeUnit.js";
+import {ChangeUnit} from "@pt/ref_store/overlay/ChangeUnit.js";
 
 /**
  * Retrieve object value via nested property access. E.g. deepGet(obj, "value.nested");

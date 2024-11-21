@@ -1,5 +1,5 @@
 import {Tree} from "@pt/tree/Tree.js";
-import {OverlayRefStore} from "@pt/ref_store/OverlayRefStore.js";
+import {OverlayRefStore} from "@pt/ref_store/overlay/OverlayRefStore.js";
 import {reactive} from "vue";
 import {useRecompute} from "@pt/tree/computed/useRecompute.js";
 

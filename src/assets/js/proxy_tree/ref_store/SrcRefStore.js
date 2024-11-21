@@ -1,6 +1,6 @@
 import {RefStore} from "@pt/ref_store/RefStore.js";
 import {computed, ref} from "vue";
-import {OverlayType} from "@pt/ref_store/OverlayType.js";
+import {OverlayType} from "@pt/ref_store/overlay/OverlayType.js";
 import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {deepGet, deepSet} from "@pt/utils/deepObjectUtil.js";
 import {createNodeRef} from "@pt/ref_store/NodeRef.js";

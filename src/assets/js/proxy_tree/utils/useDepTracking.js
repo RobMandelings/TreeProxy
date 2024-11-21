@@ -1,5 +1,9 @@
 import {computed, isReactive, isRef, ref, watch} from "vue";
 
+/**
+ * Creates a function that only re-runs whenever one of the dependencies have changed.
+ * This function will probably not be of much use outside this file, but it is useful for the track dependencies.
+ */
 export function computedEffect(effectFn) {
 
     /**
@@ -48,14 +52,14 @@ function checkDeps(deps) {
  *
  * Also used to check whether the tree should execute its recompute function.
  */
-export function trackDependencies(depsArray) {
+export function useDepTracking(depsArray) {
 
     const hasDirtyDeps = ref(false);
     const effect = computedEffect((initial) => {
         console.log("Effect function called");
         checkDeps(depsArray)
         if (!initial) hasDirtyDeps.value = true;
-    })
+    });
 
     /**
      * Sets hasDirtyDeps to true if the effect was recomputed.

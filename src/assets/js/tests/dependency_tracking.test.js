@@ -1,10 +1,10 @@
-import {computedEffect, trackDependencies} from "@pt/utils/computedEffect.js";
+import {computedEffect, useDepTracking} from "@pt/utils/useDepTracking.js";
 import {nextTick, ref, watch} from "vue";
 
 test('Track dependencies: no dependencies', () => {
 
     const rCount = ref(0);
-    const depTracker = trackDependencies([]);
+    const depTracker = useDepTracking([]);
     expect(depTracker.hasDirtyDeps()).toBe(false);
     // For some reason if a computed property does not access any reactive props, it becomes dirty after any ref changes
     // Changing the count should not  trigger any hasDirtyDeps to be true (see fallbackRef)
@@ -27,7 +27,7 @@ describe('Single dirty dep', () => {
             target: state,
             prop: "count"
         }
-        depTracker = trackDependencies([dep]);
+        depTracker = useDepTracking([dep]);
         expect(depTracker.hasDirtyDeps()).toBe(false);
     });
 
@@ -105,7 +105,7 @@ test('Watch on hasDirtyDeps', async () => {
         target: state,
         prop: "count"
     }
-    depTracker = trackDependencies([dep]);
+    depTracker = useDepTracking([dep]);
     const watchTrigger = jest.fn(() => console.log("hello"));
     watch(() => depTracker.hasDirtyDeps(), () => watchTrigger());
     rCount.value++;

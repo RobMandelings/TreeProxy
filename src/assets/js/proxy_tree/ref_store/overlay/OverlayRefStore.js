@@ -1,7 +1,7 @@
 import * as Utils from "@pt/proxy_utils/Utils.js";
 import {RefStore} from "@pt/ref_store/RefStore.js";
 import {computed, reactive, ref} from "vue";
-import {OverlayType} from "@pt/ref_store/OverlayType.js";
+import {OverlayType} from "@pt/ref_store/overlay/OverlayType.js";
 import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {
     applyChanges,
@@ -10,7 +10,7 @@ import {
     deepGet,
     deepSet
 } from "@pt/utils/deepObjectUtil.js";
-import {ChangeUnit, deepGetChangesToApply, setChange, wrapInChangeUnitIfRequired} from "@pt/ref_store/ChangeUnit.js";
+import {ChangeUnit, deepGetChangesToApply, setChange, wrapInChangeUnitIfRequired} from "@pt/ref_store/overlay/ChangeUnit.js";
 import {createNodeRef} from "@pt/ref_store/NodeRef.js";
 
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {

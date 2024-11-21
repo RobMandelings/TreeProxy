@@ -1,7 +1,6 @@
-import {createCustomProxy, reactiveReflectGet, useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
-import {computed, isReactive, isRef, reactive, ref, toRefs, watch, watchSyncEffect} from "vue";
-import {isEmpty} from "@pt/proxy_utils/Utils.js";
-import {trackDependencies} from "@pt/utils/computedEffect.js";
+import {createCustomProxy, reactiveReflectGet} from "@pt/proxy_utils/ProxyUtils.js";
+import {isReactive, isRef, reactive, ref, toRefs, watch} from "vue";
+import {useDepTracking} from "@pt/utils/useDepTracking.js";
 
 function createStateProxy(state, rDeps, path = null) {
     const proxy = {value: null};
@@ -55,7 +54,7 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
 
         const depsArray = Object.values(rDependencies.value);
         console.log(`Length of dependencies: ${depsArray.length}`)
-        rDepTracker.value = trackDependencies(depsArray);
+        rDepTracker.value = useDepTracking(depsArray);
 
     }
 
