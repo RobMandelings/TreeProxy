@@ -46,11 +46,26 @@ function checkDeps(deps) {
     });
 }
 
+
 /**
  * Function to help track reactive vue dependencies. Used for creating custom computed properties that are more sophisticated
  * than the built-in computed props. E.g. for computed trees.
  *
  * Also used to check whether the tree should execute its recompute function.
+ *
+ * Vue does not provide a built-in way to see whether dependencies have changed. I have made use of computed properties
+ *   to hack this system a bit.
+ * A computed property recomputes each time any of it's dependency change. Dependencies within computed properties are
+ *   registered by simply making calls to reactive variables within that computed property
+ *
+ * E.g. rCount = ref(0);
+ * const comp = computed(() => rCount.value). Because rCount.value was called inside the computed property, it is regarded as a dependency for that computed prop.
+ * So if rCount.value changes, say rCount.value = 5, and we access the computed property, then it will recompute. We can use this to our advantage
+ * By setting a variable 'dirty' to true whenever the computed property re-runs. This way, when we do comp.value, it is set to dirty if it has re-run. We can then simply query for the dirty property to see whether any of the dependencies have changed
+ * And act accordingly. This is what happens when
+ *
+ * TODO 1: deep tracking of a reactive dependency: all properties within that dependency and all nested levels of that property should be tracked deeply as well.
+ * It would be great if you could do useDepTracking(reactiveDep) and see whether anything in that reactive object has changed, and act accordingly.
  */
 export function useDepTracking(depsArray) {
 
