@@ -9,6 +9,9 @@ import {isEmpty} from "@pt/utils/util.js";
  */
 export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
 
+    const rSrcNode = computed(() => srcNodeMap.getElement(rId.value));
+    const rNodeChanges = computed(() => nodeChanges.get(rId.value) ?? {});
+
     /**
      * Tracks changes on the srcNode. This is required as we need to invalidate the copy when any of the dependencies
      * of the source node change.
@@ -17,9 +20,6 @@ export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
      */
     const rDepTracker = computed(() => useDepTracking([() => Object.values(rSrcNode.value)]));
     const rSrcNodeChanged = computed(() => rDepTracker.value.hasDirtyDeps());
-    const rSrcNode = computed(() => srcNodeMap.getElement(rId.value));
-
-    const rNodeChanges = computed(() => nodeChanges.get(rId.value) ?? {});
 
     /**
      * Reference to the current copy of the source node. rCopy returns this value after applying changes to it

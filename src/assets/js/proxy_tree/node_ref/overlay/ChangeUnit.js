@@ -32,7 +32,7 @@ export function setChange(obj, path, value) {
  * param curChanges: all changes that should be applied on the src node to get to the node copy
  * param srcNode: the original node with all it's original properties
  *
- * E.g. prevChanges = {a: 1}, curChanges = {b: 1} -> changesToApply: {b: 1} as a=1 is already applied on the copy
+ * E.g. prevChanges = {a: 1}, curChanges = {a: 1, b: 1} -> changesToApply: {b: 1} as a=1 is already applied on the copy
  * E.g. prevChanges = {a: 1}, curChanges = {}, srcNode has {a: 5} -> changesToApply: {a: 5}, as the copy currently has {a: 1} applied,
  */
 export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
