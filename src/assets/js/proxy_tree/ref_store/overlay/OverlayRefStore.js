@@ -17,7 +17,7 @@ import {
     wrapInChangeUnitIfRequired
 } from "@pt/ref_store/overlay/ChangeUnit.js";
 import {createNodeRef} from "@pt/ref_store/NodeRef.js";
-import {useOverlayNode} from "@pt/ref_store/overlay/useOverlayNode.js";
+import {useNodeCopy} from "@pt/ref_store/overlay/useNodeCopy.js";
 
 
 /**
@@ -68,7 +68,7 @@ export class OverlayRefStore extends RefStore {
         // Any adjustments directly apply to the element on this layer
         if (this.addedElements.has(id)) rNode = computed(() => this.addedElements.get(id));
         else {
-            const {rCopy} = useOverlayNode(this.elementChanges, this.srcElementMap, rId);
+            const {rCopy} = useNodeCopy(this.elementChanges, this.srcElementMap, rId);
             rNode = computed(() => this.getElement(rId.value));
             this.overlayElements[rId.value] = rCopy;
         }

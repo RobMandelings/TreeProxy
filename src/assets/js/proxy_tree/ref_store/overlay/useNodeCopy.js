@@ -2,7 +2,7 @@ import {computed, reactive} from "vue";
 import {deepGetChangesToApply} from "@pt/ref_store/overlay/ChangeUnit.js";
 import {applyChanges} from "@pt/utils/deepObjectUtil.js";
 
-export function useOverlayNode(nodeChanges, srcNodeMap, rId) {
+export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
 
     let prevChanges = {};
     let srcNodeChanged = false;
