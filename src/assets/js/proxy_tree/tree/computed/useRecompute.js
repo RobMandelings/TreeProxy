@@ -53,7 +53,6 @@ export function useRecompute(state, root, recomputeFn, markOverlaysDirtyFn, rese
     const initCheckDependencies = () => {
 
         const depsArray = Object.values(rDependencies.value);
-        console.log(`Length of dependencies: ${depsArray.length}`)
         rDepTracker.value = useDepTracking(depsArray);
 
     }

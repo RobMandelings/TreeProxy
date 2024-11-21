@@ -192,7 +192,6 @@ test('Apply changes: Assign object value', () => {
     const src = {value: {a: 1, b: 0}};
     const changes = deepGetChangesToApply(prev, cur, src);
     applyChanges(src, changes);
-    console.log("Hello");
 })
 
 test('Changes to apply', () => {

@@ -2,7 +2,6 @@ import {computed, reactive} from "vue";
 import {
     createCustomProxy,
     reactiveReflectGet,
-    useShouldExcludeProperty,
     wrappedProxyTargetGetter
 } from "@pt/proxy_utils/ProxyUtils.js";
 

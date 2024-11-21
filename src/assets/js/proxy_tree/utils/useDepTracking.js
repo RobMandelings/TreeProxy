@@ -40,7 +40,7 @@ function checkDep(dep) {
         const res = dep.target[dep.prop];
         if (!isRef(res) && !isReactive(dep.target))
             throw new Error(`Cannot check dependency '${dep.prop}': 
-            target is not reactive target.prop is not a ref`);
+            target is not reactive or target.prop is not a ref`);
 
         if (isRef(res)) return res.value;
         return res;
@@ -76,7 +76,6 @@ export function useDepTracking(deps) {
 
     const hasDirtyDeps = ref(false);
     const effect = computedEffect((initial) => {
-        console.log("Effect function called");
         checkDeps(deps)
         if (!initial) hasDirtyDeps.value = true;
     });
@@ -86,7 +85,6 @@ export function useDepTracking(deps) {
      *
      */
     const hasDirtyDepsFn = () => {
-        console.debug("Has dirty dependencies called");
         effect(); // Run the effect. If the effect is re-run once, hasDirtyDeps is set to true
         return hasDirtyDeps.value;
     }
