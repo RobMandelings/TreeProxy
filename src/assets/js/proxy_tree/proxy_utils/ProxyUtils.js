@@ -18,6 +18,9 @@ export function wrappedProxyTargetGetter(t, tWrapped, prop, receiver) {
     return undefined;
 }
 
+/**
+ * Same as what happens when you access a property on a reactive object.
+ */
 const reactiveGet = (v) => isRef(v) ? v.value : v;
 
 export function reactiveReflectGet(t, p, receiver) {

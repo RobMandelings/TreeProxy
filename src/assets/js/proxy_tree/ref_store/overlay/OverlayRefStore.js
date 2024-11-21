@@ -80,11 +80,10 @@ export class OverlayRefStore extends RefStore {
         return this.overlayElements[id] != null;
     }
 
+    /**
+     * Synchronise all changes with the source ref store.
+     */
     syncSrc() {
-        // Copy the computed elements from the computed map to the src map.
-        // Old elements will be overwritten with their new values
-        // this.changedNodes.forEach((v, k) => this.srcElementMap.nodes.set(k, v));
-        // this.changedNodes.clear();
     }
 
     _addElement(node) {
