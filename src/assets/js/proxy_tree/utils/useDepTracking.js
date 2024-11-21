@@ -43,6 +43,12 @@ function isValidDep(dep) {
     return false;
 }
 
+/**
+ * Recursively checks dependencies. By calling properties on the reactive dependencies, these properties are marked
+ * as a 'dependency' for a given computed property. Computed properties are then recomputed when any of these dependencies change
+ * In this way, we can use the re-computation function of a computed property to mark any of the properties as dirty.
+ * If a property did not become dirty since the last reset, then the computed property did not re-evaluate and did not set the dirty flag to true
+ */
 function checkDep(dep) {
     if (!isValidDep(dep)) throw new Error(`Cannot check dependency '${dep}': 
     invalid dependency. Type: ${typeof dep}. It must be a reactive object, ref, getter function, or array
