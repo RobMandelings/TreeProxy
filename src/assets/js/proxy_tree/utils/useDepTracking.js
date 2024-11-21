@@ -38,7 +38,7 @@ function checkDep(dep) {
     if (typeof dep === 'function') dep();
     else if (typeof dep === 'object') {
         const res = dep.target[dep.prop];
-        if (!isRef(res) && !isReactive(d.target))
+        if (!isRef(res) && !isReactive(dep.target))
             throw new Error(`Cannot check dependency '${dep.prop}': 
             target is not reactive target.prop is not a ref`);
 
