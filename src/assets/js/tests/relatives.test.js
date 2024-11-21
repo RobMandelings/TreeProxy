@@ -1,7 +1,7 @@
-import {createTree} from "@pt/TreeUtil.js";
+import {createTree} from "@pt/utils/TreeUtil.js";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
-import {CustomNode} from "@pt/CustomNode.js";
-import {CoreNode} from "@pt/CoreNode.js";
+import {CustomNode} from "@pt/nodes/CustomNode.js";
+import {CoreNode} from "@pt/nodes/CoreNode.js";
 
 describe('Relatives', () => {
 

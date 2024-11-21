@@ -2,8 +2,8 @@ import * as Utils from "@pt/proxy_utils/Utils.js";
 import {RefStore} from "@pt/node_map/RefStore.js";
 import {computed, reactive, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js";
-import {OverlayType} from "@pt/OverlayType.js";
-import {CoreNode} from "@pt/CoreNode.js";
+import {OverlayType} from "@pt/node_map/OverlayType.js";
+import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {
     applyChanges,
     deepDelete,
@@ -62,6 +62,10 @@ function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
 }
 
+/**
+ * Goal of the overlay ref store is to provide a mapping between the id and a node object. Whether or not the node object
+ * is an (adjusted) copy of the original node or whether it simply refers to the original node is abstracted.
+ */
 export class OverlayRefStore extends RefStore {
 
     constructor(srcElementMap) {

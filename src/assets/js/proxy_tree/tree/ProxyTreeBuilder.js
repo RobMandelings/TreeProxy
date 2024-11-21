@@ -1,5 +1,5 @@
-import {ComputedTree} from "@pt/ComputedTree.js";
-import {SourceTree} from "@pt/SrcTree.js";
+import {ComputedTree} from "@pt/tree/computed/ComputedTree.js";
+import {SourceTree} from "@pt/tree/SrcTree.js";
 
 class ProxyTreeBuilder {
 

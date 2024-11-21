@@ -1,4 +1,4 @@
-import {useRecompute} from "@pt/Recompute.js";
+import {useRecompute} from "@pt/tree/computed/useRecompute.js";
 import {ref} from "vue";
 
 test('Hello', () => {

@@ -1,8 +1,8 @@
-import {ComputedTree} from "@pt/ComputedTree.js";
-import {createTree} from "@pt/TreeUtil.js";
+import {ComputedTree} from "@pt/tree/computed/ComputedTree.js";
+import {createTree} from "@pt/utils/TreeUtil.js";
 import {createEmptyCompTree} from "./trees.js";
-import {OverlayType} from "@pt/OverlayType.js";
-import {CustomNode} from "@pt/CustomNode.js";
+import {OverlayType} from "@pt/node_map/OverlayType.js";
+import {CustomNode} from "@pt/nodes/CustomNode.js";
 import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 

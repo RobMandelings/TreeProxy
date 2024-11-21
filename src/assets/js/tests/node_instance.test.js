@@ -1,4 +1,4 @@
-import {CustomNode} from "@pt/CustomNode.js";
+import {CustomNode} from "@pt/nodes/CustomNode.js";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 test('Check node instance', () => {

@@ -1,4 +1,4 @@
-import {CustomNode} from "@pt/CustomNode.js";
+import {CustomNode} from "@pt/nodes/CustomNode.js";
 
 class NodeNotExistsError extends Error {
     constructor(id) {
@@ -6,6 +6,9 @@ class NodeNotExistsError extends Error {
     }
 }
 
+/**
+ * The purpose of the ref store is to maintain references to node objects via their id.
+ */
 export class RefStore {
     constructor() {
     }

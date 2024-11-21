@@ -1,4 +1,4 @@
-import {createTree} from "@pt/TreeUtil.js";
+import {createTree} from "@pt/utils/TreeUtil.js";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 describe("Parent relation test", () => {

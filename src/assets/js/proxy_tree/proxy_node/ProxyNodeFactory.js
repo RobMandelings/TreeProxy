@@ -1,6 +1,6 @@
-import {DirectNodeAccessError, StaleProxyError} from "@pt/ProxyNodeErrors.js";
+import {DirectNodeAccessError, StaleProxyError} from "@pt/proxy_node/ProxyNodeErrors.js";
 import {createCustomProxy, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
-import {createBaseProxyNodeTarget} from "@pt/coreProxyNode.js";
+import {createCoreProxyNodeTarget} from "@pt/proxy_node/coreProxyNode.js";
 import {computed, isReactive, reactive, toRefs} from "vue";
 
 /**
@@ -17,7 +17,7 @@ export class ProxyNodeFactory {
      * Then checks in nodeRef.
      */
     __createBaseProxyNode(proxyTree, id, parentId) {
-        let target = createBaseProxyNodeTarget(proxyTree, id, parentId);
+        let target = createCoreProxyNodeTarget(proxyTree, id, parentId);
         return createCustomProxy(target, {
             get(t, prop, receiver) {
                 return wrappedProxyTargetGetter(t, t.nodeRef, prop, receiver);

@@ -1,8 +1,8 @@
-import {ProxyTree} from "@pt/ProxyTree.js";
+import {ProxyTree} from "@pt/tree/ProxyTree.js";
 import {OverlayRefStore} from "@pt/node_map/OverlayRefStore.js";
 import {reactive} from "vue";
 import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
-import {useRecompute} from "@pt/Recompute.js";
+import {useRecompute} from "@pt/tree/computed/useRecompute.js";
 
 const excludedPropsCompTree = new Set(["_root", "isRecomputing", "_isRecomputingObj", "markDirty", "recomputeIfDirty", "markedForRecompute", "_isDirtyObj"]);
 const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);

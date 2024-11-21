@@ -1,8 +1,8 @@
-import {createTree} from "@pt/TreeUtil.js";
+import {createTree} from "@pt/utils/TreeUtil.js";
 import {nextTick, reactive, ref, toRefs} from "vue";
 import {createEmptyCompTree} from "./trees.js";
 import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
-import {CustomNode} from "@pt/CustomNode.js";
+import {CustomNode} from "@pt/nodes/CustomNode.js";
 
 
 const createSuffixCompTree = (srcTree, concat) => {
@@ -195,22 +195,20 @@ describe('Computed tree state changes', () => {
     test('Conditional', () => {
 
         const rCount = ref(0);
-        const rCount2 = ref(0);
         const rSyncWeight = ref(false);
-        const anotherReactive = reactive({hello: 5});
-        const stateObj = {count: rCount, syncWeight: rSyncWeight, anotherCount: rCount2, anotherReactive};
-        
+        const stateObj = {count: rCount, syncWeight: rSyncWeight};
+
         const srcTree = createSimpleSourceTree();
         const recomputeSpy = jest.fn();
-        const compTree = createComputedTree(srcTree, (state, root) => {
-
+        const computeFn = (state, root) => {
             if (state.syncWeight) {
                 console.log(`SyncWeight is true: ${state.count}`);
                 root.name = `${state.count}`;
-                root.weight = state.anotherCount;
             }
             recomputeSpy();
-        }, stateObj);
+        };
+
+        const compTree = createComputedTree(srcTree, computeFn, stateObj);
         expect(compTree.root.name).toBe(srcTree.root.name);
         expect(recomputeSpy).toBeCalledTimes(1);
         recomputeSpy.mockClear();

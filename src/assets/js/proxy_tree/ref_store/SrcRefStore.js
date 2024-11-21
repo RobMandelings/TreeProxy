@@ -1,8 +1,8 @@
 import {RefStore} from "@pt/node_map/RefStore.js";
 import {computed, ref} from "vue";
 import * as RefProxy from "@pt/node_map/RefProxy.js"
-import {OverlayType} from "@pt/OverlayType.js";
-import {CoreNode} from "@pt/CoreNode.js";
+import {OverlayType} from "@pt/node_map/OverlayType.js";
+import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {deepGet, deepSet} from "@pt/utils/deepObjectUtil.js";
 
 export class SrcRefStore extends RefStore {

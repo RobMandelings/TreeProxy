@@ -1,4 +1,4 @@
-import {CoreNode} from "@pt/CoreNode.js";
+import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {toRaw} from "vue";
 
 export class CustomNode extends CoreNode {

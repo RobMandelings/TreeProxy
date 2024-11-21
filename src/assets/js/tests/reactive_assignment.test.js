@@ -1,7 +1,7 @@
 import {isProxy, reactive, toRaw} from "vue";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
-import {createTree} from "@pt/TreeUtil.js";
-import {CustomNode} from "@pt/CustomNode.js";
+import {createTree} from "@pt/utils/TreeUtil.js";
+import {CustomNode} from "@pt/nodes/CustomNode.js";
 
 describe('Tests', () => {
 

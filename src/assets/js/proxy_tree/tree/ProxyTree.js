@@ -1,7 +1,7 @@
 import {RefStore} from "@pt/node_map/RefStore.js";
-import {NodeNotFoundError, RootNotSetError} from "@pt/ProxyTreeErrors.js";
-import {IncorrectIndexError, UndefinedIndexError} from "@pt/ProxyNodeErrors.js";
-import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/ProxyNodeFactory.js";
+import {NodeNotFoundError, RootNotSetError} from "@pt/tree/ProxyTreeErrors.js";
+import {IncorrectIndexError, UndefinedIndexError} from "@pt/proxy_node/ProxyNodeErrors.js";
+import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/proxy_node/ProxyNodeFactory.js";
 
 export class ProxyTree extends RefStore {
 

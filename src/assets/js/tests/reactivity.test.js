@@ -1,5 +1,5 @@
 import {computed, isReactive, nextTick, reactive, ref, watch} from "vue";
-import {ComputedTree} from "@pt/ComputedTree.js";
+import {ComputedTree} from "@pt/tree/computed/ComputedTree.js";
 import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 function runWatchTests(description, getTarget, watchTriggers) {

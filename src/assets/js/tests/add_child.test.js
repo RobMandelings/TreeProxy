@@ -3,8 +3,8 @@
 // Add when there are multiple children
 
 
-import {createTree} from "@pt/TreeUtil.js";
-import {CustomNode} from "@pt/CustomNode.js";
+import {createTree} from "@pt/utils/TreeUtil.js";
+import {CustomNode} from "@pt/nodes/CustomNode.js";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 
 test('No children', () => {

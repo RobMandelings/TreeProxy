@@ -93,7 +93,7 @@ function usePos(proxyTree, rParent, rId) {
     return {rPos, rMaxPos, movePosFn}
 }
 
-export function createBaseProxyNodeTarget(proxyTree, id, parentId) {
+export function createCoreProxyNodeTarget(proxyTree, id, parentId) {
 
     const nodeRef = proxyTree.nodeMap.createRefProxy(id);
 
