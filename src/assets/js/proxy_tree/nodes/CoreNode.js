@@ -1,4 +1,4 @@
-import {isValidUUID} from "@pt/proxy_utils/Utils.js";
+import {isValidUUID} from "@pt/utils/util.js";
 
 /**
  * The simples node object that exists. It should be extended from to add extra properties or variables.

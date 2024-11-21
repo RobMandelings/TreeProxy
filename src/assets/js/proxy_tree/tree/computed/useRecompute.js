@@ -1,6 +1,7 @@
-import {createCustomProxy, reactiveReflectGet} from "@pt/proxy_utils/ProxyUtils.js";
+import {reactiveReflectGet} from "@pt/proxy_utils/ProxyUtils.js";
 import {isReactive, isRef, reactive, ref, toRefs, watch} from "vue";
 import {useDepTracking} from "@pt/utils/useDepTracking.js";
+import {createCustomProxy} from "@pt/proxy_utils/CustomProxy.js";
 
 function createStateProxy(state, rDeps, path = null) {
     const proxy = {value: null};

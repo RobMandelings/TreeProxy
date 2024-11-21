@@ -1,4 +1,4 @@
-import * as Utils from "@pt/proxy_utils/Utils.js";
+import * as Utils from "@pt/utils/util.js";
 import {RefStore} from "@pt/ref_store/RefStore.js";
 import {computed, reactive, ref} from "vue";
 import {OverlayType} from "@pt/ref_store/overlay/OverlayType.js";

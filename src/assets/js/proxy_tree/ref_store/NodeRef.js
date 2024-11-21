@@ -1,11 +1,11 @@
 import {computed, reactive} from "vue";
 import {
-    createCustomProxy,
     reactiveReflectGet,
     wrappedProxyTargetGetter
 } from "@pt/proxy_utils/ProxyUtils.js";
 
 import {deepGet} from "@pt/utils/deepObjectUtil.js";
+import {createCustomProxy} from "@pt/proxy_utils/CustomProxy.js";
 
 /**
  * NodeRef for nested properties. E.g. node.gui is a nested property, but when you set node.gui.style = "" for example,

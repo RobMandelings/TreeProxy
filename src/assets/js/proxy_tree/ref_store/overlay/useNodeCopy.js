@@ -2,7 +2,7 @@ import {computed, reactive} from "vue";
 import {deepGetChangesToApply} from "@pt/ref_store/overlay/ChangeUnit.js";
 import {applyChanges} from "@pt/utils/deepObjectUtil.js";
 import {computedEffect, useDepTracking} from "@pt/utils/useDepTracking.js";
-import {isEmpty} from "@pt/proxy_utils/Utils.js";
+import {isEmpty} from "@pt/utils/util.js";
 
 /**
  * Creates a computed property that represents the copied source node (with applied changes).
