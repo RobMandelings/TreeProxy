@@ -1,7 +1,6 @@
 import {ProxyTree} from "@pt/tree/ProxyTree.js";
 import {OverlayRefStore} from "@pt/ref_store/OverlayRefStore.js";
 import {reactive} from "vue";
-import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
 import {useRecompute} from "@pt/tree/computed/useRecompute.js";
 
 const excludedPropsCompTree = new Set(["_root", "isRecomputing", "_isRecomputingObj", "markDirty", "recomputeIfDirty", "markedForRecompute", "_isDirtyObj"]);
@@ -34,13 +33,9 @@ export class ComputedTree extends ProxyTree {
         this._isRecomputingObj = isRecomputingObj;
         this._isDirtyObj = isDirtyObj;
         this.markDirty = markDirty;
-
-        const excludePropFn = useShouldExcludeProperty(this);
         // Return a proxied version of this instance
         return new Proxy(this, {
-
             get: (target, prop, receiver) => {
-                excludePropFn(prop);
                 if (checkDirtyForProp(prop)) this.recomputeIfDirty();
                 return Reflect.get(target, prop, receiver);
             },
