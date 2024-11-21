@@ -1,5 +1,10 @@
 import {computedEffect, useDepTracking} from "@pt/utils/useDepTracking.js";
-import {nextTick, ref, watch} from "vue";
+import {nextTick, reactive, ref, watch} from "vue";
+
+const resetDirty = (depTracker) => {
+    depTracker.resetDirtyDeps();
+    expect(depTracker.hasDirtyDeps()).toBe(false);
+}
 
 test('Track dependencies: no dependencies', () => {
 
@@ -112,5 +117,44 @@ test('Watch on hasDirtyDeps', async () => {
     await nextTick();
     expect(depTracker.hasDirtyDeps()).toBe(true);
     expect(watchTrigger).toBeCalledTimes(1);
+
+})
+
+test('Dep tracking on ref', () => {
+
+    const rCount = ref(0);
+    const depTracker = useDepTracking(rCount);
+    expect(depTracker.hasDirtyDeps()).toBe(false);
+    rCount.value++;
+    expect(depTracker.hasDirtyDeps()).toBe(true);
+
+})
+
+test('Deep dependency tracking on regular object', () => {
+
+    const throwingDepTracker = () => useDepTracking({});
+    expect(throwingDepTracker).toThrow();
+})
+
+test('Deep dependency tracking on reactive object', () => {
+
+    const dep = reactive({
+        a: 0,
+        b: {
+            bA: 0,
+            bB: ref(0),
+        }
+    });
+
+    const depTracker = useDepTracking(dep);
+    expect(depTracker.hasDirtyDeps()).toBe(false);
+    dep.a = 5;
+    expect(depTracker.hasDirtyDeps()).toBe(true);
+    resetDirty(depTracker);
+    dep.b.bA = 5;
+    expect(depTracker.hasDirtyDeps()).toBe(true);
+    resetDirty(depTracker);
+    dep.b.bB = 10;
+    expect(depTracker.hasDirtyDeps()).toBe(true);
 
 })

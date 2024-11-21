@@ -1,9 +1,4 @@
 # TODO
 
-provide movePos() functionality
-syncSrc
-
-bind with hasGrades()
-bind with grades
-
-reImplement gradeType
+- Deep reactivity on deep tracking
+- Not only support getters, but also support reactive objects to be provided.

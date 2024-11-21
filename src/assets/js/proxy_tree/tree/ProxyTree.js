@@ -5,10 +5,10 @@ import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/tree_node/ProxyNodeFactory.js";
 
 export class ProxyTree extends RefStore {
 
-    constructor(elementRegistry, treeNodeFactory) {
+    constructor(nodeMap, treeNodeFactory) {
         super();
         this.proxyNodeFactory = treeNodeFactory;
-        this.nodeMap = elementRegistry; // TODO make the node map immutable when returned
+        this.nodeMap = nodeMap; // TODO make the node map immutable when returned
         this.proxyNodes = new Map();
         this.computedTreeOverlays = [];
         this._root = null;
