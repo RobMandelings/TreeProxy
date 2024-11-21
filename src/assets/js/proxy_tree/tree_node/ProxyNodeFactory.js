@@ -1,13 +1,13 @@
-import {DirectNodeAccessError, StaleProxyError} from "@pt/tree_node/TreeNodeErrors.js";
+import {DirectNodeAccessError, StaleProxyError} from "@pt/tree_node/ProxyNodeErrors.js";
 import {wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
-import {createCoreTreeNodeTarget} from "@pt/tree_node/core/coreTreeNode.js";
+import {createBaseProxyNode, createBaseProxyNodeTarget} from "@pt/tree_node/core/baseProxyNode.js";
 import {computed, isReactive, reactive, toRefs} from "vue";
 import {createCustomProxy} from "@pt/proxy_utils/CustomProxy.js";
 
 /**
  *
  */
-export class TreeNodeFactory {
+export class ProxyNodeFactory {
 
     _createProxyTarget(proxyTree, id, parentId) {
         throw new Error("Abstract method");
@@ -18,15 +18,7 @@ export class TreeNodeFactory {
      * Then checks in nodeRef.
      */
     __createBaseProxyNode(proxyTree, id, parentId) {
-        let target = createCoreTreeNodeTarget(proxyTree, id, parentId);
-        return createCustomProxy(target, {
-            get(t, prop, receiver) {
-                return wrappedProxyTargetGetter(t, t.nodeRef, prop, receiver);
-            },
-            set(t, prop, value, receiver) {
-                return Reflect.set(t.nodeRef, prop, value, receiver);
-            }
-        });
+        return createBaseProxyNode(proxyTree, id, parentId);
     }
 
     decorateProxyNode(proxyTree, proxyNode) {
@@ -76,7 +68,7 @@ export class TreeNodeFactory {
     }
 }
 
-class SimpleProxyNodeFactory extends TreeNodeFactory {
+class SimpleProxyNodeFactory extends ProxyNodeFactory {
 
     decorateProxyNode(proxyTree, proxyNode) {
         return {randomStuff: computed(() => proxyNode.children.size + proxyNode.name)};

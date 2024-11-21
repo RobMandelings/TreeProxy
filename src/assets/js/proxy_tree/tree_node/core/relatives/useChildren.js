@@ -1,13 +1,13 @@
 import {computed} from "vue";
 import {decorateWithFind, useRelatives} from "@pt/tree_node/core/relatives/useRelatives.js";
 
-export function useAddChild(rId, proxyTree) {
-    return (node, index = undefined) => proxyTree.addChild(rId.value, node, index)
+export function useAddChild(rId, tree) {
+    return (node, index = undefined) => tree.addChild(rId.value, node, index)
 }
 
-export function useChildren(rId, rChildrenIds, proxyTree) {
+export function useChildren(rId, rChildrenIds, tree) {
 
-    const rChildrenArray = computed(() => proxyTree.getChildren(rId.value));
+    const rChildrenArray = computed(() => tree.getChildren(rId.value));
     const rChildrenIdsAsArray = computed(() => rChildrenIds.value);
     const getChildrenIdsAsSet = () => new Set(rChildrenIdsAsArray.value);
     const nodeRelativesCore = useRelatives(() => rChildrenArray.value);

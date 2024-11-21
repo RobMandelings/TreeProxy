@@ -1,6 +1,7 @@
-# Computed copy
+# ProxyTree
 
-
+ProxyTree is a class that was previously called ProxyTree. So it might be that there are some references to ProxyTree. Just
+keep in mind that these two things are identical.
 
 # Vue Devtools compatibility
 

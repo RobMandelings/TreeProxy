@@ -1,9 +1,9 @@
 import {RefStore} from "@pt/ref_store/RefStore.js";
 import {NodeNotFoundError, RootNotSetError} from "@pt/tree/TreeErrors.js";
-import {IncorrectIndexError, UndefinedIndexError} from "@pt/tree_node/TreeNodeErrors.js";
-import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/tree_node/TreeNodeFactory.js";
+import {IncorrectIndexError, UndefinedIndexError} from "@pt/tree_node/ProxyNodeErrors.js";
+import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/tree_node/ProxyNodeFactory.js";
 
-export class Tree extends RefStore {
+export class ProxyTree extends RefStore {
 
     constructor(elementRegistry, treeNodeFactory) {
         super();

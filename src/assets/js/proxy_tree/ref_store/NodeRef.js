@@ -57,8 +57,7 @@ export function createNodeRef(nodeMap, rId, rNode) {
         nodeMap.set(rId.value, prop, value);
         return true;
     }
-
-    // TODO provide array support as well: childrenIds.push etc. Now you have to do careful assignment to not mess up
+    
     // References
     const getHandler = (t, prop, receiver) => {
         let res = wrappedProxyTargetGetter(t, t.__node__.value, prop, receiver)

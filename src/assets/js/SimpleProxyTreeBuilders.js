@@ -2,7 +2,7 @@ import {ComputedProxyTreeBuilder, SrcProxyTreeBuilder} from "@pt/tree/TreeBuilde
 import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {CustomNode} from "@pt/nodes/CustomNode.js";
 import {SourceTree} from "@pt/tree/SrcTree.js";
-import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/tree_node/TreeNodeFactory.js";
+import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/tree_node/ProxyNodeFactory.js";
 
 function parseJSONTreeRec(tree, map) {
     let childrenIds = (tree.children?.length) ? tree.children.map(c => parseJSONTreeRec(c, map)) : [];

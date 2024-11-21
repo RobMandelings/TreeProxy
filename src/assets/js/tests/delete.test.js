@@ -1,4 +1,4 @@
-import * as ProxyNodeErrors from "@pt/tree_node/TreeNodeErrors.js";
+import * as ProxyNodeErrors from "@pt/tree_node/ProxyNodeErrors.js";
 import {createTree} from "@pt/utils/TreeUtil.js";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 

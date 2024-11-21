@@ -3,6 +3,8 @@ import {useAddChild, useChildren} from "@pt/tree_node/core/relatives/useChildren
 import {useAncestors} from "@pt/tree_node/core/relatives/useAncestors.js";
 import {useDescendants} from "@pt/tree_node/core/relatives/useDescendants.js";
 import {useLeafs} from "@pt/tree_node/core/relatives/useLeafs.js";
+import {createCustomProxy} from "@pt/proxy_utils/CustomProxy.js";
+import {wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
 
 export function useDelete(proxyTree, rId) {
     const deleteFn = () => proxyTree.deleteElement(rId.value);
@@ -93,7 +95,8 @@ function usePos(proxyTree, rParent, rId) {
     return {rPos, rMaxPos, movePosFn}
 }
 
-export function createCoreTreeNodeTarget(proxyTree, id, parentId) {
+function createBaseProxyNodeTarget(proxyTree, id, parentId) {
+
 
     const nodeRef = proxyTree.nodeMap.createNodeRef(id);
 
@@ -167,4 +170,17 @@ export function createCoreTreeNodeTarget(proxyTree, id, parentId) {
     target.hasProp = (prop) => prop in target || target.nodeRef.hasProp(prop);
 
     return target;
+}
+
+
+export function createBaseProxyNode(proxyTree, id, parentId) {
+    let target = createBaseProxyNodeTarget(proxyTree, id, parentId);
+    return createCustomProxy(target, {
+        get(t, prop, receiver) {
+            return wrappedProxyTargetGetter(t, t.nodeRef, prop, receiver);
+        },
+        set(t, prop, value, receiver) {
+            return Reflect.set(t.nodeRef, prop, value, receiver);
+        }
+    });
 }

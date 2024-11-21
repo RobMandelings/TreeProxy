@@ -1,4 +1,4 @@
-import {Tree} from "@pt/tree/Tree.js";
+import {ProxyTree} from "@pt/tree/ProxyTree.js";
 import {OverlayRefStore} from "@pt/ref_store/overlay/OverlayRefStore.js";
 import {reactive} from "vue";
 import {useRecompute} from "@pt/tree/computed/useRecompute.js";
@@ -6,7 +6,7 @@ import {useRecompute} from "@pt/tree/computed/useRecompute.js";
 const excludedPropsCompTree = new Set(["_root", "isRecomputing", "_isRecomputingObj", "markDirty", "recomputeIfDirty", "markedForRecompute", "_isDirtyObj"]);
 const checkDirtyForProp = (prop) => !excludedPropsCompTree.has(prop);
 
-export class ComputedTree extends Tree {
+export class ComputedTree extends ProxyTree {
 
     constructor(srcTree,
                 state,
