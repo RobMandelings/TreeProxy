@@ -95,7 +95,7 @@ function usePos(proxyTree, rParent, rId) {
 
 export function createCoreProxyNodeTarget(proxyTree, id, parentId) {
 
-    const nodeRef = proxyTree.nodeMap.createRefProxy(id);
+    const nodeRef = proxyTree.nodeMap.createNodeRef(id);
 
     const rId = computed(() => nodeRef.id);
     const rStale = computed(() => nodeRef.stale || !proxyTree.getElement(id));

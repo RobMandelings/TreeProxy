@@ -19,6 +19,10 @@ export function findFn(t, str) {
     if (res !== undefined) return res;
 }
 
+/**
+ * Wraps the node relatives object in a proxy such that you can easily search on the object. This is the funcitionality
+ * that is added when you attempt to access relatives using .children["id"] or .children[index] for example.
+ */
 export function decorateWithFind(nodeRelatives, customFindFn = null) {
 
     return new Proxy(nodeRelatives, {
@@ -33,6 +37,10 @@ export function decorateWithFind(nodeRelatives, customFindFn = null) {
     });
 }
 
+/**
+ * Common functionality that is used by all relatives functionality. E.g. ancestors.asArray, descendants.asArray, children.asArray.
+ * param asArrayFn: function that returns an array of objects of the desired relatives. E.g. the ancestors of a node, the children of a node, ...
+ */
 export function useNodeRelatives(asArrayFn) {
 
     /**
