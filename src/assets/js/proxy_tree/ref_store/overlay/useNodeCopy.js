@@ -29,19 +29,32 @@ export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
     let copy;
     let prevChanges = {}; // Changes that were already applied to the copy
 
+    /**
+     * Returns true if a new copy of the source node should be made.
+     */
     const shouldMakeNewCopy = () => {
         if (rSrcNodeChanged.value) return true;  // If the source node has changed in any way, we need to invalidate the current copy
         else if (!copy && !isEmpty(rNodeChanges.value)) return true; // There is no copy but we should apply changes to the source node
         return false;
     }
 
+    /**
+     * Simply sets the values of prevChanges to be the currentChanges
+     * Need to make a shallow copy in order to not reference the same object. Otherwise if rNodeChanges is altered,
+     * then prevChanges will also reflect this change. We don't want that.
+     */
+    const updatePrevChanges = () => prevChanges = {...rNodeChanges.value};
+
+    /**
+     * Updates the copy objects to reflect the recent changes on the source node. Since the last computation,
+     * the changes might be different than before.
+     */
     const updateCopy = () => {
         const srcNode = rSrcNode.value;
         const curChanges = rNodeChanges.value;
         let changesToApply;
 
-        if (shouldMakeNewCopy()) // In this case we need to create a new copy and apply all changes again
-         {
+        if (shouldMakeNewCopy()) {// In this case we need to create a new copy and apply all changes again
             copy = reactive(srcNode.copy());
             changesToApply = curChanges; // It is a fresh copy, so we need to apply all changes that were tracked to this new copy
             rDepTracker.value.resetDirtyDeps();
@@ -51,7 +64,7 @@ export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
         }
 
         if (copy && !isEmpty(changesToApply)) applyChanges(copy, changesToApply);
-        prevChanges = {...curChanges};
+        updatePrevChanges();
     }
 
     const rCopy = computed(() => {
