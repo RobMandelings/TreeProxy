@@ -1,8 +1,8 @@
 import {computed, reactive, ref} from "vue";
-import {useAddChild, useChildren} from "@pt/proxy_node/useChildren.js";
-import {useAncestors} from "@pt/proxy_node/useAncestors.js";
-import {useDescendants} from "@pt/proxy_node/useDescendants.js";
-import {useLeafs} from "@pt/proxy_node/useLeafs.js";
+import {useAddChild, useChildren} from "@pt/tree_node/core/relatives/useChildren.js";
+import {useAncestors} from "@pt/tree_node/core/relatives/useAncestors.js";
+import {useDescendants} from "@pt/tree_node/core/relatives/useDescendants.js";
+import {useLeafs} from "@pt/tree_node/core/relatives/useLeafs.js";
 
 export function useDelete(proxyTree, rId) {
     const deleteFn = () => proxyTree.deleteElement(rId.value);

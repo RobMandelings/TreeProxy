@@ -1,8 +1,8 @@
-import {decorateWithFind, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
+import {decorateWithFind, useRelatives} from "@pt/tree_node/core/relatives/useRelatives.js";
 
 export function useLeafs(proxyTree, descendants) {
     const getLeafsAsArray = () => descendants.asArray.filter(d => d.isLeaf);
-    const nodeRelativesCore = useNodeRelatives(getLeafsAsArray);
+    const nodeRelativesCore = useRelatives(getLeafsAsArray);
 
     return decorateWithFind(nodeRelativesCore);
 }

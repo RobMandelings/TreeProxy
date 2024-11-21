@@ -1,12 +1,12 @@
-import {DirectNodeAccessError, StaleProxyError} from "@pt/proxy_node/ProxyNodeErrors.js";
+import {DirectNodeAccessError, StaleProxyError} from "@pt/tree_node/TreeNodeErrors.js";
 import {createCustomProxy, wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
-import {createCoreProxyNodeTarget} from "@pt/proxy_node/coreProxyNode.js";
+import {createCoreProxyNodeTarget} from "@pt/tree_node/core/coreTreeNode.js";
 import {computed, isReactive, reactive, toRefs} from "vue";
 
 /**
  *
  */
-export class ProxyNodeFactory {
+export class TreeNodeFactory {
 
     _createProxyTarget(proxyTree, id, parentId) {
         throw new Error("Abstract method");
@@ -75,7 +75,7 @@ export class ProxyNodeFactory {
     }
 }
 
-class SimpleProxyNodeFactory extends ProxyNodeFactory {
+class SimpleProxyNodeFactory extends TreeNodeFactory {
 
     decorateProxyNode(proxyTree, proxyNode) {
         return {randomStuff: computed(() => proxyNode.children.size + proxyNode.name)};

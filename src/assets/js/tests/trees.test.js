@@ -1,6 +1,6 @@
 import {SourceTree} from "@pt/tree/SrcTree.js";
-import * as ProxyNodeErrors from "@pt/proxy_node/ProxyNodeErrors.js"
-import * as ProxyTreeErrors from "@pt/tree/ProxyTreeErrors.js"
+import * as ProxyNodeErrors from "@pt/tree_node/TreeNodeErrors.js"
+import * as ProxyTreeErrors from "@pt/tree/TreeErrors.js"
 import {nextTick, watch} from "vue";
 import {createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 

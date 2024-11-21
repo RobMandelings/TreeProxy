@@ -41,7 +41,7 @@ export function decorateWithFind(nodeRelatives, customFindFn = null) {
  * Common functionality that is used by all relatives functionality. E.g. ancestors.asArray, descendants.asArray, children.asArray.
  * param asArrayFn: function that returns an array of objects of the desired relatives. E.g. the ancestors of a node, the children of a node, ...
  */
-export function useNodeRelatives(asArrayFn) {
+export function useRelatives(asArrayFn) {
 
     /**
      * E.g. has(Vakonderdeel)

@@ -1,4 +1,4 @@
-import {decorateWithFind, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
+import {decorateWithFind, findById, useRelatives} from "@pt/tree_node/core/relatives/useRelatives.js";
 
 export function useDescendants(proxyTree, children, rId) {
     
@@ -7,7 +7,7 @@ export function useDescendants(proxyTree, children, rId) {
         const descendants = [...children.asArray.flatMap(c => [c, ...c.descendants.asArray])];
         return [...descendants];
     }
-    const nodeRelativesCore = useNodeRelatives(getDescendantsAsArray);
+    const nodeRelativesCore = useRelatives(getDescendantsAsArray);
 
     const decorateDescendants = (descendants) => {
         const getDescendantFromPath = (posPath) => {

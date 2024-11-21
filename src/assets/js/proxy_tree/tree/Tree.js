@@ -1,13 +1,13 @@
 import {RefStore} from "@pt/ref_store/RefStore.js";
-import {NodeNotFoundError, RootNotSetError} from "@pt/tree/ProxyTreeErrors.js";
-import {IncorrectIndexError, UndefinedIndexError} from "@pt/proxy_node/ProxyNodeErrors.js";
-import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/proxy_node/ProxyNodeFactory.js";
+import {NodeNotFoundError, RootNotSetError} from "@pt/tree/TreeErrors.js";
+import {IncorrectIndexError, UndefinedIndexError} from "@pt/tree_node/TreeNodeErrors.js";
+import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/tree_node/TreeNodeFactory.js";
 
-export class ProxyTree extends RefStore {
+export class Tree extends RefStore {
 
-    constructor(elementRegistry, proxyNodeFactory) {
+    constructor(elementRegistry, treeNodeFactory) {
         super();
-        this.proxyNodeFactory = proxyNodeFactory;
+        this.proxyNodeFactory = treeNodeFactory;
         this.nodeMap = elementRegistry; // TODO make the node map immutable when returned
         this.proxyNodes = new Map();
         this.computedTreeOverlays = [];

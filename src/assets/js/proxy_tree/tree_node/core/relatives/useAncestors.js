@@ -1,4 +1,4 @@
-import {decorateWithFind, findById, useNodeRelatives} from "@pt/proxy_node/nodeRelatives.js";
+import {decorateWithFind, findById, useRelatives} from "@pt/tree_node/core/relatives/useRelatives.js";
 
 export function useAncestors(rParent) {
 
@@ -9,7 +9,7 @@ export function useAncestors(rParent) {
         return [parent, ...parent.ancestors.asArray];
     }
 
-    const nodeRelativesCore = useNodeRelatives(getAncestorsAsArrayFn)
+    const nodeRelativesCore = useRelatives(getAncestorsAsArrayFn)
 
     const ancestorsObj = Object.create(
         Object.getPrototypeOf(nodeRelativesCore),

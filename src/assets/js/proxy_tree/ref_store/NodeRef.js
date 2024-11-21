@@ -8,7 +8,12 @@ import {
 
 import {deepGet} from "@pt/utils/deepObjectUtil.js";
 
-function createdNestedRefProxy(nodeMap, rNode, rId, targetPath) {
+/**
+ * NodeRef for nested properties. E.g. node.gui is a nested property, but when you set node.gui.style = "" for example,
+ * you want the change to be handled by the NodeMap and not the gui object itself. Without this nested node ref, setting node.gui.style to another value
+ * would always alter the style property of the original gui object. In overlay nodes, we want to leave the original object intact.
+ */
+function createNestedNodeRef(nodeMap, rNode, rId, targetPath) {
 
     /*
     We cannot use static targets because rNode might change
@@ -22,7 +27,7 @@ function createdNestedRefProxy(nodeMap, rNode, rId, targetPath) {
             const res = reactiveReflectGet(rTarget.value, p, receiver);
             if (typeof res === 'object' && res != null && !(res instanceof Array)) {
                 targetPath += `.${p}`;
-                return createdNestedRefProxy(nodeMap, rNode, rId, targetPath);
+                return createNestedNodeRef(nodeMap, rNode, rId, targetPath);
             }
             return res;
         },
@@ -62,7 +67,7 @@ export function createNodeRef(nodeMap, rId, rNode) {
             && !(res instanceof Array)
             && !(res == null)
             && !(res === t.__node__) // Don't wrap the node object in a proxy. If it is explicitly retrieved, then raw access is meant.
-        ) res = createdNestedRefProxy(nodeMap, rNode, rId, prop);
+        ) res = createNestedNodeRef(nodeMap, rNode, rId, prop);
         return res;
     }
 

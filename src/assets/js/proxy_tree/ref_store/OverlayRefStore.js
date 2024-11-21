@@ -11,7 +11,7 @@ import {
     deepSet
 } from "@pt/utils/deepObjectUtil.js";
 import {ChangeUnit, deepGetChangesToApply, setChange, wrapInChangeUnitIfRequired} from "@pt/ref_store/ChangeUnit.js";
-import {createNodeRef} from "@pt/ref_store/NodeProxy.js";
+import {createNodeRef} from "@pt/ref_store/NodeRef.js";
 
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 

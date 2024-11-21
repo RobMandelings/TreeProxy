@@ -42,6 +42,12 @@ function checkDeps(deps) {
     });
 }
 
+/**
+ * Function to help track reactive vue dependencies. Used for creating custom computed properties that are more sophisticated
+ * than the built-in computed props. E.g. for computed trees.
+ *
+ * Also used to check whether the tree should execute its recompute function.
+ */
 export function trackDependencies(depsArray) {
 
     const hasDirtyDeps = ref(false);
