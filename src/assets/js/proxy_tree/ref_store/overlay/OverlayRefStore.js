@@ -10,57 +10,15 @@ import {
     deepGet,
     deepSet
 } from "@pt/utils/deepObjectUtil.js";
-import {ChangeUnit, deepGetChangesToApply, setChange, wrapInChangeUnitIfRequired} from "@pt/ref_store/overlay/ChangeUnit.js";
+import {
+    ChangeUnit,
+    deepGetChangesToApply,
+    setChange,
+    wrapInChangeUnitIfRequired
+} from "@pt/ref_store/overlay/ChangeUnit.js";
 import {createNodeRef} from "@pt/ref_store/NodeRef.js";
+import {useOverlayNode} from "@pt/ref_store/overlay/useOverlayNode.js";
 
-function useOverlayNode(nodeChanges, srcNodeMap, rId) {
-
-    let prevChanges = {};
-    let srcNodeChanged = false;
-    let initial = true;
-    const rSrcNode = computed(() => {
-        if (initial) initial = false;
-        else srcNodeChanged = true;
-        const srcNode = srcNodeMap.getElement(rId.value);
-
-        // This one is essential to make the computed prop reactive on deep changes
-        // It seems like it does nothing, but this makes sure that the computed prop is recalled whenever any of the properties in the srcNode changes
-        // E.g. name change, weight change, or anything else. This will indirectly invalidate the copy of the overlay node.
-        Object.values(srcNode);
-        return srcNode;
-    });
-
-    let copy;
-    const rNodeChanges = computed(() => nodeChanges.get(rId.value) ?? {});
-
-    // TODO future optimisation: when the srcNode originates from another computed layer,
-    // instead of copying the entire node again we can simply get the changes from the previous layer and apply them recursively.
-    // E.g. via function getTotalChanges() or something. Then we only have to copy once and then use that copy
-    const rCopy = computed(() => {
-        const srcNode = rSrcNode.value;
-        const curChanges = rNodeChanges.value;
-        let changesToApply;
-        if (srcNodeChanged || (!copy && Object.keys(curChanges).length)) { // In this case we need to create a new copy and apply all changes again
-            copy = reactive(srcNode.copy());
-            changesToApply = curChanges; // Don't use prevChanges as it is a new copy
-            srcNodeChanged = false;
-        } else {
-            // Compute the changes that should be applied based on current and prev changes.
-            changesToApply = deepGetChangesToApply(prevChanges, curChanges, srcNode);
-        }
-
-        const deep = deepGetChangesToApply(prevChanges, curChanges, srcNode);
-
-        if (copy && Object.keys(changesToApply).length) applyChanges(copy, changesToApply);
-        prevChanges = {...curChanges};
-
-        if (copy && Object.keys(curChanges).length) return copy; // For consistency we only return the overwritten node if it actually has to be overwritten
-        else return null; // If the copy is identical to the src node or if there is no copy
-    });
-
-    return {rCopy};
-
-}
 
 /**
  * Goal of the overlay ref store is to provide a mapping between the id and a node object. Whether or not the node object
@@ -139,6 +97,15 @@ export class OverlayRefStore extends RefStore {
         throw new Error("Not implemented");
     }
 
+    /**
+     * Sets the property value of a node with id nodeId. In the overlayNodeMap,
+     * the change is not directly applied to the node, but the changes are kept in the elementChanges variable.
+     * Then we can use the elementChanges variable to apply the changes to a copy of the source node such that it has
+     * the correct values (see useOverlayNode)
+     * @param nodeId
+     * @param prop
+     * @param val
+     */
     set(nodeId, prop, val) {
 
         // TODO we did not yet check for object equalities (only primitives)

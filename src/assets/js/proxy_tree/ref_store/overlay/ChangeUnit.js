@@ -26,7 +26,12 @@ export function setChange(obj, path, value) {
     deepSet(obj, path, wrapInChangeUnitIfRequired(value));
 }
 
-// TODO should not allow changes to be set when it is not part of the interface (use TypeScript!)
+/**
+ * E.g. prevChanges = {a: 1}
+ * param prevChanges: these changes were applied to the copied node
+ * param curChanges: all changes that should be applied on the src node to get to the node copy
+ * param srcNode: the original node with all it's original properties
+ */
 export function deepGetChangesToApply(prevChanges, curChanges, srcNode) {
     const changesToApply = {};
 
