@@ -1,4 +1,4 @@
-import {RefStore} from "@pt/ref_store/RefStore.js";
+import {RefStore} from "@pt/node_ref/RefStore.js";
 import {NodeNotFoundError, RootNotSetError} from "@pt/tree/TreeErrors.js";
 import {IncorrectIndexError, UndefinedIndexError} from "@pt/tree_node/ProxyNodeErrors.js";
 import {SIMPLE_PROXY_NODE_FACTORY} from "@pt/tree_node/ProxyNodeFactory.js";

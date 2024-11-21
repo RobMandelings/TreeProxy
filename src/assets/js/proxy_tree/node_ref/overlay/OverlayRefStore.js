@@ -1,7 +1,7 @@
 import * as Utils from "@pt/utils/util.js";
-import {RefStore} from "@pt/ref_store/RefStore.js";
+import {RefStore} from "@pt/node_ref/RefStore.js";
 import {computed, reactive, ref} from "vue";
-import {OverlayType} from "@pt/ref_store/overlay/OverlayType.js";
+import {OverlayType} from "@pt/node_ref/overlay/OverlayType.js";
 import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {
     applyChanges,
@@ -15,9 +15,9 @@ import {
     deepGetChangesToApply,
     setChange,
     wrapInChangeUnitIfRequired
-} from "@pt/ref_store/overlay/ChangeUnit.js";
-import {createNodeRef} from "@pt/ref_store/NodeRef.js";
-import {useNodeCopy} from "@pt/ref_store/overlay/useNodeCopy.js";
+} from "@pt/node_ref/overlay/ChangeUnit.js";
+import {createNodeRef} from "@pt/node_ref/NodeRef.js";
+import {useNodeCopy} from "@pt/node_ref/overlay/useNodeCopy.js";
 
 
 /**
