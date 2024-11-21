@@ -3,6 +3,7 @@ import {wrappedProxyTargetGetter} from "@pt/proxy_utils/ProxyUtils.js";
 import {createBaseProxyNode, createBaseProxyNodeTarget} from "@pt/tree_node/core/baseProxyNode.js";
 import {computed, isReactive, reactive, toRefs} from "vue";
 import {createCustomProxy} from "@pt/proxy_utils/CustomProxy.js";
+import {createFullProxyNode} from "@pt/tree_node/fullProxyNode.js";
 
 /**
  *
@@ -21,38 +22,19 @@ export class ProxyNodeFactory {
         return createBaseProxyNode(proxyTree, id, parentId);
     }
 
-    decorateProxyNode(proxyTree, proxyNode) {
+    /**
+     * Add extra functionality to the proxy node that is not in the base version.
+     *
+     * E.g. for the grade system this means adding validEditModes, canAddTest, canAddVakonderdeel etc etc.
+     */
+    getDecoratedFunctionality(proxyTree, proxyNode) {
         return {};
     }
 
     _createProxyNode(proxyTree, id, parentId, beforeGetFn) {
-
         const proxyNode = this.__createBaseProxyNode(proxyTree, id, parentId);
-        const decoratedFunctionality = this.decorateProxyNode(proxyTree, proxyNode);
-
-        const target = {__base__: proxyNode, __decorated__: decoratedFunctionality};
-
-        const handler = {
-            get: (t, prop, receiver) => {
-                if (beforeGetFn) beforeGetFn(t, prop, receiver);
-
-                if (prop === "node") throw new DirectNodeAccessError();
-                else if (prop === "stale") return proxyNode.stale;
-                else if (proxyNode.stale) {
-                    if (prop === "toJSON") return {msg: "This proxy is stale"};
-                    else throw new StaleProxyError();
-                }
-
-                return wrappedProxyTargetGetter(t.__decorated__, t.__base__, prop, receiver);
-            },
-            set: (t, prop, value, receiver) => {
-                const success = Reflect.set(t.__base__, prop, value, receiver);
-                if (success) proxyTree.markOverlaysDirty();
-                return success;
-            }
-        }
-
-        return new createCustomProxy(target, handler, {name: "ProxyNode"});
+        const decoratedFunctionality = this.getDecoratedFunctionality(proxyTree, proxyNode);
+        return createFullProxyNode(proxyNode, decoratedFunctionality, proxyTree, beforeGetFn);
     }
 
     createSrcProxyNode(srcProxyTree, id, parentId) {
@@ -70,8 +52,8 @@ export class ProxyNodeFactory {
 
 class SimpleProxyNodeFactory extends ProxyNodeFactory {
 
-    decorateProxyNode(proxyTree, proxyNode) {
-        return {randomStuff: computed(() => proxyNode.children.size + proxyNode.name)};
+    getDecoratedFunctionality(proxyTree, proxyNode) {
+        return {};
     }
 }
 
