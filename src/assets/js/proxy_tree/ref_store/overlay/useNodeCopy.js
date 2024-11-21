@@ -1,6 +1,7 @@
 import {computed, reactive} from "vue";
 import {deepGetChangesToApply} from "@pt/ref_store/overlay/ChangeUnit.js";
 import {applyChanges} from "@pt/utils/deepObjectUtil.js";
+import {useDepTracking} from "@pt/utils/useDepTracking.js";
 
 /**
  * Creates a computed property that represents the copied source node (with applied changes).
@@ -10,8 +11,6 @@ export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
     let prevChanges = {};
     let srcNodeChanged = false;
     let initial = true;
-
-
 
     const rSrcNode = computed(() => {
         if (initial) initial = false;
