@@ -57,7 +57,7 @@ export function createNodeRef(nodeMap, rId, rNode) {
         nodeMap.set(rId.value, prop, value);
         return true;
     }
-    
+
     // References
     const getHandler = (t, prop, receiver) => {
         let res = wrappedProxyTargetGetter(t, t.__node__.value, prop, receiver)
@@ -72,5 +72,5 @@ export function createNodeRef(nodeMap, rId, rNode) {
     return createCustomProxy(targetObj, {
         get: getHandler,
         set: setHandler
-    });
+    }, {name: `Node Ref for id ${rId.value}`});
 }

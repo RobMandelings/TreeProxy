@@ -61,17 +61,10 @@ export class OverlayRefStore extends RefStore {
 
     createNodeRef(id) {
         const rId = ref(id);
-
-        let rNode;
-
-        // We don't need to a copy of the previous layer as the element was added on this layer.
-        // Any adjustments directly apply to the element on this layer
-        if (this.addedElements.has(id)) rNode = computed(() => this.addedElements.get(id));
-        else {
-            const {rCopy} = useNodeCopy(this.elementChanges, this.srcElementMap, rId);
-            rNode = computed(() => this.getElement(rId.value));
-            this.overlayElements[rId.value] = rCopy;
-        }
+        
+        const {rCopy} = useNodeCopy(this.elementChanges, this.srcElementMap, rId);
+        this.overlayElements[rId.value] = rCopy;
+        const rNode = computed(() => this.getElement(rId.value));
 
         return createNodeRef(this, rId, rNode);
     }
@@ -129,6 +122,7 @@ export class OverlayRefStore extends RefStore {
                     this.elementChanges.set(nodeId, {});
                 }
                 setChange(this.elementChanges.get(nodeId), prop, val);
+                console.log("");
             }
         }
     }
