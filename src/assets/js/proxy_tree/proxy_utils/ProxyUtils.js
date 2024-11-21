@@ -19,6 +19,9 @@ function getExcludeProperties(obj) {
     return Array.from(properties);
 }
 
+/**
+ * Sometimes the get trap is accessed for properties like __v_isReactive, __v_raw (properties that exist on a reactive proxy)
+ */
 export function useShouldExcludeProperty(target) {
     const excludeProps = getExcludeProperties(target);
     return (prop) => {

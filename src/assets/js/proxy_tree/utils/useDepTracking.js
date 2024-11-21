@@ -34,16 +34,21 @@ export function computedEffect(effectFn) {
     return run;
 }
 
-function checkDeps(deps) {
-    deps.forEach(d => {
-        const res = d.target[d.prop];
+function checkDep(dep) {
+    if (typeof dep === 'function') dep();
+    else if (typeof dep === 'object') {
+        const res = dep.target[dep.prop];
         if (!isRef(res) && !isReactive(d.target))
-            throw new Error(`Cannot check dependency '${d.prop}': 
+            throw new Error(`Cannot check dependency '${dep.prop}': 
             target is not reactive target.prop is not a ref`);
 
         if (isRef(res)) return res.value;
         return res;
-    });
+    } else throw new Error(`Cannot track dependency: incorrect type ${typeof dep}`);
+}
+
+function checkDeps(deps) {
+    deps.forEach(d => checkDep(d));
 }
 
 
@@ -67,12 +72,12 @@ function checkDeps(deps) {
  * TODO 1: deep tracking of a reactive dependency: all properties within that dependency and all nested levels of that property should be tracked deeply as well.
  * It would be great if you could do useDepTracking(reactiveDep) and see whether anything in that reactive object has changed, and act accordingly.
  */
-export function useDepTracking(depsArray) {
+export function useDepTracking(deps) {
 
     const hasDirtyDeps = ref(false);
     const effect = computedEffect((initial) => {
         console.log("Effect function called");
-        checkDeps(depsArray)
+        checkDeps(deps)
         if (!initial) hasDirtyDeps.value = true;
     });
 
