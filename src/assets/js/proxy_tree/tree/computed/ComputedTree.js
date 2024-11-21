@@ -1,5 +1,5 @@
 import {ProxyTree} from "@pt/tree/ProxyTree.js";
-import {OverlayRefStore} from "@pt/node_map/OverlayRefStore.js";
+import {OverlayRefStore} from "@pt/ref_store/OverlayRefStore.js";
 import {reactive} from "vue";
 import {useShouldExcludeProperty} from "@pt/proxy_utils/ProxyUtils.js";
 import {useRecompute} from "@pt/tree/computed/useRecompute.js";

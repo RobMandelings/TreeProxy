@@ -10,7 +10,7 @@ import {
     deepSet
 } from "@pt/utils/deepObjectUtil.js";
 import {isEmpty} from "@pt/proxy_utils/Utils.js";
-import {ChangeUnit, deepGetChangesToApply, unwrapChangeUnits} from "@pt/node_map/ChangeUnit.js";
+import {ChangeUnit, deepGetChangesToApply, unwrapChangeUnits} from "@pt/ref_store/ChangeUnit.js";
 
 const getUnwrappedDeepChanges = (prev, cur, src) => {
     return unwrapChangeUnits(deepGetChangesToApply(prev, cur, src));

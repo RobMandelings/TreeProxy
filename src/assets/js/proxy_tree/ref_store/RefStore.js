@@ -7,7 +7,9 @@ class NodeNotExistsError extends Error {
 }
 
 /**
- * The purpose of the ref store is to maintain references to node objects via their id.
+ * The purpose of the ref store is to maintain references to objects via their id.
+ * And to provide a centralised way of setting node properties and getting nodes. This allows for abstracting complexity,
+ * such as when a copy needs to be made when a property of an object has changed.
  */
 export class RefStore {
     constructor() {
@@ -29,7 +31,7 @@ export class RefStore {
         throw new Error("Abstract method");
     }
 
-    createRefProxy(initialId) {
+    createNodeRef(initialId) {
         throw new Error("Abstract method");
     }
 

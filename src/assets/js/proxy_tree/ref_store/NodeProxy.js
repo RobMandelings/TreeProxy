@@ -37,7 +37,7 @@ function createdNestedRefProxy(nodeMap, rNode, rId, targetPath) {
  * rNode: ref to the current node (with id). A ref is used such that the underlying reference can be changed dynamically.
  * This is essential for computed trees, as computed nodes reference a copied version if altered, and otherwise reference the source node version
  */
-export function createRefProxy(nodeMap, rId, rNode) {
+export function createNodeRef(nodeMap, rId, rNode) {
 
     const nodeInstanceOf = (instType) => rNode.value instanceof instType;
 

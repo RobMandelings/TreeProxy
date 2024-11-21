@@ -1,8 +1,8 @@
 import * as Utils from "@pt/proxy_utils/Utils.js";
-import {RefStore} from "@pt/node_map/RefStore.js";
+import {RefStore} from "@pt/ref_store/RefStore.js";
 import {computed, reactive, ref} from "vue";
-import * as RefProxy from "@pt/node_map/RefProxy.js";
-import {OverlayType} from "@pt/node_map/OverlayType.js";
+import * as RefProxy from "@pt/ref_store/RefProxy.js";
+import {OverlayType} from "@pt/ref_store/OverlayType.js";
 import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {
     applyChanges,
@@ -11,7 +11,7 @@ import {
     deepGet,
     deepSet
 } from "@pt/utils/deepObjectUtil.js";
-import {ChangeUnit, deepGetChangesToApply, setChange, wrapInChangeUnitIfRequired} from "@pt/node_map/ChangeUnit.js";
+import {ChangeUnit, deepGetChangesToApply, setChange, wrapInChangeUnitIfRequired} from "@pt/ref_store/ChangeUnit.js";
 
 function useOverlayNode(nodeChanges, srcNodeMap, rId) {
 
@@ -101,7 +101,7 @@ export class OverlayRefStore extends RefStore {
         return deepGet(this.elementChanges.get(id), prop);
     }
 
-    createRefProxy(id) {
+    createNodeRef(id) {
         const rId = ref(id);
 
         let rNode;

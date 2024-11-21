@@ -1,9 +1,9 @@
-import {RefStore} from "@pt/node_map/RefStore.js";
+import {RefStore} from "@pt/ref_store/RefStore.js";
 import {computed, ref} from "vue";
-import * as RefProxy from "@pt/node_map/RefProxy.js"
-import {OverlayType} from "@pt/node_map/OverlayType.js";
+import {OverlayType} from "@pt/ref_store/OverlayType.js";
 import {CoreNode} from "@pt/nodes/CoreNode.js";
 import {deepGet, deepSet} from "@pt/utils/deepObjectUtil.js";
+import {createNodeRef} from "@pt/ref_store/NodeProxy.js";
 
 export class SrcRefStore extends RefStore {
 
@@ -30,10 +30,10 @@ export class SrcRefStore extends RefStore {
         return deepGet(n, prop);
     }
 
-    createRefProxy(initialId) {
+    createNodeRef(initialId) {
         const rId = ref(initialId);
         const rNode = computed(() => this.getElement(rId.value));
-        return RefProxy.createRefProxy(this, rId, rNode);
+        return createNodeRef(this, rId, rNode);
     }
 
     _addElement(node) {

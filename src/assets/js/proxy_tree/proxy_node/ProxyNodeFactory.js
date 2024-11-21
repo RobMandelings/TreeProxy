@@ -4,7 +4,7 @@ import {createCoreProxyNodeTarget} from "@pt/proxy_node/coreProxyNode.js";
 import {computed, isReactive, reactive, toRefs} from "vue";
 
 /**
- * TODO use TypeScript to add typing to the returned objects (e.g. what properties are available etc)
+ *
  */
 export class ProxyNodeFactory {
 

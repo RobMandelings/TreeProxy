@@ -1,6 +1,6 @@
 import {ProxyTree} from "@pt/tree/ProxyTree.js";
 import {reactive} from "vue";
-import {SrcRefStore} from "@pt/node_map/SrcRefStore.js";
+import {SrcRefStore} from "@pt/ref_store/SrcRefStore.js";
 
 export class SourceTree extends ProxyTree {
 
