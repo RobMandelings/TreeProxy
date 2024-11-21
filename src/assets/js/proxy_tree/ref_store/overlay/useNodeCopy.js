@@ -9,12 +9,13 @@ import {isEmpty} from "@pt/proxy_utils/Utils.js";
  */
 export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
 
-    const rDepTracker = computed(() => {
-        // This one is essential to make the computed prop reactive on deep changes
-        // It seems like it does nothing, but this makes sure that the computed prop is recalled whenever any of the properties in the srcNode changes
-        // E.g. name change, weight change, or anything else. This will indirectly invalidate the copy of the overlay node.
-        return useDepTracking([() => Object.values(rSrcNode.value)]);
-    })
+    /**
+     * Tracks changes on the srcNode. This is required as we need to invalidate the copy when any of the dependencies
+     * of the source node change.
+     *
+     * TODO: currently, the source node
+     */
+    const rDepTracker = computed(() => useDepTracking([() => Object.values(rSrcNode.value)]));
     const rSrcNodeChanged = computed(() => rDepTracker.value.hasDirtyDeps());
     const rSrcNode = computed(() => srcNodeMap.getElement(rId.value));
 
@@ -27,13 +28,20 @@ export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
      */
     let copy;
     let prevChanges = {}; // Changes that were already applied to the copy
+
+    const shouldMakeNewCopy = () => {
+        if (rSrcNodeChanged.value) return true;  // If the source node has changed in any way, we need to invalidate the current copy
+        else if (!copy && !isEmpty(rNodeChanges.value)) return true; // There is no copy but we should apply changes to the source node
+        return false;
+    }
+
     const updateCopy = () => {
         const srcNode = rSrcNode.value;
         const curChanges = rNodeChanges.value;
         let changesToApply;
-        if (rSrcNodeChanged.value || // If the source node has changed in any way, we need to invalidate the current copy
-            (!copy && !isEmpty(curChanges)) // In this case we need to create a new copy and apply all changes again
-        ) {
+
+        if (shouldMakeNewCopy()) // In this case we need to create a new copy and apply all changes again
+         {
             copy = reactive(srcNode.copy());
             changesToApply = curChanges; // It is a fresh copy, so we need to apply all changes that were tracked to this new copy
             rDepTracker.value.resetDirtyDeps();
