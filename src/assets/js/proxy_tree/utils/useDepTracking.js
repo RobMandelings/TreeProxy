@@ -1,4 +1,5 @@
 import {computed, isReactive, isRef, ref, watch} from "vue";
+import {isNonNullObject} from "@pt/utils/deepObjectUtil.js";
 
 /**
  * Creates a function that only re-runs whenever one of the dependencies have changed.
@@ -39,7 +40,7 @@ function isValidDep(dep) {
         || dep instanceof Array
         || isRef(dep)
         || isReactive(dep)
-        || (typeof dep === "object" && ("target" in dep && "prop" in dep))) return true;
+        || (isNonNullObject(dep) && ("target" in dep && "prop" in dep))) return true;
     return false;
 }
 
@@ -55,7 +56,7 @@ function checkDep(dep) {
      (or perhaps others that are not mentioned here)`);
 
     if (typeof dep === 'function') dep();
-    else if (dep instanceof Array) dep.forEach(d => isValidDep(dep) && checkDep(d));
+    else if (dep instanceof Array) dep.forEach(d => isValidDep(d) && checkDep(d));
     else if (isRef(dep)) return dep.value;
     else if (isReactive(dep)) {
         Object.values(dep).forEach(d => isValidDep(d) && checkDep(d))

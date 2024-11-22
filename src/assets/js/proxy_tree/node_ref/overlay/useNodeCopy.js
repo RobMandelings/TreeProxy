@@ -18,7 +18,7 @@ export function useNodeCopy(nodeChanges, srcNodeMap, rId) {
      *
      * TODO: currently, the source node
      */
-    const rDepTracker = computed(() => useDepTracking([() => Object.values(rSrcNode.value)]));
+    const rDepTracker = computed(() => useDepTracking(rSrcNode.value));
     const rSrcNodeChanged = computed(() => rDepTracker.value.hasDirtyDeps());
 
     /**

@@ -10,6 +10,9 @@ import {deepGet, deepSet, isNonNullObject} from "@pt/utils/deepObjectUtil.js";
  * Or if style is currently set to be an instance of another class, it might not have the property "background" for example, and therefore crash upon trying to set background to "yellow".
  *
  * If the element on which the changes are applied has for example .gui.style = null, then it will try to assign .gui.null.color, .gui.null.background, which will raise errors.
+ *
+ * E.g. changesToApply: { gui: { style: ChangeUnit({color: "green", background: "yellow"}) } }. The entire object inside the ChangeUnit will be applied at once, instead of trying to apply more granular changes.
+ * Suppose 'style' is from a class that only has a background color property for example, then not having the ChangeUnit might try to apply "color" to a nonexistent property, leading to errors.
  */
 export class ChangeUnit {
     constructor(value) {
