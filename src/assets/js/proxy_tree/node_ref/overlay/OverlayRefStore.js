@@ -77,6 +77,7 @@ export class OverlayRefStore extends RefStore {
      * Synchronise all changes with the source ref store.
      */
     syncSrc() {
+        this.srcElementMap.synchronise(this.elementChanges);
     }
 
     _addElement(node) {

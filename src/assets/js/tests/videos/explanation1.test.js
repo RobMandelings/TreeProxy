@@ -1,6 +1,7 @@
 import {createComputedTree, createSourceTree} from "@/SimpleProxyTreeBuilders.js";
 import {createEmptyCompTree} from "@/tests/trees.js";
 import {ref} from "vue";
+import {useTest} from "@pt/useTest.js";
 
 let srcTree, compTree;
 beforeEach(() => {
@@ -15,7 +16,7 @@ test('', () => {
 
     const srcChild = srcTree.root.children[0];
     const compChild = srcTree.root.children[1]
-})
+});
 
 test('', () => {
 
@@ -34,5 +35,12 @@ test('', () => {
     console.log(compTree.root.name);
     rCount.value++;
     console.log(compTree.root.name);
-    
+
+})
+
+test('Another watch effect', () => {
+
+    const rCount = ref(0);
+    useTest(rCount);
+
 })
